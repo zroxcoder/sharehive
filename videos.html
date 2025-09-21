@@ -89,7 +89,13 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .video h3 { margin-bottom: 8px; font-size: 16px; }
-    .video a { color: var(--primary-color); text-decoration: none; }
+    .video a {
+      color: var(--primary-color);
+      text-decoration: none;
+      word-break: break-all;      /* Break long URLs */
+      overflow-wrap: anywhere;    /* Allow wrapping */
+      display: block;             /* Optional: makes wrapping more reliable */
+    }
     .actions { display: flex; gap: 8px; margin-top: 10px; }
     .video button {
       border: none; padding: 5px 8px;
