@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Projects</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: var(--bg-color); color: var(--text-color); transition: 0.3s; }
+    :root {
+      --bg-color: #ffffff; --text-color: #222;
+      --primary-color: #0077ff; --sidebar-bg: #f4f4f4; --card-bg: #f8f8f8;
+    }
+    body.dark {
+      --bg-color: #1e1e1e; --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c; --card-bg: #333333;
+    }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color);
+      padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; padding: 8px 10px; margin-bottom: 5px;
+      text-decoration: none; color: var(--text-color); border-radius: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .form input, .form textarea, .form select {
+      padding: 8px; border: 1px solid #ccc; border-radius: 5px;
+      background: var(--card-bg); color: var(--text-color);
+    }
+    .form button {
+      padding: 8px; border: none; background: var(--primary-color);
+      color: white; border-radius: 5px; cursor: pointer; font-weight: bold;
+    }
+
+    .search-box { margin-bottom: 15px; }
+    .search-box input { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+
+    .projects-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 15px; }
+    .project {
+      background: var(--card-bg); padding: 15px; border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .project h3 { margin-bottom: 6px; font-size: 16px; }
+    .progress-bar { height: 6px; background: #ddd; border-radius: 3px; margin: 8px 0; }
+    .progress { height: 100%; background: var(--primary-color); border-radius: 3px; }
+
+    .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .project button { padding: 4px 6px; font-size: 12px; border: none; border-radius: 5px; cursor: pointer; }
+    .edit { background: #4caf50; color: white; }
+    .delete { background: #f44336; color: white; }
+    .pin { background: gold; }
+    .subtasks { margin-top: 8px; }
+    .subtasks li { list-style: none; display: flex; align-items: center; gap: 5px; }
+    .subtasks input[type="checkbox"] { cursor: pointer; }
+
+    /* Kanban */
+    .kanban { display: flex; gap: 15px; margin-top: 20px; }
+    .kanban-column {
+      flex: 1; background: var(--card-bg); border-radius: 10px; padding: 10px;
+      min-height: 300px;
+    }
+    .kanban-column h3 { text-align: center; margin-bottom: 10px; }
+    .kanban-project { background: white; color: black; margin: 5px 0; padding: 6px;
+      border-radius: 5px; cursor: grab; }
+
+    /* Gantt */
+    .gantt { margin-top: 20px; overflow-x: auto; }
+    .gantt-table { width: 100%; border-collapse: collapse; }
+    .gantt-table th, .gantt-table td {
+      border: 1px solid #ccc; padding: 6px; text-align: left;
+    }
+    .timeline { height: 20px; background: var(--primary-color); border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🐝 ShareHive - Projects</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Videos</a>
+      <a href="todo.html">✅ To-Do</a>
+      <a href="expense.html">💰 Expenses</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Uploads</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Add Project</h2>
+      <div class="form">
+        <input type="text" id="title" placeholder="Project title">
+        <textarea id="desc" placeholder="Description"></textarea>
+        <label>Start Date <input type="date" id="start"></label>
+        <label>Due Date <input type="date" id="due"></label>
+        <select id="status">
+          <option value="todo">To-Do</option>
+          <option value="progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+        <button id="saveBtn">Save Project</button>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search projects...">
+      </div>
+
+      <h2>Your Projects (List View)</h2>
+      <div class="projects-container" id="projects"></div>
+
+      <h2>Kanban Board</h2>
+      <div class="kanban">
+        <div class="kanban-column" id="col-todo"><h3>To-Do</h3></div>
+        <div class="kanban-column" id="col-progress"><h3>In Progress</h3></div>
+        <div class="kanban-column" id="col-done"><h3>Done</h3></div>
+      </div>
+
+      <h2>Gantt Chart</h2>
+      <div class="gantt">
+        <table class="gantt-table" id="ganttTable">
+          <thead>
+            <tr><th>Project</th><th>Timeline</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+
+  // 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displayProjects();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+
+    // ➕ Save / update
+    document.getElementById("saveBtn").onclick=()=>{
+      const title=document.getElementById("title").value.trim();
+      const desc=document.getElementById("desc").value.trim();
+      const start=document.getElementById("start").value;
+      const due=document.getElementById("due").value;
+      const status=document.getElementById("status").value;
+      if(!title) return;
+
+      const btn=document.getElementById("saveBtn");
+      const editId=btn.getAttribute("data-edit");
+
+      const tx=db.transaction("projects","readwrite");
+      const store=tx.objectStore("projects");
+      const data={title,desc,start,due,status,pinned:false,subtasks:[]};
+
+      if(editId){ data.id=Number(editId); store.put(data); }
+      else{ store.add(data); }
+
+      tx.oncomplete=()=>{
+        ["title","desc","start","due"].forEach(id=>document.getElementById(id).value="");
+        btn.textContent="Save Project"; btn.removeAttribute("data-edit");
+        displayProjects();
+      };
+    };
+
+    // 📋 Display
+    function displayProjects(){
+      const tx=db.transaction("projects","readonly");
+      const req=tx.objectStore("projects").getAll();
+      req.onsuccess=()=>{
+        let projects=req.result;
+        const search=document.getElementById("search").value.toLowerCase();
+        if(search) projects=projects.filter(p=>p.title.toLowerCase().includes(search)||p.desc.toLowerCase().includes(search));
+        projects.sort((a,b)=>b.pinned-a.pinned);
+
+        // List view
+        const container=document.getElementById("projects"); container.innerHTML="";
+        projects.forEach(p=>{
+          const done=p.subtasks.filter(s=>s.done).length;
+          const total=p.subtasks.length||1;
+          const progress=Math.round((done/total)*100);
+          const div=document.createElement("div");
+          div.className="project";
+          div.innerHTML=`
+            <h3>${p.title}</h3>
+            <p>${p.desc||""}</p>
+            <p><small>${p.start||""} → ${p.due||""}</small></p>
+            <div class="progress-bar"><div class="progress" style="width:${progress}%"></div></div>
+            <ul class="subtasks">${p.subtasks.map((s,i)=>`<li><input type="checkbox" ${s.done?"checked":""} onchange="toggleSubtask(${p.id},${i})">${s.text}</li>`).join("")}</ul>
+            <input type="text" id="sub-${p.id}" placeholder="New subtask"><button onclick="addSubtask(${p.id})">Add</button>
+            <div class="actions">
+              <button class="edit" onclick="editProject(${p.id})">Edit</button>
+              <button class="delete" onclick="deleteProject(${p.id})">Delete</button>
+              <button class="pin" onclick="togglePin(${p.id})">${p.pinned?"Unpin":"Pin"}</button>
+            </div>`;
+          container.appendChild(div);
+        });
+
+        // Kanban
+        ["col-todo","col-progress","col-done"].forEach(id=>document.getElementById(id).innerHTML="<h3>"+document.getElementById(id).querySelector("h3").textContent+"</h3>");
+        projects.forEach(p=>{
+          const el=document.createElement("div");
+          el.className="kanban-project"; el.textContent=p.title; el.draggable=true;
+          el.ondragstart=e=>e.dataTransfer.setData("id",p.id);
+          document.getElementById("col-"+p.status).appendChild(el);
+        });
+
+        // Gantt
+        const tbody=document.querySelector("#ganttTable tbody"); tbody.innerHTML="";
+        projects.forEach(p=>{
+          if(!p.start||!p.due) return;
+          const tr=document.createElement("tr");
+          tr.innerHTML=`<td>${p.title}</td><td><div class="timeline" style="width:${daysBetween(p.start,p.due)*10}px"></div></td>`;
+          tbody.appendChild(tr);
+        });
+      };
+    }
+
+    // 📅 Helpers
+    function daysBetween(s,d){ return Math.max(1,(new Date(d)-new Date(s))/(1000*60*60*24)); }
+
+    // ✏️ Edit
+    function editProject(id){
+      const tx=db.transaction("projects","readonly");
+      tx.objectStore("projects").get(id).onsuccess=e=>{
+        const p=e.target.result;
+        document.getElementById("title").value=p.title;
+        document.getElementById("desc").value=p.desc;
+        document.getElementById("start").value=p.start;
+        document.getElementById("due").value=p.due;
+        document.getElementById("status").value=p.status;
+        const btn=document.getElementById("saveBtn");
+        btn.textContent="Update Project"; btn.setAttribute("data-edit",id);
+      };
+    }
+
+    // ❌ Delete
+    function deleteProject(id){
+      const tx=db.transaction("projects","readwrite");
+      tx.objectStore("projects").delete(id);
+      tx.oncomplete=displayProjects;
+    }
+
+    // 📌 Pin
+    function togglePin(id){
+      const tx=db.transaction("projects","readwrite");
+      const store=tx.objectStore("projects");
+      store.get(id).onsuccess=e=>{
+        const p=e.target.result; p.pinned=!p.pinned; store.put(p);
+        tx.oncomplete=displayProjects;
+      };
+    }
+
+    // ✅ Subtasks
+    function addSubtask(pid){
+      const input=document.getElementById("sub-"+pid);
+      const text=input.value.trim(); if(!text) return;
+      const tx=db.transaction("projects","readwrite"); const store=tx.objectStore("projects");
+      store.get(pid).onsuccess=e=>{
+        const p=e.target.result; p.subtasks.push({text,done:false}); store.put(p);
+        tx.oncomplete=()=>{input.value=""; displayProjects();};
+      };
+    }
+    function toggleSubtask(pid,i){
+      const tx=db.transaction("projects","readwrite"); const store=tx.objectStore("projects");
+      store.get(pid).onsuccess=e=>{
+        const p=e.target.result; p.subtasks[i].done=!p.subtasks[i].done; store.put(p);
+        tx.oncomplete=displayProjects;
+      };
+    }
+
+    // Kanban drop
+    document.querySelectorAll(".kanban-column").forEach(col=>{
+      col.ondragover=e=>e.preventDefault();
+      col.ondrop=e=>{
+        const id=Number(e.dataTransfer.getData("id"));
+        const status=col.id.replace("col-","");
+        const tx=db.transaction("projects","readwrite"); const store=tx.objectStore("projects");
+        store.get(id).onsuccess=ev=>{
+          const p=ev.target.result; p.status=status; store.put(p);
+          tx.oncomplete=displayProjects;
+        };
+      };
+    });
+
+    document.getElementById("search").addEventListener("input",displayProjects);
+  </script>
+</body>
+</html>

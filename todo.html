@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - To-Do List</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: 0.3s; }
+    :root { --bg-color: #ffffff; --text-color: #222; --primary-color: #0077ff; --sidebar-bg: #f4f4f4; --card-bg: #f8f8f8; }
+    body.dark { --bg-color: #1e1e1e; --text-color: #f0f0f0; --sidebar-bg: #2c2c2c; --card-bg: #333333; }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .form { margin-bottom: 20px; display: flex; gap: 8px; }
+    .form input { flex: 1; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; background: var(--card-bg); color: var(--text-color); }
+    .form button { padding: 8px; border: none; background: var(--primary-color); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .tasks { display: flex; flex-direction: column; gap: 10px; }
+    .task { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .task span { flex: 1; margin-left: 10px; }
+    .done span { text-decoration: line-through; color: gray; }
+    .actions { display: flex; gap: 6px; }
+    .actions button { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .delete { background: #f44336; color: white; }
+    .complete { background: #4caf50; color: white; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - To-Do List</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Add Task</h2>
+      <div class="form">
+        <input type="text" id="taskInput" placeholder="Enter a new task">
+        <button id="addTaskBtn">Add</button>
+      </div>
+
+      <h2>Your Tasks</h2>
+      <div class="tasks" id="tasks"></div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+   // 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displayTasks();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+
+
+
+    // ➕ Add Task
+    document.getElementById("addTaskBtn").onclick = () => {
+      const taskText = document.getElementById("taskInput").value.trim();
+      if (!taskText) return;
+
+      const tx = db.transaction("todos", "readwrite");
+      tx.objectStore("todos").add({ text: taskText, done: false });
+
+      tx.oncomplete = () => {
+        document.getElementById("taskInput").value = "";
+        displayTasks();
+      };
+    };
+
+    // 📋 Display Tasks
+    function displayTasks() {
+      const tx = db.transaction("todos", "readonly");
+      const req = tx.objectStore("todos").getAll();
+
+      req.onsuccess = () => {
+        const tasks = req.result;
+        const container = document.getElementById("tasks");
+        container.innerHTML = "";
+        tasks.forEach(task => {
+          const div = document.createElement("div");
+          div.className = "task" + (task.done ? " done" : "");
+          div.innerHTML = `
+            <input type="checkbox" ${task.done ? "checked" : ""} onchange="toggleComplete(${task.id})">
+            <span>${task.text}</span>
+            <div class="actions">
+              <button class="delete" onclick="deleteTask(${task.id})">Delete</button>
+            </div>`;
+          container.appendChild(div);
+        });
+      };
+    }
+
+    // ✅ Toggle Complete
+    function toggleComplete(id) {
+      const tx = db.transaction("todos", "readwrite");
+      const store = tx.objectStore("todos");
+      const req = store.get(id);
+
+      req.onsuccess = () => {
+        const task = req.result;
+        task.done = !task.done;
+        store.put(task);
+        tx.oncomplete = displayTasks;
+      };
+    }
+
+    // ❌ Delete Task
+    function deleteTask(id) {
+      const tx = db.transaction("todos", "readwrite");
+      tx.objectStore("todos").delete(id);
+      tx.oncomplete = displayTasks;
+    }
+  </script>
+</body>
+</html>

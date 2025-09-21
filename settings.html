@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Settings</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: 0.3s; }
+    :root { --bg-color: #ffffff; --text-color: #222; --primary-color: #0077ff; --sidebar-bg: #f4f4f4; --card-bg: #f8f8f8; }
+    body.dark { --bg-color: #1e1e1e; --text-color: #f0f0f0; --sidebar-bg: #2c2c2c; --card-bg: #333333; }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .form { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .form input, .form textarea { padding: 8px; border: 1px solid #ccc; border-radius: 5px; background: var(--card-bg); color: var(--text-color); }
+    .form button { padding: 8px; border: none; background: var(--primary-color); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .profile-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+    .import-export { margin-top: 30px; }
+    .import-export button { margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Settings</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Edit Profile</h2>
+      <div class="form">
+        <img id="profilePreview" class="profile-pic" src="default-avatar.png" alt="Profile Picture">
+        <input type="file" id="profilePic" accept="image/*">
+        <input type="text" id="name" placeholder="Full Name">
+        <textarea id="bio" placeholder="Bio"></textarea>
+        <input type="email" id="email" placeholder="Email">
+        <input type="text" id="social" placeholder="Social Media Link">
+        <input type="text" id="address" placeholder="Address">
+        <input type="text" id="work" placeholder="Work">
+        <input type="text" id="study" placeholder="Study">
+        <button onclick="saveProfile()">Save Profile</button>
+      </div>
+
+      <div class="import-export">
+        <h2>Data Management</h2>
+        <button onclick="exportData()">Export All Data</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        <button onclick="document.getElementById('importFile').click()">Import Data</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+  // 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displaysettings();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+
+    // 👤 Profile save/load
+    function saveProfile() {
+      const reader = new FileReader();
+      const file = document.getElementById("profilePic").files[0];
+      if (file) {
+        reader.onload = () => saveProfileData(reader.result);
+        reader.readAsDataURL(file);
+      } else {
+        saveProfileData(document.getElementById("profilePreview").src);
+      }
+    }
+
+    function saveProfileData(pic) {
+      const data = {
+        id: 1,
+        picture: pic,
+        name: document.getElementById("name").value,
+        bio: document.getElementById("bio").value,
+        email: document.getElementById("email").value,
+        social: document.getElementById("social").value,
+        address: document.getElementById("address").value,
+        work: document.getElementById("work").value,
+        study: document.getElementById("study").value,
+      };
+      const tx = db.transaction("profile", "readwrite");
+      tx.objectStore("profile").put(data);
+      tx.oncomplete = () => alert("✅ Profile Saved!");
+    }
+
+    function loadProfile() {
+      const tx = db.transaction("profile", "readonly");
+      const req = tx.objectStore("profile").get(1);
+      req.onsuccess = () => {
+        if (req.result) {
+          const p = req.result;
+          document.getElementById("profilePreview").src = p.picture || "default-avatar.png";
+          document.getElementById("name").value = p.name || "";
+          document.getElementById("bio").value = p.bio || "";
+          document.getElementById("email").value = p.email || "";
+          document.getElementById("social").value = p.social || "";
+          document.getElementById("address").value = p.address || "";
+          document.getElementById("work").value = p.work || "";
+          document.getElementById("study").value = p.study || "";
+        }
+      };
+    }
+
+    // 📤 Export
+    function exportData() {
+      const txs = stores.map(name => {
+        return new Promise(resolve => {
+          const tx = db.transaction(name, "readonly");
+          const req = tx.objectStore(name).getAll();
+          req.onsuccess = () => resolve([name, req.result]);
+        });
+      });
+
+      Promise.all(txs).then(all => {
+        const data = Object.fromEntries(all);
+        const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "sharehive_backup.json"; a.click();
+      });
+    }
+
+    // 📥 Import
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const data = JSON.parse(e.target.result);
+        Object.keys(data).forEach(name => {
+          if (db.objectStoreNames.contains(name)) {
+            const tx = db.transaction(name, "readwrite");
+            const store = tx.objectStore(name);
+            data[name].forEach(item => store.put(item));
+          }
+        });
+        alert("✅ Data Imported!");
+      };
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>

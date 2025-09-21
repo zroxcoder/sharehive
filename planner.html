@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Planner</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: 0.3s;
+    }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #222;
+      --primary-color: #0077ff;
+      --sidebar-bg: #f4f4f4;
+      --card-bg: #f8f8f8;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c;
+      --card-bg: #333333;
+    }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .form { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .form input, .form textarea {
+      padding: 8px; font-size: 14px;
+      border: 1px solid #ccc; border-radius: 5px;
+      background: var(--card-bg); color: var(--text-color);
+    }
+    .form button {
+      padding: 8px; border: none; background: var(--primary-color);
+      color: white; border-radius: 5px; cursor: pointer; font-weight: bold;
+    }
+
+    .search-box { margin-bottom: 15px; }
+    .search-box input { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+
+    .tasks-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+    .task {
+      background: var(--card-bg); padding: 15px; border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .task h3 { margin-bottom: 8px; font-size: 16px; }
+    .task small { color: gray; font-size: 12px; display: block; margin-bottom: 5px; }
+    .actions { display: flex; gap: 8px; margin-top: 10px; }
+    .task button { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .edit { background: #4caf50; color: white; }
+    .delete { background: #f44336; color: white; }
+    .pin { background: gold; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Planner</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html"><b>📅 Planner</b></a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Add Task</h2>
+      <div class="form">
+        <input type="text" id="title" placeholder="Task title">
+        <textarea id="description" placeholder="Task description"></textarea>
+        <input type="date" id="date">
+        <button id="saveBtn">Save Task</button>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search tasks...">
+      </div>
+
+      <h2>Your Planner</h2>
+      <div class="tasks-container" id="tasks"></div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+   // 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displayplanner();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+    // ➕ Save or Update
+    document.getElementById("saveBtn").onclick = () => {
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const date = document.getElementById("date").value;
+      if (!title && !description) return;
+
+      const btn = document.getElementById("saveBtn");
+      const editId = btn.getAttribute("data-edit");
+
+      const tx = db.transaction("planner", "readwrite");
+      const store = tx.objectStore("planner");
+
+      if (editId) {
+        store.put({ id: Number(editId), title, description, date, pinned: false });
+      } else {
+        store.add({ title, description, date, pinned: false });
+      }
+
+      tx.oncomplete = () => {
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("date").value = "";
+        btn.textContent = "Save Task";
+        btn.removeAttribute("data-edit");
+        displayTasks();
+      };
+    };
+
+    // 📋 Display
+    function displayTasks() {
+      const tx = db.transaction("planner", "readonly");
+      const req = tx.objectStore("planner").getAll();
+
+      req.onsuccess = () => {
+        let tasks = req.result;
+
+        // 🔍 Search
+        const search = document.getElementById("search").value.toLowerCase();
+        if (search) {
+          tasks = tasks.filter(t =>
+            (t.title || "").toLowerCase().includes(search) ||
+            (t.description || "").toLowerCase().includes(search)
+          );
+        }
+
+        // 📌 Pinned first
+        tasks.sort((a,b) => b.pinned - a.pinned);
+
+        const container = document.getElementById("tasks");
+        container.innerHTML = "";
+        tasks.forEach(t => {
+          const div = document.createElement("div");
+          div.className = "task";
+          div.innerHTML = `
+            <h3>${t.title}</h3>
+            <small>${t.date ? "📅 " + t.date : ""}</small>
+            <p>${t.description}</p>
+            <div class="actions">
+              <button class="edit" onclick="editTask(${t.id})">Edit</button>
+              <button class="delete" onclick="deleteTask(${t.id})">Delete</button>
+              <button class="pin" onclick="togglePin(${t.id})">${t.pinned ? "Unpin" : "Pin"}</button>
+            </div>`;
+          container.appendChild(div);
+        });
+      };
+    }
+
+    // ✏️ Edit
+    function editTask(id) {
+      const tx = db.transaction("planner", "readonly");
+      const req = tx.objectStore("planner").get(id);
+
+      req.onsuccess = () => {
+        const t = req.result;
+        document.getElementById("title").value = t.title;
+        document.getElementById("description").value = t.description;
+        document.getElementById("date").value = t.date;
+        const btn = document.getElementById("saveBtn");
+        btn.textContent = "Update Task";
+        btn.setAttribute("data-edit", id);
+      };
+    }
+
+    // ❌ Delete
+    function deleteTask(id) {
+      const tx = db.transaction("planner", "readwrite");
+      tx.objectStore("planner").delete(id);
+      tx.oncomplete = displayTasks;
+    }
+
+    // 📌 Pin/Unpin
+    function togglePin(id) {
+      const tx = db.transaction("planner", "readwrite");
+      const store = tx.objectStore("planner");
+      const req = store.get(id);
+      req.onsuccess = () => {
+        const t = req.result;
+        t.pinned = !t.pinned;
+        store.put(t);
+        tx.oncomplete = displayTasks;
+      };
+    }
+
+    // 🔍 Live search
+    document.getElementById("search").addEventListener("input", displayTasks);
+  </script>
+</body>
+</html>

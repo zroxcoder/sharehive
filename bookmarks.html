@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Bookmarks</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: 0.3s; }
+    :root { --bg-color: #ffffff; --text-color: #222; --primary-color: #0077ff; --sidebar-bg: #f4f4f4; --card-bg: #f8f8f8; }
+    body.dark { --bg-color: #1e1e1e; --text-color: #f0f0f0; --sidebar-bg: #2c2c2c; --card-bg: #333333; }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .form { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .form input { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; background: var(--card-bg); color: var(--text-color); }
+    .form button { padding: 8px; border: none; background: var(--primary-color); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .search-box { margin-bottom: 15px; }
+    .search-box input { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+
+    .bookmarks-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+    .bookmark { background: var(--card-bg); padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .bookmark h3 { margin-bottom: 8px; font-size: 16px; }
+    .bookmark a { color: var(--primary-color); text-decoration: none; }
+    .actions { display: flex; gap: 8px; margin-top: 10px; }
+    .bookmark button { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .edit { background: #4caf50; color: white; }
+    .delete { background: #f44336; color: white; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Bookmarks</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Add Bookmark</h2>
+      <div class="form">
+        <input type="text" id="title" placeholder="Bookmark title">
+        <input type="url" id="url" placeholder="https://example.com">
+        <button id="saveBtn">Save Bookmark</button>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search bookmarks...">
+      </div>
+
+      <h2>Your Bookmarks</h2>
+      <div class="bookmarks-container" id="bookmarks"></div>
+    </div>
+  </div>
+
+  <script>
+    // Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+// 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displayBookmarks();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+    // Save / Update
+    document.getElementById("saveBtn").onclick = () => {
+      const title = document.getElementById("title").value.trim();
+      const url = document.getElementById("url").value.trim();
+      if (!title || !url) return;
+
+      const btn = document.getElementById("saveBtn");
+      const editId = btn.getAttribute("data-edit");
+
+      const tx = db.transaction("bookmarks", "readwrite");
+      const store = tx.objectStore("bookmarks");
+
+      if (editId) {
+        store.put({ id: Number(editId), title, url });
+      } else {
+        store.add({ title, url });
+      }
+
+      tx.oncomplete = () => {
+        document.getElementById("title").value = "";
+        document.getElementById("url").value = "";
+        btn.textContent = "Save Bookmark";
+        btn.removeAttribute("data-edit");
+        displayBookmarks();
+      };
+    };
+
+    // Display
+    function displayBookmarks() {
+      const tx = db.transaction("bookmarks", "readonly");
+      const req = tx.objectStore("bookmarks").getAll();
+
+      req.onsuccess = () => {
+        let bookmarks = req.result;
+
+        // Search filter
+        const search = document.getElementById("search").value.toLowerCase();
+        if (search) {
+          bookmarks = bookmarks.filter(b => b.title.toLowerCase().includes(search) || b.url.toLowerCase().includes(search));
+        }
+
+        const container = document.getElementById("bookmarks");
+        container.innerHTML = "";
+        bookmarks.forEach(bm => {
+          const div = document.createElement("div");
+          div.className = "bookmark";
+          div.innerHTML = `
+            <h3>${bm.title}</h3>
+            <a href="${bm.url}" target="_blank">${bm.url}</a>
+            <div class="actions">
+              <button class="edit" onclick="editBookmark(${bm.id})">Edit</button>
+              <button class="delete" onclick="deleteBookmark(${bm.id})">Delete</button>
+            </div>`;
+          container.appendChild(div);
+        });
+      };
+    }
+
+    // Edit
+    function editBookmark(id) {
+      const tx = db.transaction("bookmarks", "readonly");
+      const req = tx.objectStore("bookmarks").get(id);
+
+      req.onsuccess = () => {
+        const bm = req.result;
+        document.getElementById("title").value = bm.title;
+        document.getElementById("url").value = bm.url;
+        const btn = document.getElementById("saveBtn");
+        btn.textContent = "Update Bookmark";
+        btn.setAttribute("data-edit", id);
+      };
+    }
+
+    // Delete
+    function deleteBookmark(id) {
+      const tx = db.transaction("bookmarks", "readwrite");
+      tx.objectStore("bookmarks").delete(id);
+      tx.oncomplete = displayBookmarks;
+    }
+
+    // Live search
+    document.getElementById("search").addEventListener("input", displayBookmarks);
+  </script>
+</body>
+</html>

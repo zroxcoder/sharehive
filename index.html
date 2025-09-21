@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Dashboard</title>
+  <style>
+    /* ===== Global Styles ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: 0.3s;
+    }
+
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #222;
+      --primary-color: #0077ff;
+      --sidebar-bg: #f4f4f4;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c;
+    }
+
+    /* ===== Navbar ===== */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: var(--primary-color);
+      color: white;
+    }
+    .navbar h1 {
+      font-size: 20px;
+    }
+    .toggle-btn {
+      background: white;
+      border: none;
+      color: var(--primary-color);
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* ===== Layout ===== */
+    .container {
+      display: flex;
+      height: calc(100vh - 50px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar-bg);
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .sidebar h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .sidebar a {
+      display: block;
+      text-decoration: none;
+      color: var(--text-color);
+      padding: 8px 10px;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      transition: 0.2s;
+    }
+    .sidebar a:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      padding: 20px;
+    }
+    .welcome {
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+
+    /* Search Bar */
+    .search-box {
+      margin-bottom: 20px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== Navbar ===== -->
+  <div class="navbar">
+    <h1>🐝 ShareHive</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <!-- ===== Layout ===== -->
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <div class="welcome">Welcome to ShareHive 🐝</div>
+      <div class="search-box">
+        <input type="text" id="search" placeholder="🔍 Search ShareHive...">
+      </div>
+      <p>This is your personal productivity hub. Use the sidebar to explore features like Notes, To-Do, Expense Tracker, Wiki, and more!</p>
+    </div>
+  </div>
+
+  <script>
+    // ===== Dark Mode Toggle =====
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", 
+        document.body.classList.contains("dark") ? "dark" : "light"
+      );
+    }
+    // Load saved theme
+    if(localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>

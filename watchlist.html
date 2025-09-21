@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Watchlist</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.3s;
+    }
+    :root {
+      --bg:#fff; --text:#222; --primary:#0077ff;
+      --sidebar:#f4f4f4; --card:#f9f9f9;
+    }
+    body.dark {
+      --bg:#1e1e1e; --text:#f0f0f0;
+      --sidebar:#2c2c2c; --card:#333;
+    }
+
+    .navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:var(--primary); color:#fff; }
+    .navbar h1 { font-size:20px; }
+    .toggle-btn { background:#fff; border:none; color:var(--primary); padding:5px 10px; border-radius:5px; cursor:pointer; }
+
+    .container { display:flex; height:calc(100vh - 50px); }
+    .sidebar { width:220px; background:var(--sidebar); padding:20px; overflow-y:auto; }
+    .sidebar a { display:block; padding:8px; text-decoration:none; color:var(--text); border-radius:5px; margin-bottom:5px; }
+    .sidebar a:hover { background:var(--primary); color:#fff; }
+
+    .main { flex:1; padding:20px; overflow-y:auto; }
+    h2 { margin:15px 0; }
+
+    .form { display:grid; gap:10px; margin-bottom:20px; }
+    .form input, .form select, .form textarea {
+      padding:8px; border:1px solid #ccc; border-radius:5px; background:var(--card); color:var(--text);
+    }
+    .form button {
+      padding:10px; background:var(--primary); border:none; color:#fff; border-radius:5px; cursor:pointer; font-weight:bold;
+    }
+
+    .search-filter { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
+    .search-filter input, .search-filter select { padding:8px; border-radius:5px; border:1px solid #ccc; }
+
+    .kanban { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; }
+    .column { background:var(--card); padding:10px; border-radius:10px; }
+    .column h3 { text-align:center; margin-bottom:10px; }
+    .item { background:#fff2; border:1px solid #ccc; border-radius:8px; padding:10px; margin-bottom:10px; background:var(--card); }
+    .item h4 { margin-bottom:5px; }
+    .progress { height:6px; background:#ddd; border-radius:3px; overflow:hidden; margin:5px 0; }
+    .progress span { display:block; height:100%; background:var(--primary); }
+
+    .actions { display:flex; gap:5px; margin-top:5px; flex-wrap:wrap; }
+    .actions button { border:none; padding:5px 8px; border-radius:5px; cursor:pointer; font-size:12px; }
+    .edit { background:#4caf50; color:#fff; }
+    .delete { background:#f44336; color:#fff; }
+    .pin { background:gold; }
+    .fav { background:#ff4081; color:#fff; }
+
+    .calendar { margin-top:30px; }
+    .calendar table { width:100%; border-collapse:collapse; }
+    .calendar th, .calendar td { border:1px solid #ccc; padding:5px; text-align:center; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Watchlist</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Add to Watchlist</h2>
+      <div class="form">
+        <input id="title" placeholder="Title">
+        <select id="type">
+          <option value="Movie">Movie</option>
+          <option value="Series">Series</option>
+          <option value="Anime">Anime</option>
+          <option value="YouTube">YouTube</option>
+          <option value="Twitch">Twitch</option>
+          <option value="Other">Other</option>
+        </select>
+        <input id="genre" placeholder="Genre">
+        <input id="platform" placeholder="Platform (Netflix, Prime, etc.)">
+        <input id="link" placeholder="Link (optional)">
+        <select id="status">
+          <option value="To-Watch">To-Watch</option>
+          <option value="Watching">Watching</option>
+          <option value="Completed">Completed</option>
+          <option value="Dropped">Dropped</option>
+        </select>
+        <input id="episodes" placeholder="Episodes watched / Total (e.g. 5/12)">
+        <input id="rating" type="number" min="1" max="10" placeholder="Rating (1-10)">
+        <textarea id="notes" placeholder="Notes..."></textarea>
+        <input id="start" type="date">
+        <input id="end" type="date">
+        <button id="saveBtn">Save</button>
+      </div>
+
+      <div class="search-filter">
+        <input id="search" placeholder="Search...">
+        <select id="filterStatus">
+          <option value="">All Status</option>
+          <option>To-Watch</option>
+          <option>Watching</option>
+          <option>Completed</option>
+          <option>Dropped</option>
+        </select>
+        <select id="filterType">
+          <option value="">All Types</option>
+          <option>Movie</option>
+          <option>Series</option>
+          <option>Anime</option>
+          <option>YouTube</option>
+          <option>Twitch</option>
+          <option>Other</option>
+        </select>
+        <select id="filterPlatform">
+          <option value="">All Platforms</option>
+        </select>
+        <button onclick="randomPick()">🎲 Random Pick</button>
+      </div>
+
+      <div class="kanban" id="kanban">
+        <div class="column" id="To-Watch"><h3>To-Watch</h3></div>
+        <div class="column" id="Watching"><h3>Watching</h3></div>
+        <div class="column" id="Completed"><h3>Completed</h3></div>
+        <div class="column" id="Dropped"><h3>Dropped</h3></div>
+      </div>
+
+      <div class="calendar">
+        <h2>Calendar View</h2>
+        <table id="calendarTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Theme
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+
+   // 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displayWatchlist();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+
+    // Save / Update
+    document.getElementById("saveBtn").onclick=()=>{
+      const item={
+        title:document.getElementById("title").value.trim(),
+        type:document.getElementById("type").value,
+        genre:document.getElementById("genre").value.trim(),
+        platform:document.getElementById("platform").value.trim(),
+        link:document.getElementById("link").value.trim(),
+        status:document.getElementById("status").value,
+        episodes:document.getElementById("episodes").value.trim(),
+        rating:document.getElementById("rating").value,
+        notes:document.getElementById("notes").value.trim(),
+        start:document.getElementById("start").value,
+        end:document.getElementById("end").value,
+        pinned:false, favorite:false
+      };
+      if(!item.title) return;
+
+      const btn=document.getElementById("saveBtn");
+      const editId=btn.getAttribute("data-edit");
+
+      const tx=db.transaction("watchlist","readwrite");
+      const store=tx.objectStore("watchlist");
+      if(editId){ item.id=Number(editId); store.put(item); }
+      else store.add(item);
+
+      tx.oncomplete=()=>{ clearForm(); displayWatchlist(); };
+    };
+
+    function clearForm(){
+      document.querySelectorAll(".form input, .form textarea, .form select").forEach(el=>el.value="");
+      const btn=document.getElementById("saveBtn");
+      btn.textContent="Save";
+      btn.removeAttribute("data-edit");
+    }
+
+    // Display
+    function displayWatchlist(){
+      const tx=db.transaction("watchlist","readonly");
+      tx.objectStore("watchlist").getAll().onsuccess=e=>{
+        let items=e.target.result;
+
+        // Filters
+        const s=document.getElementById("search").value.toLowerCase();
+        const fs=document.getElementById("filterStatus").value;
+        const ft=document.getElementById("filterType").value;
+        const fp=document.getElementById("filterPlatform").value;
+        if(s) items=items.filter(i=>i.title.toLowerCase().includes(s));
+        if(fs) items=items.filter(i=>i.status===fs);
+        if(ft) items=items.filter(i=>i.type===ft);
+        if(fp) items=items.filter(i=>i.platform===fp);
+
+        // Populate platform filter
+        const platforms=[...new Set(items.map(i=>i.platform).filter(p=>p))];
+        const pf=document.getElementById("filterPlatform");
+        pf.innerHTML='<option value="">All Platforms</option>'+platforms.map(p=>`<option>${p}</option>`).join("");
+
+        // Clear Kanban
+        ["To-Watch","Watching","Completed","Dropped"].forEach(col=>{
+          const el=document.getElementById(col);
+          el.innerHTML=`<h3>${col}</h3>`;
+        });
+
+        // Add to columns
+        items.sort((a,b)=>b.pinned-a.pinned || b.favorite-a.favorite);
+        items.forEach(i=>{
+          const div=document.createElement("div");
+          div.className="item";
+          let [watched,total]=i.episodes.split("/").map(Number);
+          let percent=(watched&&total)?(watched/total*100):0;
+          div.innerHTML=`
+            <h4>${i.title} ${i.favorite?"❤️":""}</h4>
+            <small>${i.type} | ${i.platform} | ${i.genre}</small><br>
+            ${i.link?`<a href="${i.link}" target="_blank">🔗 Link</a><br>`:""}
+            <div class="progress"><span style="width:${percent}%"></span></div>
+            ${i.rating?`⭐ ${i.rating}/10`:""}
+            <p>${i.notes||""}</p>
+            <small>${i.start?`Start: ${i.start}`:""} ${i.end?`End: ${i.end}`:""}</small>
+            <div class="actions">
+              <button class="edit" onclick="editItem(${i.id})">Edit</button>
+              <button class="delete" onclick="deleteItem(${i.id})">Delete</button>
+              <button class="pin" onclick="togglePin(${i.id})">${i.pinned?"Unpin":"Pin"}</button>
+              <button class="fav" onclick="toggleFav(${i.id})">${i.favorite?"Unfav":"Fav"}</button>
+            </div>`;
+          document.getElementById(i.status).appendChild(div);
+        });
+
+        updateCalendar(items);
+      };
+    }
+
+    // Calendar view
+    function updateCalendar(items){
+      const table=document.getElementById("calendarTable");
+      table.innerHTML="<tr><th>Title</th><th>Start</th><th>End</th></tr>";
+      items.forEach(i=>{
+        if(i.start||i.end){
+          table.innerHTML+=`<tr><td>${i.title}</td><td>${i.start||""}</td><td>${i.end||""}</td></tr>`;
+        }
+      });
+    }
+
+    // Edit
+    function editItem(id){
+      const tx=db.transaction("watchlist","readonly");
+      tx.objectStore("watchlist").get(id).onsuccess=e=>{
+        const i=e.target.result;
+        document.getElementById("title").value=i.title;
+        document.getElementById("type").value=i.type;
+        document.getElementById("genre").value=i.genre;
+        document.getElementById("platform").value=i.platform;
+        document.getElementById("link").value=i.link;
+        document.getElementById("status").value=i.status;
+        document.getElementById("episodes").value=i.episodes;
+        document.getElementById("rating").value=i.rating;
+        document.getElementById("notes").value=i.notes;
+        document.getElementById("start").value=i.start;
+        document.getElementById("end").value=i.end;
+        const btn=document.getElementById("saveBtn");
+        btn.textContent="Update";
+        btn.setAttribute("data-edit",id);
+      };
+    }
+
+    // Delete
+    function deleteItem(id){
+      const tx=db.transaction("watchlist","readwrite");
+      tx.objectStore("watchlist").delete(id);
+      tx.oncomplete=displayWatchlist;
+    }
+
+    // Pin / Fav
+    function togglePin(id){ toggleField(id,"pinned"); }
+    function toggleFav(id){ toggleField(id,"favorite"); }
+    function toggleField(id,field){
+      const tx=db.transaction("watchlist","readwrite");
+      const store=tx.objectStore("watchlist");
+      store.get(id).onsuccess=e=>{
+        const i=e.target.result; i[field]=!i[field]; store.put(i);
+        tx.oncomplete=displayWatchlist;
+      };
+    }
+
+    // Random pick
+    function randomPick(){
+      const tx=db.transaction("watchlist","readonly");
+      tx.objectStore("watchlist").getAll().onsuccess=e=>{
+        const list=e.target.result.filter(i=>i.status==="To-Watch");
+        if(list.length){
+          const pick=list[Math.floor(Math.random()*list.length)];
+          alert("🎲 Random Pick: "+pick.title);
+        } else alert("No To-Watch items.");
+      };
+    }
+
+    // Live search/filter
+    ["search","filterStatus","filterType","filterPlatform"].forEach(id=>{
+      document.getElementById(id).addEventListener("input",displayWatchlist);
+    });
+  </script>
+</body>
+</html>

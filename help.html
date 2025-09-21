@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Help</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: 0.3s;
+    }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #222;
+      --primary-color: #0077ff;
+      --sidebar-bg: #f4f4f4;
+      --card-bg: #f8f8f8;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c;
+      --card-bg: #333333;
+    }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .accordion button {
+      width: 100%;
+      text-align: left;
+      padding: 12px;
+      font-size: 16px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin: 5px 0;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .accordion button:hover {
+      background: #0056cc;
+    }
+    .accordion-content {
+      display: none;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      background: var(--card-bg);
+    }
+    .accordion-content p, .accordion-content ul {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Help</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todos.html">✅ To-Do List</a>
+      <a href="expenses.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="card">
+        <h2>Help & User Guide</h2>
+        <div class="accordion">
+          <button onclick="toggleAccordion(this)">📝 Notes</button>
+          <div class="accordion-content">
+            <p>Create, edit, pin, and delete notes. Search through your notes easily.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">🔖 Bookmarks</button>
+          <div class="accordion-content">
+            <p>Save your favorite websites and search them quickly.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">🎬 Video Links</button>
+          <div class="accordion-content">
+            <p>Store links to your favorite YouTube or video sites and watch them later.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">✅ To-Do List</button>
+          <div class="accordion-content">
+            <p>Organize tasks, mark them as done, and stay productive.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">💰 Expense Tracker</button>
+          <div class="accordion-content">
+            <p>Track your expenses, income, and balance all in one place.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">📅 Planner</button>
+          <div class="accordion-content">
+            <p>Plan your daily or monthly activities and goals.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">📖 Wiki</button>
+          <div class="accordion-content">
+            <p>Write long text, notes, and create a personal wiki knowledge base.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">📂 Upload Files</button>
+          <div class="accordion-content">
+            <p>Upload photos, videos, PDFs, or music and access them anytime.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">📌 Projects</button>
+          <div class="accordion-content">
+            <p>Manage projects with Kanban boards, Gantt charts, and to-do lists.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">📚 Courses</button>
+          <div class="accordion-content">
+            <p>Track courses, progress, and mark them as completed.</p>
+          </div>
+
+          <button onclick="toggleAccordion(this)">👤 Profile & ⚙️ Settings</button>
+          <div class="accordion-content">
+            <p>Edit your profile details from settings. Import/export your data safely.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+    // Accordion
+    function toggleAccordion(btn) {
+      const content = btn.nextElementSibling;
+      content.style.display = content.style.display === "block" ? "none" : "block";
+    }
+  </script>
+</body>
+</html>

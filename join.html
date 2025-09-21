@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Join Us</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: 0.3s;
+    }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #222;
+      --primary-color: #0077ff;
+      --sidebar-bg: #f4f4f4;
+      --card-bg: #f8f8f8;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c;
+      --card-bg: #333333;
+    }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .form input, .form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+    .form button {
+      background: var(--primary-color);
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .social-links a {
+      display: inline-block;
+      margin-right: 10px;
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Join Us</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todos.html">✅ To-Do List</a>
+      <a href="expenses.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="card">
+        <h2>🤝 Join the ShareHive Team</h2>
+        <p>We’re building a collaborative platform full of powerful tools. If you’re passionate about development, design, or content creation, join us!</p>
+      </div>
+
+      <div class="card">
+        <h3>Fill the Form</h3>
+        <form class="form" onsubmit="sendJoinRequest(event)">
+          <input type="text" id="name" placeholder="Your Name" required>
+          <input type="email" id="email" placeholder="Your Email" required>
+          <input type="text" id="skills" placeholder="Your Skills/Role" required>
+          <textarea id="why" placeholder="Why do you want to join?" rows="4" required></textarea>
+          <input type="url" id="resume" placeholder="Resume/Portfolio Link">
+          <button type="submit">Send Request</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>🌍 Connect With Us</h3>
+        <div class="social-links">
+          <a href="https://github.com/" target="_blank">GitHub</a>
+          <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+          <a href="https://twitter.com/" target="_blank">Twitter</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+    // Mailto Join Request
+    function sendJoinRequest(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const skills = document.getElementById("skills").value;
+      const why = document.getElementById("why").value;
+      const resume = document.getElementById("resume").value;
+
+      const subject = encodeURIComponent("Join Request from " + name);
+      const body = encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\nSkills: ${skills}\nWhy Join: ${why}\nResume: ${resume}`
+      );
+
+      window.location.href = `mailto:sharehive@gmail.com?subject=${subject}&body=${body}`;
+    }
+  </script>
+</body>
+</html>

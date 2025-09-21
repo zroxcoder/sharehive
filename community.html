@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Community</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: 0.3s;
+    }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #222;
+      --primary-color: #0077ff;
+      --sidebar-bg: #f4f4f4;
+      --card-bg: #f8f8f8;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c;
+      --card-bg: #333333;
+    }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .card {
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .discussion-form textarea {
+      width: 100%; padding: 10px; border-radius: 8px;
+      border: 1px solid #ccc; margin-bottom: 10px; resize: vertical;
+    }
+    .discussion-form button {
+      background: var(--primary-color); color: white;
+      border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;
+    }
+
+    .post { border-bottom: 1px solid #ddd; padding: 10px 0; }
+    .post strong { display: block; margin-bottom: 5px; }
+    .post .actions { margin-top: 5px; }
+    .like-btn { cursor: pointer; color: var(--primary-color); margin-right: 10px; }
+    .pinned { background: gold; padding: 3px 6px; border-radius: 4px; margin-left: 6px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Community</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todos.html">✅ To-Do List</a>
+      <a href="expenses.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <!-- Welcome -->
+      <div class="card">
+        <h2>👋 Welcome to ShareHive Community</h2>
+        <p>Connect, share, and grow together! 🚀 This is your space to discuss, ask questions, and stay updated.</p>
+      </div>
+
+      <!-- Announcements (Static) -->
+      <div class="card">
+        <h2>📢 Announcements</h2>
+        <p>🚀 New features rolling out this week! Stay tuned.</p>
+      </div>
+
+      <!-- Discussion Board -->
+      <div class="card">
+        <h2>💬 Discussion Board</h2>
+        <form class="discussion-form" onsubmit="addPost(event)">
+          <textarea id="postContent" placeholder="Write something..."></textarea>
+          <label><input type="checkbox" id="pinPost"> Pin this post</label><br>
+          <button type="submit">Post</button>
+        </form>
+        <div id="posts"></div>
+      </div>
+
+      <!-- Guidelines -->
+      <div class="card">
+        <h2>📜 Community Guidelines</h2>
+        <ul>
+          <li>Be respectful to others</li>
+          <li>No spam or self-promotion</li>
+          <li>Stay on topic</li>
+          <li>Report inappropriate content</li>
+        </ul>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="card">
+        <h2>🔗 Quick Links</h2>
+        <ul>
+          <li><a href="faq.html">❔ FAQ</a></li>
+          <li><a href="help.html">❓ Help</a></li>
+          <li><a href="report.html">🐞 Report</a></li>
+          <li><a href="contact.html">✉️ Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+    // 📦 IndexedDB v21
+    let db;
+    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
+    const request = indexedDB.open("ShareHiveDB", 21);
+
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      stores.forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+        }
+      });
+    };
+
+    request.onsuccess = e => {
+      db = e.target.result;
+      loadPosts();
+    };
+    request.onerror = e => console.error("DB error:", e.target.error);
+
+    // Add Post
+    function addPost(e){
+      e.preventDefault();
+      const content=document.getElementById("postContent").value.trim();
+      const pinned=document.getElementById("pinPost").checked;
+      if(!content) return;
+      const tx=db.transaction("community","readwrite");
+      tx.objectStore("community").add({content,likes:0,pinned,date:new Date()});
+      tx.oncomplete=()=>{ document.getElementById("postContent").value=""; document.getElementById("pinPost").checked=false; loadPosts(); };
+    }
+
+    // Load Posts
+    function loadPosts(){
+      const tx=db.transaction("community","readonly");
+      const store=tx.objectStore("community");
+      const req=store.getAll();
+      req.onsuccess=()=>{
+        let posts=req.result;
+        // sort pinned first, then recent
+        posts.sort((a,b)=> (b.pinned - a.pinned) || new Date(b.date)-new Date(a.date));
+        const container=document.getElementById("posts");
+        container.innerHTML="";
+        posts.forEach(p=>{
+          const div=document.createElement("div");
+          div.className="post";
+          div.innerHTML=`
+            <strong>${p.pinned ? "📌 " : ""}${p.content}</strong>
+            <div class="actions">
+              <span class="like-btn" onclick="likePost(${p.id})">👍 ${p.likes}</span>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      };
+    }
+
+    // Like Post
+    function likePost(id){
+      const tx=db.transaction("community","readwrite");
+      const store=tx.objectStore("community");
+      const req=store.get(id);
+      req.onsuccess=()=>{
+        let post=req.result;
+        post.likes++;
+        store.put(post);
+        loadPosts();
+      };
+    }
+  </script>
+</body>
+</html>

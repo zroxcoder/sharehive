@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Courses</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition:0.3s;
+    }
+    :root {
+      --bg-color:#ffffff;
+      --text-color:#222;
+      --primary-color:#0077ff;
+      --sidebar-bg:#f4f4f4;
+      --card-bg:#f8f8f8;
+    }
+    body.dark {
+      --bg-color:#1e1e1e;
+      --text-color:#f0f0f0;
+      --sidebar-bg:#2c2c2c;
+      --card-bg:#333333;
+    }
+
+    .navbar {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 20px; background:var(--primary-color); color:white;
+    }
+    .navbar h1 { font-size:20px; }
+    .toggle-btn {
+      background:white; border:none; color:var(--primary-color);
+      padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold;
+    }
+
+    .container { display:flex; height:calc(100vh - 50px); }
+
+    .sidebar {
+      width:220px; background:var(--sidebar-bg); padding:20px; overflow-y:auto;
+    }
+    .sidebar h2 { font-size:16px; margin-bottom:10px; }
+    .sidebar a {
+      display:block; text-decoration:none; color:var(--text-color);
+      padding:8px 10px; border-radius:5px; margin-bottom:5px;
+    }
+    .sidebar a:hover { background:var(--primary-color); color:white; }
+
+    .main { flex:1; padding:20px; overflow-y:auto; }
+    h2 { margin:15px 0; }
+
+    .form { margin-bottom:20px; display:flex; flex-direction:column; gap:8px; }
+    .form input, .form textarea, .form select {
+      padding:8px; font-size:14px;
+      border:1px solid #ccc; border-radius:5px;
+      background:var(--card-bg); color:var(--text-color);
+    }
+    .form button {
+      padding:8px; border:none; background:var(--primary-color);
+      color:white; border-radius:5px; cursor:pointer; font-weight:bold;
+    }
+
+    .search-box { margin-bottom:15px; display:flex; gap:10px; }
+    .search-box input, .search-box select {
+      padding:8px; border-radius:5px; border:1px solid #ccc; flex:1;
+    }
+
+    .courses-container {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:15px;
+    }
+    .course {
+      background:var(--card-bg); padding:15px; border-radius:10px;
+      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    }
+    .course h3 { margin-bottom:8px; font-size:16px; }
+    .progress { height:10px; background:#ddd; border-radius:5px; margin:8px 0; }
+    .bar { height:100%; background:#4caf50; border-radius:5px; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .course button { border:none; padding:5px 8px; border-radius:5px; cursor:pointer; font-size:12px; }
+    .edit { background:#4caf50; color:white; }
+    .delete { background:#f44336; color:white; }
+    .lesson { display:flex; align-items:center; gap:5px; margin:3px 0; }
+    .calendar { margin-top:20px; padding:15px; background:var(--card-bg); border-radius:10px; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Courses</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html"><b>📚 Courses</b></a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Add Course</h2>
+      <div class="form">
+        <input type="text" id="title" placeholder="Course Title">
+        <input type="text" id="platform" placeholder="Platform (Udemy, YouTube, etc.)">
+        <input type="url" id="link" placeholder="Course Link (optional)">
+        <input type="text" id="category" placeholder="Category">
+        <input type="date" id="startDate">
+        <input type="date" id="endDate">
+        <textarea id="desc" placeholder="Description"></textarea>
+        <input type="file" id="certificate">
+        <button id="saveBtn">Save Course</button>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search courses...">
+        <select id="filter">
+          <option value="all">All</option>
+          <option value="not-started">Not Started</option>
+          <option value="in-progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
+      <h2>Your Courses</h2>
+      <div class="courses-container" id="courses"></div>
+
+      <div class="calendar">
+        <h2>📅 Deadlines Calendar</h2>
+        <ul id="calendarList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark Mode
+    function toggleTheme(){
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light");
+    }
+    if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+
+   // 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displayCourses();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+
+    // ➕ Save Course
+    document.getElementById("saveBtn").onclick=()=>{
+      const title=document.getElementById("title").value.trim();
+      if(!title) return;
+      const course={
+        title,
+        platform:document.getElementById("platform").value,
+        link:document.getElementById("link").value,
+        category:document.getElementById("category").value,
+        start:document.getElementById("startDate").value,
+        end:document.getElementById("endDate").value,
+        desc:document.getElementById("desc").value,
+        certificate:null,
+        status:"not-started",
+        lessons:[],
+        progress:0
+      };
+      const file=document.getElementById("certificate").files[0];
+      if(file){
+        const reader=new FileReader();
+        reader.onload=e=>{ course.certificate=e.target.result; saveCourse(course); };
+        reader.readAsDataURL(file);
+      } else { saveCourse(course); }
+    };
+
+    function saveCourse(course){
+      const tx=db.transaction("courses","readwrite");
+      tx.objectStore("courses").add(course);
+      tx.oncomplete=()=>{ clearForm(); displayCourses(); };
+    }
+    function clearForm(){
+      ["title","platform","link","category","startDate","endDate","desc","certificate"].forEach(id=>{
+        document.getElementById(id).value="";
+      });
+    }
+
+    // 📋 Display
+    function displayCourses(){
+      const container=document.getElementById("courses");
+      const cal=document.getElementById("calendarList");
+      container.innerHTML=""; cal.innerHTML="";
+      const tx=db.transaction("courses","readonly");
+      tx.objectStore("courses").getAll().onsuccess=e=>{
+        let courses=e.target.result;
+        const search=document.getElementById("search").value.toLowerCase();
+        const filter=document.getElementById("filter").value;
+        courses=courses.filter(c=>
+          c.title.toLowerCase().includes(search) &&
+          (filter==="all"||c.status===filter)
+        );
+        courses.forEach(c=>{
+          const div=document.createElement("div");
+          div.className="course";
+          div.innerHTML=`
+            <h3>${c.title} (${c.platform})</h3>
+            <p>${c.category} | ${c.desc}</p>
+            <div class="progress"><div class="bar" style="width:${c.progress}%"></div></div>
+            <p>Status: ${c.status} | Progress: ${c.progress}%</p>
+            ${c.link?`<p><a href="${c.link}" target="_blank">🔗 Course Link</a></p>`:""}
+            ${c.certificate?`<p>🎓 Certificate: <a href="${c.certificate}" target="_blank">View</a></p>`:""}
+            <div class="actions">
+              <button class="edit" onclick="addLesson(${c.id})">+ Lesson</button>
+              <button class="edit" onclick="updateStatus(${c.id})">Update Status</button>
+              <button class="delete" onclick="deleteCourse(${c.id})">Delete</button>
+            </div>
+            <div class="lessons">${c.lessons.map((l,i)=>`
+              <div class="lesson">
+                <input type="checkbox" ${l.done?"checked":""} onchange="toggleLesson(${c.id},${i})">
+                ${l.text}
+              </div>`).join("")}</div>
+          `;
+          container.appendChild(div);
+          if(c.end){
+            const li=document.createElement("li");
+            li.textContent=`${c.title} → ${c.end}`;
+            cal.appendChild(li);
+          }
+        });
+      };
+    }
+
+    function deleteCourse(id){
+      const tx=db.transaction("courses","readwrite");
+      tx.objectStore("courses").delete(id);
+      tx.oncomplete=()=>displayCourses();
+    }
+
+    function addLesson(courseId){
+      const text=prompt("Enter lesson name:");
+      if(!text) return;
+      const tx=db.transaction("courses","readwrite");
+      const store=tx.objectStore("courses");
+      store.get(courseId).onsuccess=e=>{
+        const course=e.target.result;
+        course.lessons.push({text,done:false});
+        saveUpdate(course);
+      };
+    }
+    function toggleLesson(courseId,index){
+      const tx=db.transaction("courses","readwrite");
+      const store=tx.objectStore("courses");
+      store.get(courseId).onsuccess=e=>{
+        const course=e.target.result;
+        course.lessons[index].done=!course.lessons[index].done;
+        const done=course.lessons.filter(l=>l.done).length;
+        course.progress=Math.round((done/course.lessons.length)*100);
+        if(course.progress===100) course.status="completed";
+        else if(course.progress>0) course.status="in-progress";
+        else course.status="not-started";
+        saveUpdate(course);
+      };
+    }
+    function updateStatus(courseId){
+      const status=prompt("Enter status (not-started, in-progress, completed):");
+      if(!["not-started","in-progress","completed"].includes(status)) return;
+      const tx=db.transaction("courses","readwrite");
+      const store=tx.objectStore("courses");
+      store.get(courseId).onsuccess=e=>{
+        const course=e.target.result;
+        course.status=status;
+        saveUpdate(course);
+      };
+    }
+    function saveUpdate(course){
+      const tx=db.transaction("courses","readwrite");
+      tx.objectStore("courses").put(course);
+      tx.oncomplete=()=>displayCourses();
+    }
+
+    document.getElementById("search").oninput=displayCourses;
+    document.getElementById("filter").onchange=displayCourses;
+  </script>
+</body>
+</html>

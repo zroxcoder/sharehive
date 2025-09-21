@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Profile</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: 0.3s;
+    }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #222;
+      --primary-color: #0077ff;
+      --sidebar-bg: #f4f4f4;
+      --card-bg: #f8f8f8;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c;
+      --card-bg: #333333;
+    }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    .container { display: flex; height: calc(100vh - 50px); }
+
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+    .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
+    .sidebar a:hover { background: var(--primary-color); color: white; }
+
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h2 { margin: 15px 0; }
+
+    .card {
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .profile-pic {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--primary-color);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    .stat-box {
+      background: var(--card-bg);
+      padding: 10px;
+      text-align: center;
+      border-radius: 8px;
+    }
+
+    .timeline li { margin: 8px 0; }
+    .badges span {
+      display: inline-block;
+      background: gold;
+      color: black;
+      padding: 6px 12px;
+      margin: 5px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Profile</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todos.html">✅ To-Do List</a>
+      <a href="expenses.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="card profile-header">
+        <img id="profile-pic" class="profile-pic" src="https://via.placeholder.com/120" alt="Profile Picture">
+        <div>
+          <h2 id="profile-name">Your Name</h2>
+          <p id="profile-bio">Your bio goes here...</p>
+          <p><strong>Email:</strong> <span id="profile-email">example@email.com</span></p>
+          <p><strong>Work:</strong> <span id="profile-work">Not set</span></p>
+          <p><strong>Study:</strong> <span id="profile-study">Not set</span></p>
+          <p><strong>Address:</strong> <span id="profile-address">Not set</span></p>
+          <p><strong>Social:</strong> <a id="profile-social" href="#" target="_blank">Link</a></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📊 Statistics</h3>
+        <div class="stats">
+          <div class="stat-box">Notes: <span id="stat-notes">0</span></div>
+          <div class="stat-box">Tasks Done: <span id="stat-todos">0</span></div>
+          <div class="stat-box">Expenses: <span id="stat-expenses">0</span></div>
+          <div class="stat-box">Courses: <span id="stat-courses">0</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🕒 Recent Activity</h3>
+        <ul class="timeline" id="recent-activity"><li>No activity yet.</li></ul>
+      </div>
+
+      <div class="card">
+        <h3>🏆 Badges</h3>
+        <div class="badges" id="badges"><span>No badges yet</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+    // 📦 IndexedDB (v21 unified)
+    let db;
+    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
+    const request = indexedDB.open("ShareHiveDB", 21);
+
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      stores.forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+        }
+      });
+    };
+
+    request.onsuccess = e => {
+      db = e.target.result;
+      loadProfile();
+      loadStats();
+    };
+    request.onerror = e => console.error("DB error:", e.target.error);
+
+    // 👤 Load Profile
+    function loadProfile() {
+      const tx = db.transaction("profile","readonly");
+      const store = tx.objectStore("profile");
+      const req = store.get(1); // always use first record
+      req.onsuccess = () => {
+        if(req.result){
+          const p=req.result;
+          document.getElementById("profile-name").innerText=p.name||"Your Name";
+          document.getElementById("profile-bio").innerText=p.bio||"Your bio goes here...";
+          document.getElementById("profile-email").innerText=p.email||"Not set";
+          document.getElementById("profile-work").innerText=p.work||"Not set";
+          document.getElementById("profile-study").innerText=p.study||"Not set";
+          document.getElementById("profile-address").innerText=p.address||"Not set";
+          if(p.social){
+            const link=document.getElementById("profile-social");
+            link.href=p.social;
+            link.innerText=p.social;
+          }
+          if(p.picture){
+            document.getElementById("profile-pic").src=p.picture;
+          }
+        }
+      };
+    }
+
+    // 📊 Stats
+    function loadStats(){
+      const update=(storeName,el,filter)=>{
+        const tx=db.transaction(storeName,"readonly");
+        const store=tx.objectStore(storeName);
+        const req=store.getAll();
+        req.onsuccess=()=>{
+          let val=req.result.length;
+          if(filter) val=req.result.filter(filter).length;
+          document.getElementById(el).innerText=val;
+        };
+      };
+      update("notes","stat-notes");
+      update("todos","stat-todos",t=>t.completed||t.done);
+      update("expenses","stat-expenses");
+      update("courses","stat-courses",c=>c.status==="Completed");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShareHive - Uploads</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition:0.3s;
+    }
+    :root {
+      --bg-color:#fff;
+      --text-color:#222;
+      --primary-color:#0077ff;
+      --sidebar-bg:#f4f4f4;
+      --card-bg:#f8f8f8;
+    }
+    body.dark {
+      --bg-color:#1e1e1e;
+      --text-color:#f0f0f0;
+      --sidebar-bg:#2c2c2c;
+      --card-bg:#333;
+    }
+
+    /* Navbar */
+    .navbar {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 20px; background:var(--primary-color); color:#fff;
+    }
+    .navbar h1 { font-size:20px; }
+    .toggle-btn {
+      background:#fff; border:none; color:var(--primary-color);
+      padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold;
+    }
+
+    /* Layout */
+    .container { display:flex; height:calc(100vh - 50px); }
+    .sidebar {
+      width:220px; background:var(--sidebar-bg); padding:20px; overflow-y:auto;
+    }
+    .sidebar h2 { font-size:16px; margin-bottom:10px; }
+    .sidebar a {
+      display:block; text-decoration:none; color:var(--text-color);
+      padding:8px 10px; border-radius:5px; margin-bottom:5px;
+    }
+    .sidebar a:hover { background:var(--primary-color); color:#fff; }
+
+    .main { flex:1; padding:20px; overflow-y:auto; }
+
+    /* Form */
+    .form { margin-bottom:20px; }
+    .form input[type=file] {
+      margin-bottom:10px; display:block;
+    }
+    .form button {
+      padding:8px 12px; border:none; background:var(--primary-color);
+      color:#fff; border-radius:5px; cursor:pointer; font-weight:bold;
+    }
+
+    /* Search + Filter */
+    .controls {
+      display:flex; gap:10px; margin-bottom:15px;
+    }
+    .controls input, .controls select {
+      padding:8px; border:1px solid #ccc; border-radius:5px;
+      background:var(--card-bg); color:var(--text-color);
+    }
+
+    /* Uploads */
+    .uploads-container {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr));
+      gap:15px;
+    }
+    .upload-card {
+      background:var(--card-bg); padding:15px; border-radius:10px;
+      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    }
+    .upload-card h4 { margin-bottom:10px; font-size:14px; }
+    .actions { margin-top:10px; }
+    .delete {
+      background:#f44336; color:#fff; border:none; padding:5px 8px;
+      border-radius:5px; cursor:pointer; font-size:12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>🐝 ShareHive - Uploads</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html">✅ To-Do List</a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>Upload Files</h2>
+      <div class="form">
+        <input type="file" id="fileInput" multiple>
+        <button onclick="saveFiles()">Upload</button>
+      </div>
+
+      <div class="controls">
+        <input type="text" id="search" placeholder="Search files...">
+        <select id="filter">
+          <option value="all">All</option>
+          <option value="image">Images</option>
+          <option value="video">Videos</option>
+          <option value="audio">Music</option>
+          <option value="pdf">PDFs</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <h2>Your Uploads</h2>
+      <div class="uploads-container" id="uploads"></div>
+    </div>
+  </div>
+
+  <script>
+    // 🌙 Dark Mode
+    function toggleTheme(){
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light");
+    }
+    if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+
+   // 📦 IndexedDB (v21 unified)
+let db;
+const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
+const request = indexedDB.open("ShareHiveDB", 21);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  stores.forEach(name => {
+    if (!db.objectStoreNames.contains(name)) {
+      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    }
+  });
+};
+
+request.onsuccess = e => { 
+  db = e.target.result; 
+  displayUploads();  // ✅ call page-specific display function
+};
+
+request.onerror = e => console.error("DB error:", e.target.error);
+
+
+    // Save Files
+    function saveFiles(){
+      const files=document.getElementById("fileInput").files;
+      if(!files.length) return;
+      Array.from(files).forEach(file=>{
+        const reader=new FileReader();
+        reader.onload=()=>{
+          const tx=db.transaction("uploads","readwrite");
+          tx.objectStore("uploads").add({
+            name:file.name,
+            type:file.type,
+            data:reader.result,
+            date:Date.now()
+          });
+          tx.oncomplete=()=>displayUploads();
+        };
+        reader.readAsDataURL(file);
+      });
+      document.getElementById("fileInput").value="";
+    }
+
+    // Display Uploads
+    function displayUploads(){
+      const tx=db.transaction("uploads","readonly");
+      const store=tx.objectStore("uploads");
+      const req=store.getAll();
+
+      req.onsuccess=()=>{
+        let uploads=req.result;
+
+        // Search + Filter
+        const search=document.getElementById("search").value.toLowerCase();
+        const filter=document.getElementById("filter").value;
+
+        if(search){
+          uploads=uploads.filter(f=>f.name.toLowerCase().includes(search));
+        }
+        if(filter!=="all"){
+          uploads=uploads.filter(f=>{
+            if(filter==="image") return f.type.startsWith("image/");
+            if(filter==="video") return f.type.startsWith("video/");
+            if(filter==="audio") return f.type.startsWith("audio/");
+            if(filter==="pdf") return f.type==="application/pdf";
+            return !f.type.startsWith("image/") && !f.type.startsWith("video/") && !f.type.startsWith("audio/") && f.type!=="application/pdf";
+          });
+        }
+
+        const container=document.getElementById("uploads");
+        container.innerHTML="";
+        uploads.forEach(file=>{
+          const div=document.createElement("div");
+          div.className="upload-card";
+
+          let preview="";
+          if(file.type.startsWith("image/")){
+            preview=`<img src="${file.data}" alt="${file.name}" style="max-width:100%;border-radius:5px;">`;
+          } else if(file.type.startsWith("video/")){
+            preview=`<video controls style="max-width:100%;border-radius:5px;"><source src="${file.data}" type="${file.type}"></video>`;
+          } else if(file.type.startsWith("audio/")){
+            preview=`<audio controls style="width:100%;"><source src="${file.data}" type="${file.type}"></audio>`;
+          } else if(file.type==="application/pdf"){
+            preview=`<embed src="${file.data}" type="application/pdf" width="100%" height="200px"/>`;
+          } else {
+            preview=`📄 <a href="${file.data}" download="${file.name}">${file.name}</a>`;
+          }
+
+          div.innerHTML=`
+            <h4>${file.name}</h4>
+            ${preview}
+            <div class="actions">
+              <button class="delete" onclick="deleteFile(${file.id})">Delete</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      };
+    }
+
+    // Delete File
+    function deleteFile(id){
+      const tx=db.transaction("uploads","readwrite");
+      tx.objectStore("uploads").delete(id);
+      tx.oncomplete=displayUploads;
+    }
+
+    // Live Search & Filter
+    document.getElementById("search").addEventListener("input",displayUploads);
+    document.getElementById("filter").addEventListener("change",displayUploads);
+  </script>
+</body>
+</html>
