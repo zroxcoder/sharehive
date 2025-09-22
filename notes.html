@@ -185,8 +185,8 @@ request.onerror = e => console.error("DB error:", e.target.error);
       const btn = document.getElementById("saveBtn");
       const editId = btn.getAttribute("data-edit");
 
-      const tx = db.transaction("videos", "readwrite"); // change to "notes" or "bookmarks" as needed
-      const store = tx.objectStore("videos"); // change to "notes" or "bookmarks" as needed
+      const tx = db.transaction("videos", "readwrite"); // or "notes", "bookmarks"
+      const store = tx.objectStore("videos"); // or "notes", "bookmarks"
 
       if (editId) {
         store.put({ id: Number(editId), title, url, content });
