@@ -148,16 +148,15 @@
 
     <!-- Main -->
     <div class="main">
-      <h2>Add Video</h2>
       <div class="form">
-        <input type="text" id="title" placeholder="Video title">
-        <input type="url" id="url" placeholder="https://youtube.com/...">
+        <input id="title" type="text" placeholder="Video Title">
+        <input id="url" type="url" placeholder="Video URL">
         <button id="saveBtn">Save Video</button>
       </div>
-
-      <h2>Your Videos</h2>
-      <input type="text" id="search" placeholder="Search videos..." style="padding:8px;width:100%;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;">
-      <div class="videos-container" id="videos"></div>
+      <div class="search-box">
+        <input id="search" type="text" placeholder="Search videos...">
+      </div>
+      <div class="videos-container"></div>
     </div>
   </div>
 
