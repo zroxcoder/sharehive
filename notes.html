@@ -116,6 +116,7 @@
     <div class="main">
       <div class="form">
         <input id="title" type="text" placeholder="Note Title">
+        <input id="url" type="text" placeholder="Video URL (optional)">
         <textarea id="content" rows="4" placeholder="Note Content"></textarea>
         <button id="saveBtn">Save Note</button>
       </div>
@@ -177,27 +178,28 @@ request.onerror = e => console.error("DB error:", e.target.error);
     // Save / Update
     document.getElementById("saveBtn").onclick = () => {
       const title = document.getElementById("title").value.trim();
-      const content = document.getElementById("content").value.trim();
-      if (!title && !content) return;
+      const url = document.getElementById("url")?.value.trim();
+      const content = document.getElementById("content")?.value.trim();
+      if (!title || (!url && typeof url !== "undefined") && (!content && typeof content !== "undefined")) return;
 
       const btn = document.getElementById("saveBtn");
       const editId = btn.getAttribute("data-edit");
 
-      const tx = db.transaction("notes", "readwrite");
-      const store = tx.objectStore("notes");
+      const tx = db.transaction("videos", "readwrite"); // change to "notes" or "bookmarks" as needed
+      const store = tx.objectStore("videos"); // change to "notes" or "bookmarks" as needed
 
       if (editId) {
-        store.put({ id: Number(editId), title, content, pinned: false });
+        store.put({ id: Number(editId), title, url, content });
+        btn.removeAttribute("data-edit");
       } else {
-        store.add({ title, content, pinned: false });
+        store.add({ title, url, content });
       }
 
       tx.oncomplete = () => {
         document.getElementById("title").value = "";
-        document.getElementById("content").value = "";
-        btn.textContent = "Save Note";
-        btn.removeAttribute("data-edit");
-        displayNotes();
+        if (document.getElementById("url")) document.getElementById("url").value = "";
+        if (document.getElementById("content")) document.getElementById("content").value = "";
+        displayVideos(); // or displayNotes(), displayBookmarks()
       };
     };
 

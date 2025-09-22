@@ -211,27 +211,28 @@ request.onerror = e => console.error("DB error:", e.target.error);
     // Save / Update
     document.getElementById("saveBtn").onclick = () => {
       const title = document.getElementById("title").value.trim();
-      const url = document.getElementById("url").value.trim();
-      if (!title || !url) return;
+      const url = document.getElementById("url")?.value.trim();
+      const content = document.getElementById("content")?.value.trim();
+      if (!title || (!url && typeof url !== "undefined") && (!content && typeof content !== "undefined")) return;
 
       const btn = document.getElementById("saveBtn");
       const editId = btn.getAttribute("data-edit");
 
-      const tx = db.transaction("videos", "readwrite");
-      const store = tx.objectStore("videos");
+      const tx = db.transaction("videos", "readwrite"); // change to "notes" or "bookmarks" as needed
+      const store = tx.objectStore("videos"); // change to "notes" or "bookmarks" as needed
 
       if (editId) {
-        store.put({ id: Number(editId), title, url });
+        store.put({ id: Number(editId), title, url, content });
+        btn.removeAttribute("data-edit");
       } else {
-        store.add({ title, url });
+        store.add({ title, url, content });
       }
 
       tx.oncomplete = () => {
         document.getElementById("title").value = "";
-        document.getElementById("url").value = "";
-        btn.textContent = "Save Video";
-        btn.removeAttribute("data-edit");
-        displayVideos();
+        if (document.getElementById("url")) document.getElementById("url").value = "";
+        if (document.getElementById("content")) document.getElementById("content").value = "";
+        displayVideos(); // or displayNotes(), displayBookmarks()
       };
     };
 
