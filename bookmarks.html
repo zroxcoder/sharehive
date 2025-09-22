@@ -153,28 +153,26 @@ request.onerror = e => console.error("DB error:", e.target.error);
     // Save / Update
     document.getElementById("saveBtn").onclick = () => {
       const title = document.getElementById("title").value.trim();
-      const url = document.getElementById("url")?.value.trim();
-      const content = document.getElementById("content")?.value.trim();
-      if (!title || (!url && typeof url !== "undefined") && (!content && typeof content !== "undefined")) return;
+      const url = document.getElementById("url").value.trim();
+      if (!title || !url) return;
 
       const btn = document.getElementById("saveBtn");
       const editId = btn.getAttribute("data-edit");
 
-      const tx = db.transaction("videos", "readwrite"); // or "notes", "bookmarks"
-      const store = tx.objectStore("videos"); // or "notes", "bookmarks"
+      const tx = db.transaction("bookmarks", "readwrite");
+      const store = tx.objectStore("bookmarks");
 
       if (editId) {
-        store.put({ id: Number(editId), title, url, content });
+        store.put({ id: Number(editId), title, url });
         btn.removeAttribute("data-edit");
       } else {
-        store.add({ title, url, content });
+        store.add({ title, url }); // <-- NO id for new bookmarks!
       }
 
       tx.oncomplete = () => {
         document.getElementById("title").value = "";
-        if (document.getElementById("url")) document.getElementById("url").value = "";
-        if (document.getElementById("content")) document.getElementById("content").value = "";
-        displayVideos(); // or displayNotes(), displayBookmarks()
+        document.getElementById("url").value = "";
+        displayBookmarks();
       };
     };
 
