@@ -224,7 +224,7 @@ request.onerror = e => console.error("DB error:", e.target.error);
         store.put({ id: Number(editId), title, url });
         btn.removeAttribute("data-edit");
       } else {
-        store.add({ title, url }); // <-- NO id for new videos!
+        store.add({ title, url }); // No id for new videos!
       }
 
       tx.oncomplete = () => {
