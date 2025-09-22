@@ -191,17 +191,17 @@ request.onerror = e => console.error("DB error:", e.target.error);
           bookmarks = bookmarks.filter(b => b.title.toLowerCase().includes(search) || b.url.toLowerCase().includes(search));
         }
 
-        const container = document.getElementById("bookmarks");
+        const container = document.querySelector(".bookmarks-container"); // <-- FIXED
         container.innerHTML = "";
-        bookmarks.forEach(bm => {
+        bookmarks.forEach(b => {
           const div = document.createElement("div");
           div.className = "bookmark";
           div.innerHTML = `
-            <h3>${bm.title}</h3>
-            <a href="${bm.url}" target="_blank">${bm.url}</a>
+            <h3>${b.title}</h3>
+            <a href="${b.url}" target="_blank">${b.url}</a>
             <div class="actions">
-              <button class="edit" onclick="editBookmark(${bm.id})">Edit</button>
-              <button class="delete" onclick="deleteBookmark(${bm.id})">Delete</button>
+              <button class="edit" onclick="editBookmark(${b.id})">Edit</button>
+              <button class="delete" onclick="deleteBookmark(${b.id})">Delete</button>
             </div>`;
           container.appendChild(div);
         });

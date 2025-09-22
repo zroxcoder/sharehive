@@ -215,10 +215,7 @@ request.onerror = e => console.error("DB error:", e.target.error);
           notes = notes.filter(n => n.title.toLowerCase().includes(search) || n.content.toLowerCase().includes(search));
         }
 
-        // Pinned first
-        notes.sort((a,b) => b.pinned - a.pinned);
-
-        const container = document.getElementById("notes");
+        const container = document.querySelector(".notes-container"); // <-- FIXED
         container.innerHTML = "";
         notes.forEach(n => {
           const div = document.createElement("div");

@@ -249,7 +249,7 @@ request.onerror = e => console.error("DB error:", e.target.error);
           videos = videos.filter(v => v.title.toLowerCase().includes(search) || v.url.toLowerCase().includes(search));
         }
 
-        const container = document.getElementById("videos");
+        const container = document.querySelector(".videos-container"); // <-- FIXED
         container.innerHTML = "";
         videos.forEach(v => {
           const div = document.createElement("div");
