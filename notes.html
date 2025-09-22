@@ -59,7 +59,7 @@
       padding: 15px; 
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      overflow: hidden; /* Add this */
+      overflow: hidden;
     }
     .note h3 { margin-bottom: 8px; font-size: 16px; }
     .note p {
@@ -116,7 +116,6 @@
     <div class="main">
       <div class="form">
         <input id="title" type="text" placeholder="Note Title">
-        <input id="url" type="text" placeholder="Video URL (optional)">
         <textarea id="content" rows="4" placeholder="Note Content"></textarea>
         <button id="saveBtn">Save Note</button>
       </div>
@@ -128,54 +127,38 @@
   </div>
 
   <script>
-    // Dark Mode
+    // 🌙 Dark Mode
     function toggleTheme() {
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
     if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
- // 📦 IndexedDB (v21 unified)
-let db;
-const stores = [
-  "notes",
-  "bookmarks",
-  "videos",
-  "todos",
-  "expenses",
-  "planner",
-  "wiki",
-  "uploads",
-  "projects",
-  "watchlist",
-  "courses",
-  "profile",
-  "settings",
-  "community"
-];
+    // 📦 IndexedDB (v21 unified)
+    let db;
+    const stores = [
+      "notes","bookmarks","videos","todos","expenses","planner",
+      "wiki","uploads","projects","watchlist","courses","profile",
+      "settings","community"
+    ];
+    const request = indexedDB.open("ShareHiveDB", 21);
 
-const request = indexedDB.open("ShareHiveDB", 21);
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      stores.forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+        }
+      });
+    };
 
-request.onupgradeneeded = e => {
-  db = e.target.result;
-  stores.forEach(name => {
-    if (!db.objectStoreNames.contains(name)) {
-      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-    }
-  });
-};
+    request.onsuccess = e => { 
+      db = e.target.result; 
+      displayNotes();
+    };
+    request.onerror = e => console.error("DB error:", e.target.error);
 
-request.onsuccess = e => { 
-  db = e.target.result; 
-  displayNotes();  // ✅ call page-specific display function
-};
-
-request.onerror = e => console.error("DB error:", e.target.error);
-
-
-
-
-    // Save / Update
+    // ➕ Save / Update
     document.getElementById("saveBtn").onclick = () => {
       const title = document.getElementById("title").value.trim();
       const content = document.getElementById("content").value.trim();
@@ -188,10 +171,11 @@ request.onerror = e => console.error("DB error:", e.target.error);
       const store = tx.objectStore("notes");
 
       if (editId) {
-        store.put({ id: Number(editId), title, content });
+        store.put({ id: Number(editId), title, content, pinned: false });
         btn.removeAttribute("data-edit");
+        btn.textContent = "Save Note";
       } else {
-        store.add({ title, content }); // No id for new notes!
+        store.add({ title, content, pinned: false });
       }
 
       tx.oncomplete = () => {
@@ -201,7 +185,7 @@ request.onerror = e => console.error("DB error:", e.target.error);
       };
     };
 
-    // Display
+    // 📋 Display
     function displayNotes() {
       const tx = db.transaction("notes", "readonly");
       const req = tx.objectStore("notes").getAll();
@@ -209,20 +193,26 @@ request.onerror = e => console.error("DB error:", e.target.error);
       req.onsuccess = () => {
         let notes = req.result;
 
-        // Search filter
+        // 🔍 Search filter
         const search = document.getElementById("search").value.toLowerCase();
         if (search) {
-          notes = notes.filter(n => n.title.toLowerCase().includes(search) || n.content.toLowerCase().includes(search));
+          notes = notes.filter(n => 
+            (n.title || "").toLowerCase().includes(search) || 
+            (n.content || "").toLowerCase().includes(search)
+          );
         }
 
-        const container = document.querySelector(".notes-container"); // <-- FIXED
+        // 📌 Sort pinned first
+        notes.sort((a, b) => (b.pinned === true) - (a.pinned === true));
+
+        const container = document.querySelector(".notes-container");
         container.innerHTML = "";
         notes.forEach(n => {
           const div = document.createElement("div");
           div.className = "note";
           div.innerHTML = `
-            <h3>${n.title}</h3>
-            <p>${n.content}</p>
+            <h3>${n.title || "Untitled"}</h3>
+            <p>${n.content || ""}</p>
             <div class="actions">
               <button class="edit" onclick="editNote(${n.id})">Edit</button>
               <button class="delete" onclick="deleteNote(${n.id})">Delete</button>
@@ -233,7 +223,7 @@ request.onerror = e => console.error("DB error:", e.target.error);
       };
     }
 
-    // Edit
+    // ✏️ Edit
     function editNote(id) {
       const tx = db.transaction("notes", "readonly");
       const req = tx.objectStore("notes").get(id);
@@ -248,14 +238,14 @@ request.onerror = e => console.error("DB error:", e.target.error);
       };
     }
 
-    // Delete
+    // 🗑 Delete
     function deleteNote(id) {
       const tx = db.transaction("notes", "readwrite");
       tx.objectStore("notes").delete(id);
       tx.oncomplete = displayNotes;
     }
 
-    // Pin
+    // 📌 Pin/Unpin
     function togglePin(id) {
       const tx = db.transaction("notes", "readwrite");
       const store = tx.objectStore("notes");
@@ -268,7 +258,7 @@ request.onerror = e => console.error("DB error:", e.target.error);
       };
     }
 
-    // Live search
+    // 🔍 Live search
     document.getElementById("search").addEventListener("input", displayNotes);
   </script>
 </body>

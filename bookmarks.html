@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ShareHive - Bookmarks</title>
+  <title>ShareHive - Notes</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: 0.3s; }
@@ -24,32 +24,25 @@
     h2 { margin: 15px 0; }
 
     .form { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
-    .form input { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; background: var(--card-bg); color: var(--text-color); }
+    .form input, .form textarea { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; background: var(--card-bg); color: var(--text-color); }
+    .form textarea { resize: vertical; min-height: 80px; }
     .form button { padding: 8px; border: none; background: var(--primary-color); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
     .search-box { margin-bottom: 15px; }
     .search-box input { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
 
-    .bookmarks-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
-    .bookmark {
+    .notes-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+    .note {
       background: var(--card-bg);
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       overflow: hidden;
     }
-    .bookmark h3 { margin-bottom: 8px; font-size: 16px; }
-    .bookmark a {
-      color: var(--primary-color);
-      text-decoration: none;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-      display: block;
-      max-width: 100%;
-      white-space: normal;
-    }
+    .note h3 { margin-bottom: 8px; font-size: 16px; }
+    .note p { font-size: 14px; white-space: pre-wrap; word-wrap: break-word; }
     .actions { display: flex; gap: 8px; margin-top: 10px; }
-    .bookmark button { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .note button { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
     .edit { background: #4caf50; color: white; }
     .delete { background: #f44336; color: white; }
   </style>
@@ -57,7 +50,7 @@
 <body>
   <!-- Navbar -->
   <div class="navbar">
-    <h1>🐝 ShareHive - Bookmarks</h1>
+    <h1>🐝 ShareHive - Notes</h1>
     <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
   </div>
 
@@ -94,14 +87,14 @@
     <!-- Main -->
     <div class="main">
       <div class="form">
-        <input id="title" type="text" placeholder="Bookmark Title">
-        <input id="url" type="url" placeholder="Bookmark URL">
-        <button id="saveBtn">Save Bookmark</button>
+        <input id="title" type="text" placeholder="Note Title">
+        <textarea id="content" placeholder="Write your note..."></textarea>
+        <button id="saveBtn">Save Note</button>
       </div>
       <div class="search-box">
-        <input id="search" type="text" placeholder="Search bookmarks...">
+        <input id="search" type="text" placeholder="Search notes...">
       </div>
-      <div class="bookmarks-container"></div>
+      <div class="notes-container"></div>
     </div>
   </div>
 
@@ -113,124 +106,109 @@
     }
     if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
-// 📦 IndexedDB (v21 unified)
-let db;
-const stores = [
-  "notes",
-  "bookmarks",
-  "videos",
-  "todos",
-  "expenses",
-  "planner",
-  "wiki",
-  "uploads",
-  "projects",
-  "watchlist",
-  "courses",
-  "profile",
-  "settings",
-  "community"
-];
+    // 📦 IndexedDB (v21 unified)
+    let db;
+    const stores = [
+      "notes","bookmarks","videos","todos","expenses","planner",
+      "wiki","uploads","projects","watchlist","courses",
+      "profile","settings","community"
+    ];
+    const request = indexedDB.open("ShareHiveDB", 21);
 
-const request = indexedDB.open("ShareHiveDB", 21);
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      stores.forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+        }
+      });
+    };
 
-request.onupgradeneeded = e => {
-  db = e.target.result;
-  stores.forEach(name => {
-    if (!db.objectStoreNames.contains(name)) {
-      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-    }
-  });
-};
+    request.onsuccess = e => { db = e.target.result; displayNotes(); };
+    request.onerror = e => console.error("DB error:", e.target.error);
 
-request.onsuccess = e => { 
-  db = e.target.result; 
-  displayBookmarks();  // ✅ call page-specific display function
-};
-
-request.onerror = e => console.error("DB error:", e.target.error);
-
-    // Save / Update
+    // Save / Update Note
     document.getElementById("saveBtn").onclick = () => {
       const title = document.getElementById("title").value.trim();
-      const url = document.getElementById("url").value.trim();
-      if (!title || !url) return;
+      const content = document.getElementById("content").value.trim();
+      if (!title || !content) return;
 
       const btn = document.getElementById("saveBtn");
       const editId = btn.getAttribute("data-edit");
 
-      const tx = db.transaction("bookmarks", "readwrite");
-      const store = tx.objectStore("bookmarks");
+      const tx = db.transaction("notes", "readwrite");
+      const store = tx.objectStore("notes");
 
       if (editId) {
-        store.put({ id: Number(editId), title, url });
+        store.put({ id: Number(editId), title, content });
         btn.removeAttribute("data-edit");
+        btn.textContent = "Save Note";  // ✅ reset back
       } else {
-        store.add({ title, url }); // No id for new bookmarks!
+        store.add({ title, content });
       }
 
       tx.oncomplete = () => {
         document.getElementById("title").value = "";
-        document.getElementById("url").value = "";
-        displayBookmarks();
+        document.getElementById("content").value = "";
+        displayNotes();
       };
     };
 
-    // Display
-    function displayBookmarks() {
-      const tx = db.transaction("bookmarks", "readonly");
-      const req = tx.objectStore("bookmarks").getAll();
+    // Display Notes
+    function displayNotes() {
+      const tx = db.transaction("notes", "readonly");
+      const req = tx.objectStore("notes").getAll();
 
       req.onsuccess = () => {
-        let bookmarks = req.result;
+        let notes = req.result;
 
         // Search filter
         const search = document.getElementById("search").value.toLowerCase();
         if (search) {
-          bookmarks = bookmarks.filter(b => b.title.toLowerCase().includes(search) || b.url.toLowerCase().includes(search));
+          notes = notes.filter(n => n.title.toLowerCase().includes(search) || n.content.toLowerCase().includes(search));
         }
 
-        const container = document.querySelector(".bookmarks-container"); // <-- FIXED
+        const container = document.querySelector(".notes-container");
         container.innerHTML = "";
-        bookmarks.forEach(b => {
+        notes.forEach(n => {
           const div = document.createElement("div");
-          div.className = "bookmark";
+          div.className = "note";
           div.innerHTML = `
-            <h3>${b.title}</h3>
-            <a href="${b.url}" target="_blank">${b.url}</a>
+            <h3>${n.title}</h3>
+            <p>${n.content}</p>
             <div class="actions">
-              <button class="edit" onclick="editBookmark(${b.id})">Edit</button>
-              <button class="delete" onclick="deleteBookmark(${b.id})">Delete</button>
+              <button class="edit" onclick="editNote(${n.id})">Edit</button>
+              <button class="delete" onclick="deleteNote(${n.id})">Delete</button>
             </div>`;
           container.appendChild(div);
         });
       };
     }
 
-    // Edit
-    function editBookmark(id) {
-      const tx = db.transaction("bookmarks", "readonly");
-      const req = tx.objectStore("bookmarks").get(id);
+    // Edit Note
+    function editNote(id) {
+      const tx = db.transaction("notes", "readonly");
+      const req = tx.objectStore("notes").get(id);
 
       req.onsuccess = () => {
-        const bm = req.result;
-        document.getElementById("title").value = bm.title;
-        document.getElementById("url").value = bm.url;
+        const note = req.result;
+        document.getElementById("title").value = note.title;
+        document.getElementById("content").value = note.content;
         const btn = document.getElementById("saveBtn");
-        btn.textContent = "Update Bookmark";
+        btn.textContent = "Update Note";
         btn.setAttribute("data-edit", id);
       };
     }
 
-    // Delete
-    function deleteBookmark(id) {
-      const tx = db.transaction("bookmarks", "readwrite");
-      tx.objectStore("bookmarks").delete(id);
-      tx.oncomplete = displayBookmarks;
+    // Delete Note
+    function deleteNote(id) {
+      const tx = db.transaction("notes", "readwrite");
+      tx.objectStore("notes").delete(id);
+      tx.oncomplete = displayNotes;
     }
 
-    // Live search
-    document.getElementById("search").addEventListener("input", displayBookmarks);
+    // Live Search
+    document.getElementById("search").addEventListener("input", displayNotes);
   </script>
 </body>
 </html>

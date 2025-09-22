@@ -88,7 +88,7 @@
       padding: 15px; 
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      overflow: hidden; /* Add this */
+      overflow: hidden;
     }
     .video h3 { margin-bottom: 8px; font-size: 16px; }
     .video a {
@@ -168,45 +168,27 @@
     }
     if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
-// 📦 IndexedDB (v21 unified)
-let db;
-const stores = [
-  "notes",
-  "bookmarks",
-  "videos",
-  "todos",
-  "expenses",
-  "planner",
-  "wiki",
-  "uploads",
-  "projects",
-  "watchlist",
-  "courses",
-  "profile",
-  "settings",
-  "community"
-];
+    // 📦 IndexedDB (v21 unified)
+    let db;
+    const stores = [
+      "notes","bookmarks","videos","todos","expenses","planner",
+      "wiki","uploads","projects","watchlist","courses",
+      "profile","settings","community"
+    ];
 
-const request = indexedDB.open("ShareHiveDB", 21);
+    const request = indexedDB.open("ShareHiveDB", 21);
 
-request.onupgradeneeded = e => {
-  db = e.target.result;
-  stores.forEach(name => {
-    if (!db.objectStoreNames.contains(name)) {
-      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-    }
-  });
-};
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      stores.forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+        }
+      });
+    };
 
-request.onsuccess = e => { 
-  db = e.target.result; 
-  displayVideos();  // ✅ call page-specific display function
-};
-
-request.onerror = e => console.error("DB error:", e.target.error);
-
-
-
+    request.onsuccess = e => { db = e.target.result; displayVideos(); };
+    request.onerror = e => console.error("DB error:", e.target.error);
 
     // Save / Update
     document.getElementById("saveBtn").onclick = () => {
@@ -223,8 +205,9 @@ request.onerror = e => console.error("DB error:", e.target.error);
       if (editId) {
         store.put({ id: Number(editId), title, url });
         btn.removeAttribute("data-edit");
+        btn.textContent = "Save Video"; // ✅ reset after editing
       } else {
-        store.add({ title, url }); // No id for new videos!
+        store.add({ title, url });
       }
 
       tx.oncomplete = () => {
@@ -242,13 +225,12 @@ request.onerror = e => console.error("DB error:", e.target.error);
       req.onsuccess = () => {
         let videos = req.result;
 
-        // Search filter
         const search = document.getElementById("search").value.toLowerCase();
         if (search) {
           videos = videos.filter(v => v.title.toLowerCase().includes(search) || v.url.toLowerCase().includes(search));
         }
 
-        const container = document.querySelector(".videos-container"); // <-- FIXED
+        const container = document.querySelector(".videos-container");
         container.innerHTML = "";
         videos.forEach(v => {
           const div = document.createElement("div");
