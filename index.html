@@ -11,6 +11,7 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       transition: 0.3s;
+      line-height: 1.6;
     }
 
     :root {
@@ -18,11 +19,13 @@
       --text-color: #222;
       --primary-color: #0077ff;
       --sidebar-bg: #f4f4f4;
+      --card-bg: #f9f9f9;
     }
     body.dark {
       --bg-color: #1e1e1e;
       --text-color: #f0f0f0;
       --sidebar-bg: #2c2c2c;
+      --card-bg: #2b2b2b;
     }
 
     /* ===== Navbar ===== */
@@ -82,22 +85,58 @@
     .main {
       flex: 1;
       padding: 20px;
+      overflow-y: auto;
     }
-    .welcome {
+    .welcome h3 {
       font-size: 22px;
       margin-bottom: 15px;
+      color: var(--primary-color);
     }
 
-    /* Search Bar */
-    .search-box {
+    /* Content Sections */
+    .content-section {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
       margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    .search-box input {
-      width: 100%;
-      padding: 8px;
-      font-size: 16px;
-      border: 1px solid #ccc;
+    .content-section h2 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: var(--primary-color);
+    }
+    .content-section p {
+      margin-bottom: 10px;
+    }
+    ul.features {
+      list-style: none;
+      padding-left: 0;
+    }
+    ul.features li {
+      margin-bottom: 8px;
+    }
+    ul.features li::before {
+      content: "✔️ ";
+    }
+
+    /* Call to Action */
+    .cta {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .cta a {
+      text-decoration: none;
+      padding: 10px 15px;
       border-radius: 5px;
+      background: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .cta a:hover {
+      opacity: 0.85;
     }
   </style>
 </head>
@@ -140,85 +179,61 @@
 
     <!-- Main Content -->
     <div class="main">
-      <div class="welcome"> <h3>WELCOME TO SHAREHIVE 🐝</h3></div>
-      <p>  YOUR ALL-IN-ONE PERSONAL PRODUCTIVITY HUB 
+      <div class="welcome"><h3>WELCOME TO SHAREHIVE 🐝</h3></div>
 
-Thank you for choosing ShareHive — the smart, intuitive, and beautifully designed web application built to simplify your life and supercharge your productivity. Whether you’re a student, professional, freelancer, or just someone looking to get organized, ShareHive is your new digital command center.
+      <div class="content-section">
+        <h2>Your All-in-One Productivity Hub</h2>
+        <p>Thank you for choosing ShareHive — the smart, intuitive, and beautifully designed web application built to simplify your life and supercharge your productivity.</p>
+        <p>Whether you’re a student, professional, freelancer, or just someone looking to get organized, ShareHive is your new digital command center.</p>
+      </div>
 
-✨ WHAT IS SHAREHIVE?
+      <div class="content-section">
+        <h2>✨ What is ShareHive?</h2>
+        <p>ShareHive is more than just an app — it’s your personal ecosystem for managing every corner of your daily life. No more juggling between 10 different tools. Everything you need — centralized, synchronized, and always within reach.</p>
+      </div>
 
-ShareHive is more than just an app — it’s your personal ecosystem for managing every corner of your daily life. No more juggling between 10 different tools. No more forgotten tasks or lost notes. Everything you need — centralized, synchronized, and always within reach.
+      <div class="content-section">
+        <h2>🧭 Navigate with Ease</h2>
+        <p>Use the sleek sidebar navigation to instantly jump between powerful features. Everything is just one click away:</p>
+        <ul class="features">
+          <li>📝 Notes – Capture and organize ideas.</li>
+          <li>🔖 Bookmarks – Save websites & articles.</li>
+          <li>🎬 Videos – Curate your video library.</li>
+          <li>✅ To-Do List – Manage daily tasks.</li>
+          <li>💰 Expense Tracker – Track your finances.</li>
+          <li>📚 Wiki – Build your personal knowledge base.</li>
+          <li>📂 Upload Files – Store docs and media.</li>
+          <li>🏗️ Projects – Organize work effectively.</li>
+          <li>🍿 Watchlist – Track shows & movies.</li>
+          <li>🎓 Courses – Manage your learning journey.</li>
+          <li>👤 Profile & ⚙️ Settings – Customize your experience.</li>
+        </ul>
+      </div>
 
-🧭 NAVIGATE WITH EASE
+      <div class="content-section">
+        <h2>🌟 Why You'll Love ShareHive</h2>
+        <ul class="features">
+          <li>✅ All-in-One Platform — Ditch the app overload.</li>
+          <li>✅ Clean & Intuitive UI — Designed for focus.</li>
+          <li>✅ Always Evolving — Updates based on feedback.</li>
+          <li>✅ Secure & Private — Your data belongs to you.</li>
+        </ul>
+      </div>
 
-Use the sleek sidebar navigation to instantly jump between powerful features. Everything is just one click away:
+      <div class="content-section">
+        <p>💬 “Finally, an app that doesn’t just help me get things done — it helps me feel in control of my life.” — Early User</p>
+      </div>
 
-📝 NOTES  
-Capture ideas, meeting minutes, journal entries, or quick thoughts — whenever inspiration strikes. Format, tag, and search with ease.
-
-🔖 BOOKMARKS  
-Save your favorite websites, articles, and resources in one organized, searchable space. Never lose a link again.
-
-🎬 VIDEOS  
-Curate your personal video library — tutorials, lectures, inspiration, or entertainment. Keep them categorized and ready to watch.
-
-✅ TO-DO LIST  
-Break down your day, week, or project into manageable tasks. Set priorities, due dates, and check off wins as you go.
-
-💰 EXPENSE TRACKER  
-Take control of your finances. Log daily spending, set budgets, view trends, and stay on top of where your money goes.
-
-📚 WIKI  
-Build your personal knowledge base. Create interconnected articles, guides, or reference docs — perfect for learning, projects, or team collaboration.
-
-📂 UPLOAD FILES  
-Drag, drop, and store documents, images, PDFs, and more. Secure, searchable, and always accessible from any device.
-
-🏗️ PROJECTS  
-Organize work into focused projects. Assign tasks, track progress, set milestones, and collaborate (coming soon!) — all in one place.
-
-🍿 WATCHLIST  
-Track movies, shows, YouTube series, or courses you want to watch. Rate, review, and never forget what’s next on your list.
-
-🎓 COURSES  
-Plan your learning journey. Log enrolled courses, track progress, take notes, and store certificates — perfect for lifelong learners.
-
-👤 PROFILE & ⚙️ SETTINGS  
-Customize your experience. Update your avatar, manage preferences, adjust privacy, and control notifications — make ShareHive truly yours.
-
-🌟 WHY YOU’LL LOVE SHAREHIVE:
-
-✅ All-in-One Platform — Ditch the app overload. Notes, tasks, finances, learning, media — it’s all here.  
-✅ Clean & Intuitive UI — Designed for focus, not friction.  
-✅ Always Evolving — New features and improvements rolling out regularly based on your feedback.  
-✅ Secure & Private — Your data belongs to you. Always.
-
-💬 “Finally, an app that doesn’t just help me get things done — it helps me feel in control of my life.” — Early User
-
-🚀 Ready to Hive Your Productivity?
-
-Start exploring today. Click through the sidebar, try a feature, create your first note or to-do, and watch how ShareHive transforms the way you work, learn, and live.
-
-Got feedback? We’re all ears. This is your hive — let’s make it perfect, together.
-
-🐝 Welcome home. Welcome to ShareHive.
-
-—
-
-P.S. Don’t forget to bookmark this page (yes, you can do that in ShareHive 😉) — updates, tips, and new features are always buzzing in!
-
-—
-
-[Optional CTA buttons or links:]  
-👉 Start Exploring Now  
-💬 Give Feedback  
-🔔 Subscribe to Updates  
-📖 Read Our Getting Started Guide
-
-—
-
-Designed with ❤️ to help you do more, stress less, and own your day.  
-#ShareHive #ProductivityRedefined #OneAppToRuleThemAll #OrganizeYourLife #DigitalHiveMind </p>
+      <div class="content-section">
+        <h2>🚀 Ready to Hive Your Productivity?</h2>
+        <p>Start exploring today. Click through the sidebar, create your first note or to-do, and watch how ShareHive transforms the way you work, learn, and live.</p>
+        <div class="cta">
+          <a href="notes.html">👉 Start Exploring</a>
+          <a href="contact.html">💬 Give Feedback</a>
+          <a href="blog.html">🔔 Subscribe to Updates</a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
