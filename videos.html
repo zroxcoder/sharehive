@@ -25,86 +25,30 @@
       --card-bg: #333333;
     }
 
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      background: var(--primary-color);
-      color: white;
-    }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
     .navbar h1 { font-size: 20px; }
-    .toggle-btn {
-      background: white;
-      border: none;
-      color: var(--primary-color);
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
     .container { display: flex; height: calc(100vh - 50px); }
 
-    .sidebar {
-      width: 220px;
-      background: var(--sidebar-bg);
-      padding: 20px;
-      overflow-y: auto;
-    }
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
     .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
-    .sidebar a {
-      display: block;
-      text-decoration: none;
-      color: var(--text-color);
-      padding: 8px 10px;
-      border-radius: 5px;
-      margin-bottom: 5px;
-    }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
     .sidebar a:hover { background: var(--primary-color); color: white; }
 
     .main { flex: 1; padding: 20px; overflow-y: auto; }
     h2 { margin: 15px 0; }
 
     .form { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
-    .form input {
-      padding: 8px; font-size: 14px;
-      border: 1px solid #ccc; border-radius: 5px;
-      background: var(--card-bg); color: var(--text-color);
-    }
-    .form button {
-      padding: 8px; border: none;
-      background: var(--primary-color); color: white;
-      border-radius: 5px; cursor: pointer; font-weight: bold;
-    }
+    .form input { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; background: var(--card-bg); color: var(--text-color); }
+    .form button { padding: 8px; border: none; background: var(--primary-color); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-    .videos-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
-    }
-    .video {
-      background: var(--card-bg);
-      padding: 15px; 
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
+    .videos-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+    .video { background: var(--card-bg); padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
     .video h3 { margin-bottom: 8px; font-size: 16px; }
-    .video a {
-      color: var(--primary-color);
-      text-decoration: none;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-      display: block;
-      max-width: 100%;
-      white-space: normal;
-    }
+    .video a { color: var(--primary-color); text-decoration: none; word-break: break-all; display: block; max-width: 100%; white-space: normal; }
     .actions { display: flex; gap: 8px; margin-top: 10px; }
-    .video button {
-      border: none; padding: 5px 8px;
-      border-radius: 5px; cursor: pointer; font-size: 12px;
-    }
+    .video button { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
     .edit { background: #4caf50; color: white; }
     .delete { background: #f44336; color: white; }
   </style>
@@ -161,12 +105,12 @@
   </div>
 
   <script>
-    // Dark Mode
+    // 🌙 Dark Mode
     function toggleTheme() {
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
-    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
     // 📦 IndexedDB (v21 unified)
     let db;
@@ -175,7 +119,6 @@
       "wiki","uploads","projects","watchlist","courses",
       "profile","settings","community"
     ];
-
     const request = indexedDB.open("ShareHiveDB", 21);
 
     request.onupgradeneeded = e => {
@@ -190,7 +133,7 @@
     request.onsuccess = e => { db = e.target.result; displayVideos(); };
     request.onerror = e => console.error("DB error:", e.target.error);
 
-    // Save / Update
+    // ➕ Save / Update
     document.getElementById("saveBtn").onclick = () => {
       const title = document.getElementById("title").value.trim();
       const url = document.getElementById("url").value.trim();
@@ -205,7 +148,7 @@
       if (editId) {
         store.put({ id: Number(editId), title, url });
         btn.removeAttribute("data-edit");
-        btn.textContent = "Save Video"; // ✅ reset after editing
+        btn.textContent = "Save Video";
       } else {
         store.add({ title, url });
       }
@@ -217,7 +160,7 @@
       };
     };
 
-    // Display
+    // 📺 Display
     function displayVideos() {
       const tx = db.transaction("videos", "readonly");
       const req = tx.objectStore("videos").getAll();
@@ -247,7 +190,7 @@
       };
     }
 
-    // Edit
+    // ✏️ Edit
     function editVideo(id) {
       const tx = db.transaction("videos", "readonly");
       const req = tx.objectStore("videos").get(id);
@@ -262,14 +205,14 @@
       };
     }
 
-    // Delete
+    // ❌ Delete
     function deleteVideo(id) {
       const tx = db.transaction("videos", "readwrite");
       tx.objectStore("videos").delete(id);
       tx.oncomplete = displayVideos;
     }
 
-    // Live search
+    // 🔍 Live Search
     document.getElementById("search").addEventListener("input", displayVideos);
   </script>
 </body>

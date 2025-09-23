@@ -59,14 +59,11 @@
       padding: 15px; 
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      overflow: hidden;
     }
     .note h3 { margin-bottom: 8px; font-size: 16px; }
     .note p {
-      word-break: break-all;
+      word-break: break-word;
       overflow-wrap: anywhere;
-      max-width: 100%;
-      white-space: normal;
     }
     .actions { display: flex; gap: 8px; margin-top: 10px; }
     .note button { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
@@ -171,7 +168,11 @@
       const store = tx.objectStore("notes");
 
       if (editId) {
-        store.put({ id: Number(editId), title, content, pinned: false });
+        // get existing note so we don't reset pinned
+        store.get(Number(editId)).onsuccess = ev => {
+          const old = ev.target.result;
+          store.put({ id: Number(editId), title, content, pinned: old.pinned });
+        };
         btn.removeAttribute("data-edit");
         btn.textContent = "Save Note";
       } else {
