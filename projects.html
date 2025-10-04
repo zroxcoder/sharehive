@@ -272,6 +272,23 @@
     if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
 
     let db;
+    const stores = [
+  "notes",
+  "bookmarks",
+  "videos",
+  "todos",
+  "expenses",
+  "planner",
+  "wiki",
+  "uploads",
+  "projects",
+  "watchlist",
+  "courses",
+  "profile",
+  "settings",
+  "community"
+];
+
     const request = indexedDB.open("ShareHiveDB", 21);
     request.onupgradeneeded = e => {
       db = e.target.result;
