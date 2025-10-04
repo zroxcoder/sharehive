@@ -6,68 +6,120 @@
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: var(--bg-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
       color: var(--text-color);
       transition: 0.3s;
+      font-size: 16px;
+      overflow: hidden; /* Prevent body scroll */
     }
     :root {
-      --bg-color: #ffffff;
-      --text-color: #222;
-      --primary-color: #0077ff;
-      --sidebar-bg: #f4f4f4;
-      --card-bg: #f8f8f8;
+      --bg-color: #ffffff; --text-color: #222;
+      --primary-color: #0077ff; --secondary-color: #00c896; --sidebar-bg: #f7f7f7; --card-bg: #ffffff;
+      --border-color: #e0e0e0; --success-color: #28a745; --warning-color: #ffc107;
+      --danger-color: #dc3545; --info-color: #17a2b8;
     }
     body.dark {
-      --bg-color: #1e1e1e;
-      --text-color: #f0f0f0;
-      --sidebar-bg: #2c2c2c;
-      --card-bg: #333333;
+      --bg-color: #1e1e1e; --text-color: #f0f0f0; --sidebar-bg: #2c2c2c;
+      --card-bg: #333333; --border-color: #444;
     }
 
-    .navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:var(--primary-color); color:white; }
-    .toggle-btn { background:white; border:none; color:var(--primary-color); padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: linear-gradient(135deg, var(--primary-color), #0056cc); color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .navbar h1 { font-size: 20px; }
+    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .toggle-btn:hover { transform: scale(1.05); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
 
-    .container { display:flex; height:calc(100vh - 50px); }
-    .sidebar { width:220px; background:var(--sidebar-bg); padding:20px; overflow-y:auto; }
-    .sidebar a { display:block; text-decoration:none; color:var(--text-color); padding:8px 10px; border-radius:5px; margin-bottom:5px; }
-    .sidebar a:hover { background:var(--primary-color); color:white; }
-    .main { flex:1; padding:20px; overflow-y:auto; }
+    .container { display: flex; height: calc(100vh - 50px); }
+    
+    /* Main Sidebar (Unchanged) */
+    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); }
+    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; transition: all 0.3s ease; }
+    .sidebar a:hover { background: var(--primary-color); color: white; transform: translateX(5px); }
+    .sidebar a[href="wiki.html"] { background: var(--primary-color); color:white; font-weight:bold; }
 
-    .form { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
-    .form input, .form textarea {
-      padding:8px; border:1px solid #ccc; border-radius:5px;
-      background:var(--card-bg); color:var(--text-color);
+
+    .main { flex: 1; display: flex; overflow: hidden; padding:0; }
+
+    /* Wiki-specific Sidebar */
+    .wiki-sidebar { width: 280px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); display:flex; flex-direction:column; }
+    .main-content { flex: 1; display: flex; overflow: hidden; }
+    .editor-pane, .preview-pane { flex: 1; padding: 30px 40px; overflow-y: auto; }
+    .editor-pane { border-right: 1px solid var(--border-color); }
+    
+    .sidebar-header { margin-bottom: 20px; }
+    .search-box { width: 100%; padding: 10px 15px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-color); font-size: 14px; margin-bottom:15px; }
+    .add-page-btn { width: 100%; padding: 10px; border: none; background: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; display:flex; align-items:center; justify-content:center; gap:5px; }
+    .add-page-btn:hover { background: #0056cc; }
+
+    .page-tree { list-style: none; padding-left: 0; flex:1; }
+    .page-tree-item { margin: 5px 0; position:relative; }
+    .page-link { display: flex; align-items: center; gap: 8px; padding: 8px 10px; text-decoration: none; color: var(--text-color); border-radius: 5px; transition: background 0.2s; }
+    .page-link:hover { background: var(--bg-color); }
+    .page-link.active { background: var(--primary-color); color: white; }
+    .page-icon { font-size: 18px; }
+    .page-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .page-actions { display:none; }
+    .page-tree-item:hover .page-actions { display:flex; gap:5px; position:absolute; right:5px; top:5px; }
+    .page-actions button { background:transparent; border:none; cursor:pointer; font-size:16px; color:var(--text-color); padding:2px; }
+
+    .editor-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .editor-title { width: 100%; font-size: 32px; font-weight: bold; border: none; background: transparent; color: var(--text-color); padding: 10px 0; }
+    .editor-title:focus { outline:none; }
+    #contentEditor { width: 100%; height: calc(100% - 150px); font-size: 16px; border: none; background: transparent; color: var(--text-color); resize: none; line-height: 1.8; font-family: inherit; }
+    #contentEditor:focus { outline:none; }
+
+    .editor-footer { display:flex; gap:10px; margin-top:15px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--primary-color); color: white; }
+    .btn-danger { background: var(--danger-color); color: white; }
+    
+    /* Preview Pane Styles */
+    .preview-pane h1 { font-size: 32px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; }
+    .preview-pane h2 { font-size: 24px; margin: 25px 0 15px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+    .preview-pane h3 { font-size: 20px; margin: 20px 0 10px; }
+    .preview-pane p { line-height: 1.8; margin-bottom: 15px; }
+    .preview-pane ul, .preview-pane ol { margin: 15px 0 15px 25px; }
+    .preview-pane li { margin-bottom: 8px; line-height: 1.8; }
+    .preview-pane code { background: var(--sidebar-bg); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; }
+    .preview-pane pre { background: var(--sidebar-bg); padding: 15px; border-radius: 8px; overflow-x: auto; margin-bottom:15px; }
+    .preview-pane pre code { padding: 0; background: transparent; }
+    .preview-pane blockquote { border-left: 4px solid var(--primary-color); padding-left: 15px; margin: 15px 0; color: var(--text-color); opacity: 0.8; }
+    .preview-pane a { color: var(--primary-color); text-decoration: none; font-weight:bold; }
+    .preview-pane a:hover { text-decoration: underline; }
+    .preview-pane strong { font-weight:bold; }
+    .preview-pane em { font-style:italic; }
+    .preview-pane hr { border:none; border-top:2px solid var(--border-color); margin: 30px 0; }
+
+    .page-meta { font-size: 14px; color: #888; margin-bottom: 25px; }
+    .tags-container { display:flex; gap:8px; flex-wrap:wrap; margin-top:20px; }
+    .tag { background:var(--sidebar-bg); padding: 5px 12px; border-radius: 15px; font-size:12px; }
+
+    .toc { position:fixed; right:40px; top:120px; width:200px; background:var(--card-bg); padding:15px; border-radius:10px; border:2px solid var(--border-color); z-index:10; }
+    .toc h4 { margin-bottom:10px; }
+    .toc ul { list-style:none; padding-left:15px; }
+    .toc ul li a { text-decoration:none; color:var(--text-color); opacity:0.8; }
+    
+    @media (max-width: 1200px) {
+      .main-content { flex-direction: column; }
+      .editor-pane { border-right: none; border-bottom: 1px solid var(--border-color); }
+      .toc { display:none; }
     }
-    .form button { padding:8px; background:var(--primary-color); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; }
-
-    .search-sort { display:flex; gap:10px; margin-bottom:15px; }
-    .wiki-entry {
-      background:var(--card-bg); padding:15px; border-radius:10px;
-      box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:15px;
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      .sidebar { display:none; } /* Hide main sidebar on small screens for wiki focus */
+      .wiki-sidebar { width: 100%; height:auto; border-right:none; border-bottom:1px solid var(--border-color); }
+      .main-content { height:auto; }
     }
-    .wiki-entry h3 { margin-bottom:5px; }
-    .wiki-entry .meta { font-size:12px; color:gray; margin-bottom:8px; }
-    .actions button { margin-right:5px; padding:5px 8px; border:none; border-radius:5px; font-size:12px; cursor:pointer; }
-    .edit { background:#4caf50; color:white; }
-    .delete { background:#f44336; color:white; }
-    .pin { background:gold; }
-    .star { background:#ff9800; color:white; }
-    .collapse { background:#555; color:white; }
-    .attachment { margin-top:5px; font-size:12px; }
-
-    .hidden { display:none; }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <div class="navbar">
     <h1>🐝 ShareHive - Wiki</h1>
     <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
   </div>
 
   <div class="container">
-    <!-- Sidebar -->
+    <!-- Main App Sidebar (Unchanged) -->
     <div class="sidebar">
       <a href="index.html">🏠 Dashboard</a>
       <a href="notes.html">📝 Notes</a>
@@ -95,45 +147,46 @@
       <a href="community.html">🌍 Community</a>
     </div>
 
-    <!-- Main -->
+    <!-- Wiki Main Content -->
     <div class="main">
-      <h2>Add Wiki Entry</h2>
-      <div class="form">
-        <input type="text" id="title" placeholder="Title">
-        <textarea id="content" placeholder="Content (supports **bold**, *italic*, `code`, - list, [[links]])"></textarea>
-        <input type="text" id="tags" placeholder="Tags (comma separated)">
-        <input type="file" id="attachment">
-        <button id="saveBtn">Save Wiki</button>
-      </div>
+      <aside class="wiki-sidebar">
+        <div class="sidebar-header">
+          <input type="text" id="search" class="search-box" placeholder="Search pages...">
+          <button class="add-page-btn" onclick="createNewPage()"><span>➕</span> New Page</button>
+        </div>
+        <ul class="page-tree" id="pageTree"></ul>
+      </aside>
 
-      <div class="search-sort">
-        <input type="text" id="search" placeholder="Search wiki...">
-        <select id="sort">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="title-az">Title A–Z</option>
-          <option value="title-za">Title Z–A</option>
-          <option value="pinned">Pinned First</option>
-          <option value="starred">Starred First</option>
-        </select>
-      </div>
+      <main class="main-content">
+        <section class="editor-pane">
+          <input type="text" id="titleEditor" class="editor-title" placeholder="Untitled Page" oninput="updatePreview()">
+          <textarea id="contentEditor" placeholder="Start writing your content here. Use Markdown for formatting..." oninput="updatePreview()"></textarea>
+          <div class="editor-footer">
+            <button class="btn btn-primary" onclick="savePage()"><span>💾</span> Save Page</button>
+          </div>
+        </section>
 
-      <h2>Your Wiki</h2>
-      <div id="wiki"></div>
+        <section class="preview-pane" id="previewPane">
+          <!-- Live preview will be rendered here -->
+        </section>
+      </main>
     </div>
+  </div>
+  
+  <div id="tocContainer" class="toc" style="display:none;">
+    <h4>Table of Contents</h4>
+    <ul id="tocList"></ul>
   </div>
 
   <script>
-    // 🌙 Dark Mode
     function toggleTheme() {
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
     if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
-    // 📦 IndexedDB (v21 unified)
-let db;
-const stores = [
+    let db;
+    const stores = [
   "notes",
   "bookmarks",
   "videos",
@@ -150,179 +203,286 @@ const stores = [
   "community"
 ];
 
-const request = indexedDB.open("ShareHiveDB", 21);
+    const request = indexedDB.open("ShareHiveDB", 21);
 
-request.onupgradeneeded = e => {
-  db = e.target.result;
-  stores.forEach(name => {
-    if (!db.objectStoreNames.contains(name)) {
-      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-    }
-  });
-};
-
-request.onsuccess = e => { 
-  db = e.target.result; 
-  displayWiki();  // ✅ call page-specific display function
-};
-
-request.onerror = e => console.error("DB error:", e.target.error);
-
-
-    // 📝 Markdown Renderer
-    function renderMarkdown(text){
-      return text
-        .replace(/\*\*(.*?)\*\*/g,"<b>$1</b>")
-        .replace(/\*(.*?)\*/g,"<i>$1</i>")
-        .replace(/`(.*?)`/g,"<code>$1</code>")
-        .replace(/^- (.*)$/gm,"<li>$1</li>")
-        .replace(/\[\[(.*?)\]\]/g, `<a href="#" onclick="searchLink('$1')">$1</a>`);
-    }
-
-    // ➕ Save Wiki
-    document.getElementById("saveBtn").onclick=()=>{
-      const title=document.getElementById("title").value.trim();
-      const content=document.getElementById("content").value.trim();
-      const tags=document.getElementById("tags").value.split(",").map(t=>t.trim()).filter(t=>t);
-      const file=document.getElementById("attachment").files[0];
-      if(!title && !content) return;
-
-      const btn=document.getElementById("saveBtn");
-      const editId=btn.getAttribute("data-edit");
-
-      const tx=db.transaction("wiki","readwrite");
-      const store=tx.objectStore("wiki");
-
-      const entry={title,content,tags,starred:false,pinned:false,date:Date.now()};
-
-      if(file){
-        const reader=new FileReader();
-        reader.onload=()=>{
-          entry.attachment={name:file.name,data:reader.result};
-          if(editId){ entry.id=Number(editId); store.put(entry); }
-          else{ store.add(entry); }
-        };
-        reader.readAsDataURL(file);
-      } else {
-        if(editId){ entry.id=Number(editId); store.put(entry); }
-        else{ store.add(entry); }
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains("wiki")) {
+        const store = db.createObjectStore("wiki", { keyPath: "id", autoIncrement: true });
+        store.createIndex("title", "title", { unique: false });
       }
-
-      tx.oncomplete=()=>{
-        ["title","content","tags","attachment"].forEach(id=>{
-          const el=document.getElementById(id);
-          if(el.type==="file") el.value=""; else el.value="";
-        });
-        btn.textContent="Save Wiki"; btn.removeAttribute("data-edit");
-        displayWiki();
-      };
     };
+    request.onsuccess = e => { 
+      db = e.target.result; 
+      displayPageTree();
+      loadInitialPage();
+    };
+    request.onerror = e => console.error("DB error:", e.target.error);
 
-    // 📖 Display Wiki
-    function displayWiki(){
-      const tx=db.transaction("wiki","readonly");
-      const store=tx.objectStore("wiki");
-      const req=store.getAll();
+    let currentPageId = null;
+    
+    // Basic Markdown Renderer (safe-ish for this demo)
+    function renderMarkdown(text) {
+      if (!text) return '';
+      // Preserve code blocks first
+      const codeBlocks = [];
+      text = text.replace(/```([\s\S]*?)```/g, function(_, p1) {
+        const idx = codeBlocks.length;
+        codeBlocks.push('<pre><code>' + p1.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>');
+        return `@@CODEBLOCK${idx}@@`;
+      });
 
-      req.onsuccess=()=>{
-        let entries=req.result;
-        const search=document.getElementById("search").value.toLowerCase();
-        if(search){
-          entries=entries.filter(e=>e.title.toLowerCase().includes(search)||e.content.toLowerCase().includes(search)||(e.tags||[]).some(t=>t.toLowerCase().includes(search)));
+      // Wiki-style links [[Page Title]]
+      text = text.replace(/\[\[([^\]]+)\]\]/g, function(_, p1) {
+        const safe = p1.replace(/'/g, "\\'");
+        return `<a href="#" onclick="openPageByTitle('${safe}')">${p1}</a>`;
+      });
+
+      // Headings
+      text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+      // Blockquote
+      text = text.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+
+      // Horizontal rule
+      text = text.replace(/^\s*---\s*$/gim, '<hr>');
+
+      // Bold & Italic
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+      // Inline code
+      text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      // List items
+      text = text.replace(/^\* (.*$)/gim, '<li>$1</li>');
+      // Wrap consecutive <li> into <ul>
+      text = text.replace(/(?:<(?:li)>.*?<\/li>\s*)+/gim, function(m) {
+        // remove potential surrounding newlines
+        const content = m.trim();
+        return '<ul>' + content + '</ul>';
+      });
+
+      // Restore code blocks
+      text = text.replace(/@@CODEBLOCK(\d+)@@/g, function(_, idx) {
+        return codeBlocks[parseInt(idx, 10)] || '';
+      });
+
+      // Convert remaining line breaks to <br> for simple paragraphs
+      return text.replace(/\n/g, '<br>');
+    }
+
+    function updatePreview() {
+      const title = document.getElementById('titleEditor').value;
+      const content = document.getElementById('contentEditor').value;
+      const previewPane = document.getElementById('previewPane');
+      
+      const renderedContent = renderMarkdown(content);
+      
+      previewPane.innerHTML = `
+        <h1>${title || 'Untitled Page'}</h1>
+        <div class="page-meta">Last saved: Just now</div>
+        ${renderedContent}
+      `;
+      generateTOC();
+    }
+    
+    function generateTOC() {
+        const tocList = document.getElementById('tocList');
+        const tocContainer = document.getElementById('tocContainer');
+        tocList.innerHTML = '';
+        const headers = document.getElementById('previewPane').querySelectorAll('h2, h3');
+        if (headers.length < 2) {
+            tocContainer.style.display = 'none';
+            return;
         }
-        const sort=document.getElementById("sort").value;
-        if(sort==="newest") entries.sort((a,b)=>b.date-a.date);
-        if(sort==="oldest") entries.sort((a,b)=>a.date-b.date);
-        if(sort==="title-az") entries.sort((a,b)=>a.title.localeCompare(b.title));
-        if(sort==="title-za") entries.sort((a,b)=>b.title.localeCompare(a.title));
-        if(sort==="pinned") entries.sort((a,b)=>b.pinned-a.pinned);
-        if(sort==="starred") entries.sort((a,b)=>b.starred-a.starred);
+        
+        tocContainer.style.display = 'block';
+        headers.forEach(header => {
+            const id = header.textContent.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]/g, '');
+            header.id = id;
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `#${id}`;
+            a.textContent = header.textContent;
+            a.style.paddingLeft = `${(parseInt(header.tagName[1]) - 2) * 15}px`; // Indent based on h2/h3
+            a.onclick = (e) => { e.preventDefault(); header.scrollIntoView({behavior: 'smooth'}); };
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+    }
 
-        const container=document.getElementById("wiki");
-        container.innerHTML="";
-        entries.forEach(e=>{
-          const div=document.createElement("div");
-          div.className="wiki-entry";
-          const words=e.content.split(/\s+/).length;
-          const readTime=Math.ceil(words/200);
+    function displayPageTree() {
+      if (!db) return;
+      const tx = db.transaction("wiki", "readonly");
+      const store = tx.objectStore("wiki");
+      const getAllReq = store.getAll();
+      getAllReq.onsuccess = e => {
+        const pages = e.target.result || [];
+        const tree = document.getElementById('pageTree');
+        tree.innerHTML = '';
+        pages.sort((a,b) => (a.title || '').localeCompare(b.title || '')); // Sort alphabetically
+        pages.forEach(page => {
+          const li = document.createElement('li');
+          li.className = 'page-tree-item';
+          const link = document.createElement('a');
+          link.href = '#';
+          link.className = 'page-link' + (page.id === currentPageId ? ' active' : '');
+          link.onclick = (ev) => { ev.preventDefault(); openPage(page.id); };
+          link.innerHTML = `<span class="page-icon">📄</span><span class="page-title">${page.title || 'Untitled'}</span>`;
+          li.appendChild(link);
 
-          div.innerHTML=`
-            <h3>${e.title}</h3>
-            <div class="meta">Tags: ${(e.tags||[]).join(", ")} | ${words} words ~ ${readTime} min</div>
-            <div class="content">${renderMarkdown(e.content).substring(0,200)}...</div>
-            ${e.attachment ? `<div class="attachment">📎 <a href="${e.attachment.data}" download="${e.attachment.name}">${e.attachment.name}</a></div>`:""}
-            <div class="actions">
-              <button class="edit" onclick="editWiki(${e.id})">Edit</button>
-              <button class="delete" onclick="deleteWiki(${e.id})">Delete</button>
-              <button class="pin" onclick="togglePin(${e.id})">${e.pinned?"Unpin":"Pin"}</button>
-              <button class="star" onclick="toggleStar(${e.id})">${e.starred?"Unstar":"Star"}</button>
-              <button class="collapse" onclick="toggleCollapse(this)">Expand</button>
-            </div>
-            <div class="full hidden">${renderMarkdown(e.content)}</div>
-          `;
-          container.appendChild(div);
+          const actions = document.createElement('div');
+          actions.className = 'page-actions';
+          const delBtn = document.createElement('button');
+          delBtn.textContent = '🗑️';
+          delBtn.onclick = (ev) => { ev.stopPropagation(); deletePage(page.id); };
+          actions.appendChild(delBtn);
+          li.appendChild(actions);
+
+          tree.appendChild(li);
         });
       };
+      getAllReq.onerror = e => console.error('Failed to load pages', e);
+    }
+    
+    function createNewPage() {
+      currentPageId = null;
+      document.getElementById('titleEditor').value = '';
+      document.getElementById('contentEditor').value = '';
+      updatePreview();
+      document.getElementById('titleEditor').focus();
+      displayPageTree();
+    }
+    
+    function savePage() {
+      if (!db) { alert('Database not ready'); return; }
+      const title = document.getElementById('titleEditor').value;
+      const content = document.getElementById('contentEditor').value;
+      const tx = db.transaction("wiki", "readwrite");
+      const store = tx.objectStore("wiki");
+      
+      const pageData = { title, content, lastModified: new Date() };
+      
+      let req;
+      if (currentPageId) {
+        pageData.id = currentPageId;
+        req = store.put(pageData);
+        req.onsuccess = () => {
+          displayPageTree();
+          alert('Page updated!');
+          openPage(currentPageId);
+        };
+      } else {
+        req = store.add(pageData);
+        req.onsuccess = (e) => {
+          currentPageId = e.target.result;
+          displayPageTree();
+          openPage(currentPageId);
+          alert('Page saved!');
+        };
+      }
+      req.onerror = (e) => { console.error('Save failed', e); alert('Failed to save page'); };
+    }
+    
+    function deletePage(id) {
+        if (!id || !confirm('Are you sure you want to delete this page?')) return;
+        
+        const tx = db.transaction("wiki", "readwrite");
+        const delReq = tx.objectStore("wiki").delete(id);
+        delReq.onsuccess = () => {
+            if (id === currentPageId) {
+                currentPageId = null;
+                loadInitialPage(); // Load another page if the current one was deleted
+            }
+            displayPageTree();
+            alert('Page deleted!');
+        };
+        delReq.onerror = e => { console.error('Delete failed', e); alert('Failed to delete page'); };
     }
 
-    // 🔍 Search via Cross-link
-    function searchLink(title){
-      document.getElementById("search").value=title;
-      displayWiki();
-    }
-
-    // ✏️ Edit
-    function editWiki(id){
-      const tx=db.transaction("wiki","readonly");
-      const req=tx.objectStore("wiki").get(id);
-      req.onsuccess=()=>{
-        const e=req.result;
-        document.getElementById("title").value=e.title;
-        document.getElementById("content").value=e.content;
-        document.getElementById("tags").value=(e.tags||[]).join(", ");
-        const btn=document.getElementById("saveBtn");
-        btn.textContent="Update Wiki";
-        btn.setAttribute("data-edit",id);
-
-        // Save to history
-        const txh=db.transaction("wiki_history","readwrite");
-        txh.objectStore("wiki_history").add({...e,timestamp:Date.now()});
+    function openPage(id) {
+      if (!db) return;
+      const tx = db.transaction("wiki", "readonly");
+      const getReq = tx.objectStore("wiki").get(id);
+      getReq.onsuccess = e => {
+        const page = e.target.result;
+        if (!page) return;
+        currentPageId = page.id;
+        document.getElementById('titleEditor').value = page.title || '';
+        document.getElementById('contentEditor').value = page.content || '';
+        updatePreview();
+        displayPageTree();
       };
+      getReq.onerror = e => console.error('Open page failed', e);
+    }
+    
+    function openPageByTitle(title) {
+        if (!db) return;
+        const tx = db.transaction("wiki", "readonly");
+        const store = tx.objectStore("wiki");
+        const index = store.index("title");
+        const req = index.get(title);
+        req.onsuccess = e => {
+            if (e.target.result) {
+                openPage(e.target.result.id);
+            } else {
+                if (confirm(`Page "${title}" not found. Create it now?`)) {
+                    createNewPage();
+                    document.getElementById('titleEditor').value = title;
+                    updatePreview();
+                }
+            }
+        };
+        req.onerror = e => console.error('Search by title failed', e);
     }
 
-    // ❌ Delete
-    function deleteWiki(id){
-      const tx=db.transaction("wiki","readwrite");
-      tx.objectStore("wiki").delete(id);
-      tx.oncomplete=displayWiki;
+    function loadInitialPage() {
+      if (!db) return;
+      const tx = db.transaction("wiki", "readonly");
+      const store = tx.objectStore("wiki");
+      const cursorReq = store.openCursor();
+      cursorReq.onsuccess = e => {
+        const cursor = e.target.result;
+        if (cursor) {
+          openPage(cursor.value.id);
+        } else {
+          // Create a "Welcome" page if the wiki is empty
+          const welcomePage = {
+              title: "Welcome to your Wiki!",
+              content: "This is your personal knowledge base, powered by ShareHive.\n\n## Getting Started\n\n* Click **'New Page'** to create a new entry.\n* Write content using **Markdown** in the left editor pane.\n* See a live preview on the right.\n* Link between pages using the [[Page Title]] syntax.\n\nEnjoy building your second brain! 🧠",
+              lastModified: new Date()
+          };
+          const addTx = db.transaction("wiki", "readwrite");
+          const addReq = addTx.objectStore("wiki").add(welcomePage);
+          addReq.onsuccess = (ev) => {
+              openPage(ev.target.result);
+              displayPageTree();
+          };
+          addReq.onerror = e => console.error('Failed to create welcome page', e);
+        }
+      };
+      cursorReq.onerror = e => console.error('Cursor failed', e);
     }
+    
+    document.getElementById('search').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.page-title').forEach(el => {
+            const item = el.closest('.page-tree-item');
+            if (!item) return;
+            if (el.textContent.toLowerCase().includes(query)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
 
-    // 📌 Pin
-    function togglePin(id){
-      const tx=db.transaction("wiki","readwrite");
-      const store=tx.objectStore("wiki");
-      const req=store.get(id);
-      req.onsuccess=()=>{const e=req.result; e.pinned=!e.pinned; store.put(e); tx.oncomplete=displayWiki;};
-    }
+    // Alias for the store
+    const store = db.transaction("wiki", "readonly").objectStore("wiki");
 
-    // ⭐ Star
-    function toggleStar(id){
-      const tx=db.transaction("wiki","readwrite");
-      const store=tx.objectStore("wiki");
-      const req=store.get(id);
-      req.onsuccess=()=>{const e=req.result; e.starred=!e.starred; store.put(e); tx.oncomplete=displayWiki;};
-    }
-
-    // 🔽 Expand/Collapse
-    function toggleCollapse(btn){
-      const full=btn.parentElement.nextElementSibling;
-      full.classList.toggle("hidden");
-      btn.textContent=full.classList.contains("hidden")?"Expand":"Collapse";
-    }
-
-    // 🔎 Live Search + Sorting
-    document.getElementById("search").addEventListener("input",displayWiki);
-    document.getElementById("sort").addEventListener("change",displayWiki);
   </script>
 </body>
 </html>
