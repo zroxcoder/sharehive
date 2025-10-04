@@ -45,6 +45,252 @@
       border-radius: 10px;
       margin-bottom: 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,119,255,0.2);
+    }
+
+    /* Hero Section */
+    .hero-card {
+      background: linear-gradient(135deg, var(--primary-color), #0055cc);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "🐝";
+      position: absolute;
+      font-size: 200px;
+      opacity: 0.1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .hero-card h2 {
+      font-size: 32px;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card p {
+      font-size: 18px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Stats Section */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .stat-card:hover {
+      border-color: var(--primary-color);
+      transform: scale(1.05);
+    }
+
+    .stat-card .number {
+      font-size: 36px;
+      font-weight: bold;
+      color: var(--primary-color);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .label {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .feature-item {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid var(--primary-color);
+      transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateX(10px);
+    }
+
+    .feature-item h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .feature-item p {
+      font-size: 14px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+      margin-top: 20px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--primary-color);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 30px;
+      padding-left: 20px;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -33px;
+      top: 5px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      border: 3px solid var(--bg-color);
+      box-shadow: 0 0 0 3px var(--primary-color);
+    }
+
+    .timeline-item h3 {
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .timeline-item p {
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    /* Values Section */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .value-card {
+      text-align: center;
+      padding: 30px 20px;
+      background: var(--card-bg);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .value-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,119,255,0.15);
+    }
+
+    .value-card .icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .value-card h3 {
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+
+    .value-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      opacity: 0.8;
+    }
+
+    /* Highlight Box */
+    .highlight {
+      background: linear-gradient(135deg, rgba(0,119,255,0.1), rgba(0,85,204,0.1));
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 5px solid var(--primary-color);
+      margin: 20px 0;
+    }
+
+    .highlight h3 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      .sidebar { width: 100%; }
+      .stats-container { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+    .card:nth-child(6) { animation-delay: 0.6s; }
+
+    ul {
+      padding-left: 20px;
+      line-height: 2;
+    }
+
+    ul li {
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -87,24 +333,178 @@
 
     <!-- Main -->
     <div class="main">
-      <div class="card">
+      <!-- Hero Section -->
+      <div class="card hero-card">
         <h2>About ShareHive</h2>
         <p>🐝 <strong>ShareHive</strong> is your all-in-one personal management system — notes, bookmarks, videos, to-do lists, expenses, planning, wiki, uploads, projects, courses, and more — everything organized in one place.</p>
       </div>
 
-      <div class="card">
-        <h2>Our Mission</h2>
-        <p>To simplify productivity and knowledge management by offering an integrated, user-friendly tool accessible right from your browser.</p>
+      <!-- Stats Section -->
+      <div class="stats-container">
+        <div class="stat-card">
+          <span class="number">13+</span>
+          <span class="label">Features</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">100%</span>
+          <span class="label">Private</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">∞</span>
+          <span class="label">Possibilities</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">0$</span>
+          <span class="label">Cost</span>
+        </div>
       </div>
 
+      <!-- Mission -->
       <div class="card">
-        <h2>Why ShareHive?</h2>
+        <h2>🎯 Our Mission</h2>
+        <p>To simplify productivity and knowledge management by offering an integrated, user-friendly tool accessible right from your browser.</p>
+        <div class="highlight">
+          <h3>Vision for the Future</h3>
+          <p>We envision ShareHive becoming the ultimate personal productivity hub where users can seamlessly manage every aspect of their digital life without compromising privacy or simplicity.</p>
+        </div>
+      </div>
+
+      <!-- Why ShareHive -->
+      <div class="card">
+        <h2>💡 Why ShareHive?</h2>
         <ul>
           <li>✅ Keep all your personal data in one place.</li>
           <li>✅ Privacy-first, stored in your browser using IndexedDB.</li>
           <li>✅ Easy, clean, and intuitive design.</li>
           <li>✅ Expandable for more features in the future.</li>
+          <li>✅ No registration or login required.</li>
+          <li>✅ Works offline - no internet dependency.</li>
+          <li>✅ Completely free and open to use.</li>
+          <li>✅ Dark mode for comfortable viewing.</li>
         </ul>
+      </div>
+
+      <!-- Core Values -->
+      <div class="card">
+        <h2>🌟 Our Core Values</h2>
+        <div class="values-grid">
+          <div class="value-card">
+            <span class="icon">🔒</span>
+            <h3>Privacy First</h3>
+            <p>Your data stays in your browser. We don't collect, store, or transmit your personal information.</p>
+          </div>
+          <div class="value-card">
+            <span class="icon">⚡</span>
+            <h3>Simplicity</h3>
+            <p>Clean, intuitive interface that anyone can use without a steep learning curve.</p>
+          </div>
+          <div class="value-card">
+            <span class="icon">🚀</span>
+            <h3>Innovation</h3>
+            <p>Constantly evolving with new features to meet your productivity needs.</p>
+          </div>
+          <div class="value-card">
+            <span class="icon">🌍</span>
+            <h3>Accessibility</h3>
+            <p>Free for everyone, anywhere, on any modern browser.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Features -->
+      <div class="card">
+        <h2>🚀 Key Features</h2>
+        <div class="features-grid">
+          <div class="feature-item">
+            <h3>📝 Smart Notes</h3>
+            <p>Organize your thoughts with our intuitive note-taking system.</p>
+          </div>
+          <div class="feature-item">
+            <h3>🔖 Bookmarks Manager</h3>
+            <p>Save and categorize your favorite websites effortlessly.</p>
+          </div>
+          <div class="feature-item">
+            <h3>💰 Expense Tracking</h3>
+            <p>Monitor your spending and manage your budget effectively.</p>
+          </div>
+          <div class="feature-item">
+            <h3>✅ Task Management</h3>
+            <p>Stay on top of your to-do lists and boost productivity.</p>
+          </div>
+          <div class="feature-item">
+            <h3>📅 Smart Planner</h3>
+            <p>Plan your days, weeks, and months with ease.</p>
+          </div>
+          <div class="feature-item">
+            <h3>📚 Course Tracker</h3>
+            <p>Keep track of your learning journey and courses.</p>
+          </div>
+          <div class="feature-item">
+            <h3>📌 Project Manager</h3>
+            <p>Manage multiple projects in one organized space.</p>
+          </div>
+          <div class="feature-item">
+            <h3>🎬 Media Library</h3>
+            <p>Curate your watchlist and video collections.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Development Timeline -->
+      <div class="card">
+        <h2>📅 Development Journey</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <h3>Version 1.0 - Foundation</h3>
+            <p>Launched core features including notes, bookmarks, and to-do lists with basic functionality.</p>
+          </div>
+          <div class="timeline-item">
+            <h3>Version 1.5 - Expansion</h3>
+            <p>Added expense tracker, planner, and wiki features. Introduced dark mode for better user experience.</p>
+          </div>
+          <div class="timeline-item">
+            <h3>Version 2.0 - Enhancement</h3>
+            <p>Integrated file uploads, project management, watchlist, and courses. Improved UI/UX across all modules.</p>
+          </div>
+          <div class="timeline-item">
+            <h3>Future - Innovation</h3>
+            <p>Planning collaboration features, cloud sync options, mobile app, and AI-powered suggestions.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technology Stack -->
+      <div class="card">
+        <h2>🛠️ Built With</h2>
+        <p>ShareHive is built using modern web technologies to ensure performance, reliability, and security:</p>
+        <div class="features-grid" style="margin-top: 15px;">
+          <div class="feature-item">
+            <h3>HTML5</h3>
+            <p>Semantic markup for better structure and accessibility.</p>
+          </div>
+          <div class="feature-item">
+            <h3>CSS3</h3>
+            <p>Modern styling with custom properties and animations.</p>
+          </div>
+          <div class="feature-item">
+            <h3>JavaScript</h3>
+            <p>Vanilla JS for lightweight, fast performance.</p>
+          </div>
+          <div class="feature-item">
+            <h3>IndexedDB</h3>
+            <p>Client-side storage for privacy and offline capability.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community -->
+      <div class="card">
+        <h2>🤝 Join Our Community</h2>
+        <p>ShareHive is more than just a tool—it's a community of productivity enthusiasts. We welcome feedback, suggestions, and contributions to make ShareHive better for everyone.</p>
+        <div class="highlight">
+          <h3>Get Involved</h3>
+          <p>Have ideas for new features? Found a bug? Want to contribute? Visit our <a href="community.html" style="color: var(--primary-color); text-decoration: underline;">Community</a> page or <a href="contact.html" style="color: var(--primary-color); text-decoration: underline;">Contact Us</a> directly!</p>
+        </div>
       </div>
     </div>
   </div>
