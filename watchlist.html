@@ -6,61 +6,258 @@
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       transition: 0.3s;
     }
     :root {
-      --bg:#fff; --text:#222; --primary:#0077ff;
-      --sidebar:#f4f4f4; --card:#f9f9f9;
+      --bg-color: #f4f7fa;
+      --text-color: #222;
+      --primary-color: #0077ff;
+      --secondary-color: #00c896;
+      --sidebar-bg: #ffffff;
+      --card-bg: #ffffff;
+      --border-color: #e0e0e0;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --info-color: #17a2b8;
     }
     body.dark {
-      --bg:#1e1e1e; --text:#f0f0f0;
-      --sidebar:#2c2c2c; --card:#333;
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --sidebar-bg: #2c2c2c;
+      --card-bg: #333333;
+      --border-color: #444;
     }
 
-    .navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:var(--primary); color:#fff; }
+    .navbar { 
+      display:flex; justify-content:space-between; align-items:center; 
+      padding:10px 20px; background:linear-gradient(135deg, var(--primary-color), #0056cc); color:white; 
+      box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    }
     .navbar h1 { font-size:20px; }
-    .toggle-btn { background:#fff; border:none; color:var(--primary); padding:5px 10px; border-radius:5px; cursor:pointer; }
+    .toggle-btn { 
+      background:white; border:none; color:var(--primary-color); 
+      padding:8px 15px; border-radius:20px; cursor:pointer; font-weight:bold;
+      transition:all 0.3s ease; box-shadow:0 2px 5px rgba(0,0,0,0.2);
+    }
+    .toggle-btn:hover {
+      transform:scale(1.05);
+      box-shadow:0 3px 8px rgba(0,0,0,0.3);
+    }
 
     .container { display:flex; height:calc(100vh - 50px); }
-    .sidebar { width:220px; background:var(--sidebar); padding:20px; overflow-y:auto; }
-    .sidebar a { display:block; padding:8px; text-decoration:none; color:var(--text); border-radius:5px; margin-bottom:5px; }
-    .sidebar a:hover { background:var(--primary); color:#fff; }
 
-    .main { flex:1; padding:20px; overflow-y:auto; }
-    h2 { margin:15px 0; }
-
-    .form { display:grid; gap:10px; margin-bottom:20px; }
-    .form input, .form select, .form textarea {
-      padding:8px; border:1px solid #ccc; border-radius:5px; background:var(--card); color:var(--text);
+    .sidebar { 
+      width:220px; background:var(--sidebar-bg); padding:20px; overflow-y:auto;
+      border-right:1px solid var(--border-color);
     }
-    .form button {
-      padding:10px; background:var(--primary); border:none; color:#fff; border-radius:5px; cursor:pointer; font-weight:bold;
+    .sidebar h2 { font-size:16px; margin-bottom:10px; }
+    .sidebar a { 
+      display:block; text-decoration:none; color:var(--text-color); 
+      padding:8px 10px; border-radius:5px; margin-bottom:5px;
+      transition:all 0.3s ease;
+    }
+    .sidebar a:hover { 
+      background:var(--primary-color); color:white;
+      transform:translateX(5px);
     }
 
-    .search-filter { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
-    .search-filter input, .search-filter select { padding:8px; border-radius:5px; border:1px solid #ccc; }
+    .main { 
+      flex:1; 
+      padding:30px; 
+      overflow-y:auto;
+      background:var(--bg-color);
+    }
 
-    .kanban { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; }
-    .column { background:var(--card); padding:10px; border-radius:10px; }
-    .column h3 { text-align:center; margin-bottom:10px; }
-    .item { background:#fff2; border:1px solid #ccc; border-radius:8px; padding:10px; margin-bottom:10px; background:var(--card); }
-    .item h4 { margin-bottom:5px; }
-    .progress { height:6px; background:#ddd; border-radius:3px; overflow:hidden; margin:5px 0; }
-    .progress span { display:block; height:100%; background:var(--primary); }
+    .page-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:30px; padding-bottom:20px;
+      border-bottom:2px solid var(--border-color);
+    }
 
-    .actions { display:flex; gap:5px; margin-top:5px; flex-wrap:wrap; }
-    .actions button { border:none; padding:5px 8px; border-radius:5px; cursor:pointer; font-size:12px; }
-    .edit { background:#4caf50; color:#fff; }
-    .delete { background:#f44336; color:#fff; }
-    .pin { background:gold; }
-    .fav { background:#ff4081; color:#fff; }
+    .page-header h2 {
+      font-size:32px; color:var(--text-color);
+      display:flex; align-items:center; gap:10px;
+    }
+    
+    .btn {
+      padding:12px 30px; border:none; border-radius:25px; font-weight:bold;
+      cursor:pointer; transition:all 0.3s ease; font-size:16px;
+      display:flex; align-items:center; gap:8px;
+    }
 
-    .calendar { margin-top:30px; }
-    .calendar table { width:100%; border-collapse:collapse; }
-    .calendar th, .calendar td { border:1px solid #ccc; padding:5px; text-align:center; }
+    .btn-primary {
+      background:var(--primary-color); color:white;
+      box-shadow:0 4px 10px rgba(0,119,255,0.3);
+    }
+
+    .btn-primary:hover {
+      background:#0056cc; transform:translateY(-2px);
+      box-shadow:0 6px 20px rgba(0,119,255,0.4);
+    }
+    
+    .form-card {
+      background:var(--card-bg); padding:30px; border-radius:15px;
+      margin-bottom:30px; border:2px solid var(--border-color);
+      box-shadow:0 4px 15px rgba(0,0,0,0.08); display:none;
+    }
+
+    .form-card.show {
+      display:block; animation:slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-20px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .form-card h3 {
+      font-size:24px; margin-bottom:20px; color:var(--primary-color);
+      display:flex; align-items:center; gap:10px;
+    }
+
+    .form-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px;
+    }
+
+    .form-group { margin-bottom:20px; }
+    .form-group.full-width { grid-column:1 / -1; }
+
+    .form-group label {
+      display:block; margin-bottom:8px; font-weight:600; font-size:14px;
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      width:100%; padding:12px 15px; border:2px solid var(--border-color);
+      border-radius:10px; background:var(--bg-color); color:var(--text-color);
+      font-size:15px; transition:all 0.3s ease; font-family:inherit;
+    }
+
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline:none; border-color:var(--primary-color);
+      box-shadow:0 0 0 3px rgba(0,119,255,0.1);
+    }
+    
+    .form-group textarea { min-height:100px; resize:vertical; }
+    .form-actions { display:flex; gap:15px; margin-top:10px; }
+    .btn-secondary { background:var(--border-color); color:var(--text-color); }
+    .btn-secondary:hover { background:#ccc; }
+
+    .filter-bar {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:15px;
+      margin-bottom:30px; align-items:center;
+    }
+    .filter-bar .search-container { grid-column:1 / -1; position:relative; }
+    @media (min-width: 968px) {
+      .filter-bar .search-container { grid-column:1 / 3; }
+    }
+    .search-box {
+      width:100%; padding:12px 45px 12px 15px; font-size:15px;
+      border:2px solid var(--border-color); border-radius:10px;
+      background:var(--card-bg); color:var(--text-color);
+    }
+    .search-icon { position:absolute; right:15px; top:50%; transform:translateY(-50%); opacity:0.5; }
+
+    .kanban-board {
+      display:grid; grid-template-columns:repeat(4, 1fr); gap:20px;
+      align-items:start;
+    }
+
+    .kanban-column {
+      background:var(--bg-color); padding:15px; border-radius:12px;
+      border:2px dashed var(--border-color);
+    }
+    .kanban-column h3 {
+      font-size:18px; text-align:center; margin-bottom:15px;
+      padding:8px; border-radius:8px; background:var(--card-bg);
+      border:2px solid var(--border-color);
+    }
+    .kanban-column .items {
+      min-height:200px;
+    }
+
+    .item-card {
+      background:var(--card-bg); border-radius:12px; border:2px solid var(--border-color);
+      padding:15px; margin-bottom:15px; box-shadow:0 2px 8px rgba(0,0,0,0.05);
+      transition:all 0.3s ease; animation:fadeInUp 0.5s ease-out backwards;
+    }
+    .item-card:hover {
+      transform:translateY(-3px); box-shadow:0 5px 15px rgba(0,0,0,0.1);
+      border-color:var(--primary-color);
+    }
+    .item-card.pinned {
+      border-color:var(--warning-color);
+      box-shadow:0 5px 15px rgba(255,193,7,0.2);
+    }
+    .item-card.favorite {
+      border-color:var(--danger-color);
+    }
+
+    .item-header {
+      display:flex; justify-content:space-between; align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .item-header h4 {
+      font-size:18px; flex:1;
+    }
+    .item-icons { display:flex; gap:8px; font-size:16px; }
+    .item-icons .pinned-icon { color:var(--warning-color); }
+    .item-icons .favorite-icon { color:var(--danger-color); }
+
+    .item-meta {
+      display:flex; gap:10px; font-size:12px; opacity:0.7; margin-bottom:10px; flex-wrap:wrap;
+    }
+    .badge { padding:3px 8px; border-radius:10px; background:var(--border-color); }
+
+    .progress-bar {
+      height:8px; background:var(--border-color); border-radius:4px; overflow:hidden; margin:10px 0;
+    }
+    .progress-bar span { display:block; height:100%; transition:width 0.3s ease; }
+    
+    .item-notes {
+      font-size:13px; line-height:1.6; opacity:0.9; margin:10px 0;
+    }
+
+    .item-actions {
+      display:flex; gap:8px; margin-top:15px; padding-top:10px; border-top:1px solid var(--border-color);
+    }
+    .action-btn {
+      padding:6px 12px; border:none; border-radius:15px; cursor:pointer;
+      font-size:12px; font-weight:600; transition:all 0.3s ease;
+    }
+    .btn-edit { background:var(--info-color); color:white; }
+    .btn-delete { background:var(--danger-color); color:white; }
+    .btn-pin { background:var(--warning-color); color:#333; }
+    .btn-fav { background:var(--danger-color); color:white; opacity:0.8; }
+    .action-btn:hover { opacity:0.8; transform:scale(1.05); }
+
+    /* Modal */
+    .modal {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;
+    }
+    .modal.show { display:flex; }
+    .modal-content {
+      background:var(--card-bg); padding:30px; border-radius:15px;
+      max-width:500px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.3);
+      text-align:center; animation:slideIn 0.3s ease-out;
+    }
+    .modal-content .icon { font-size:60px; margin-bottom:15px; }
+    .modal-content h3 { margin-bottom:10px; }
+    .modal-content p { margin-bottom:20px; }
+    
+    @media (max-width:1200px) {
+      .kanban-board { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width:768px) {
+      .container { flex-direction:column; }
+      .sidebar { width:100%; }
+      .main { padding:20px; }
+      .kanban-board { grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
@@ -68,6 +265,16 @@
   <div class="navbar">
     <h1>🐝 ShareHive - Watchlist</h1>
     <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+  
+  <!-- Modal -->
+  <div class="modal" id="randomPickModal">
+    <div class="modal-content">
+      <span class="icon">🎲</span>
+      <h3 id="randomPickTitle">Random Pick!</h3>
+      <p id="randomPickResult">And the winner is...</p>
+      <button class="btn btn-primary" onclick="closeModal()">Awesome!</button>
+    </div>
   </div>
 
   <div class="container">
@@ -84,7 +291,7 @@
       <a href="wiki.html">📖 Wiki</a>
       <a href="uploads.html">📂 Upload Files</a>
       <a href="projects.html">📌 Projects</a>
-      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="watchlist.html"><b>🎥 Watchlist</b></a>
       <a href="courses.html">📚 Courses</a>
       <a href="profile.html">👤 Profile</a>
       <a href="settings.html">⚙️ Settings</a>
@@ -102,45 +309,99 @@
 
     <!-- Main -->
     <div class="main">
-      <h2>Add to Watchlist</h2>
-      <div class="form">
-        <input id="title" placeholder="Title">
-        <select id="type">
-          <option value="Movie">Movie</option>
-          <option value="Series">Series</option>
-          <option value="Anime">Anime</option>
-          <option value="YouTube">YouTube</option>
-          <option value="Twitch">Twitch</option>
-          <option value="Other">Other</option>
-        </select>
-        <input id="genre" placeholder="Genre">
-        <input id="platform" placeholder="Platform (Netflix, Prime, etc.)">
-        <input id="link" placeholder="Link (optional)">
-        <select id="status">
-          <option value="To-Watch">To-Watch</option>
-          <option value="Watching">Watching</option>
-          <option value="Completed">Completed</option>
-          <option value="Dropped">Dropped</option>
-        </select>
-        <input id="episodes" placeholder="Episodes watched / Total (e.g. 5/12)">
-        <input id="rating" type="number" min="1" max="10" placeholder="Rating (1-10)">
-        <textarea id="notes" placeholder="Notes..."></textarea>
-        <input id="start" type="date">
-        <input id="end" type="date">
-        <button id="saveBtn">Save</button>
+      <div class="page-header">
+        <h2>🎥 My Watchlist</h2>
+        <button class="btn btn-primary" onclick="toggleForm()">
+          <span>➕</span>
+          <span>Add to Watchlist</span>
+        </button>
       </div>
 
-      <div class="search-filter">
-        <input id="search" placeholder="Search...">
-        <select id="filterStatus">
-          <option value="">All Status</option>
+      <div class="form-card" id="addFormCard">
+        <h3><span id="formIcon">➕</span> <span id="formTitle">Add New Item</span></h3>
+        <form id="itemForm">
+          <input type="hidden" id="editId">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Title *</label>
+              <input id="title" placeholder="e.g., The Mandalorian" required>
+            </div>
+            <div class="form-group">
+              <label>Type</label>
+              <select id="type">
+                <option value="Series">Series</option>
+                <option value="Movie">Movie</option>
+                <option value="Anime">Anime</option>
+                <option value="YouTube">YouTube</option>
+                <option value="Twitch">Twitch</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Genre</label>
+              <input id="genre" placeholder="e.g., Sci-Fi, Action">
+            </div>
+            <div class="form-group">
+              <label>Platform</label>
+              <input id="platform" placeholder="e.g., Disney+">
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Link (optional)</label>
+            <input id="link" placeholder="https://...">
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Status</label>
+              <select id="status">
+                <option value="To-Watch">To-Watch</option>
+                <option value="Watching">Watching</option>
+                <option value="Completed">Completed</option>
+                <option value="Dropped">Dropped</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Episodes</label>
+              <input id="episodes" placeholder="Watched/Total (e.g., 8/16)">
+            </div>
+          </div>
+          <div class="form-grid">
+             <div class="form-group">
+              <label>Rating (1-10)</label>
+              <input id="rating" type="number" min="1" max="10" placeholder="e.g., 9">
+            </div>
+            <div class="form-group">
+              <label>Release Year</label>
+              <input id="year" type="number" min="1900" max="2100" placeholder="e.g., 2019">
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Notes</label>
+            <textarea id="notes" placeholder="Your thoughts..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveBtn">Save Item</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-container">
+          <input id="search" class="search-box" placeholder="Search by title...">
+          <span class="search-icon">🔍</span>
+        </div>
+        <select id="filterStatus" class="search-box">
+          <option value="">Filter by Status</option>
           <option>To-Watch</option>
           <option>Watching</option>
           <option>Completed</option>
           <option>Dropped</option>
         </select>
-        <select id="filterType">
-          <option value="">All Types</option>
+        <select id="filterType" class="search-box">
+          <option value="">Filter by Type</option>
           <option>Movie</option>
           <option>Series</option>
           <option>Anime</option>
@@ -148,22 +409,17 @@
           <option>Twitch</option>
           <option>Other</option>
         </select>
-        <select id="filterPlatform">
-          <option value="">All Platforms</option>
+        <select id="filterPlatform" class="search-box">
+          <option value="">Filter by Platform</option>
         </select>
-        <button onclick="randomPick()">🎲 Random Pick</button>
+        <button class="btn btn-primary" onclick="randomPick()" style="padding:12px 20px;">🎲 Random Pick</button>
       </div>
 
-      <div class="kanban" id="kanban">
-        <div class="column" id="To-Watch"><h3>To-Watch</h3></div>
-        <div class="column" id="Watching"><h3>Watching</h3></div>
-        <div class="column" id="Completed"><h3>Completed</h3></div>
-        <div class="column" id="Dropped"><h3>Dropped</h3></div>
-      </div>
-
-      <div class="calendar">
-        <h2>Calendar View</h2>
-        <table id="calendarTable"></table>
+      <div class="kanban-board" id="kanbanBoard">
+        <div class="kanban-column" id="To-Watch"><h3>To Watch</h3><div class="items"></div></div>
+        <div class="kanban-column" id="Watching"><h3>Watching</h3><div class="items"></div></div>
+        <div class="kanban-column" id="Completed"><h3>Completed</h3><div class="items"></div></div>
+        <div class="kanban-column" id="Dropped"><h3>Dropped</h3><div class="items"></div></div>
       </div>
     </div>
   </div>
@@ -177,77 +433,75 @@
     if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
 
    // 📦 IndexedDB (v21 unified)
-let db;
-const stores = [
-  "notes",
-  "bookmarks",
-  "videos",
-  "todos",
-  "expenses",
-  "planner",
-  "wiki",
-  "uploads",
-  "projects",
-  "watchlist",
-  "courses",
-  "profile",
-  "settings",
-  "community"
-];
+    let db;
+    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","settings","community"];
+    const request = indexedDB.open("ShareHiveDB", 21);
+    
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      stores.forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+        }
+      });
+    };
+    
+    request.onsuccess = e => { 
+      db = e.target.result; 
+      displayWatchlist();
+    };
+    
+    request.onerror = e => console.error("DB error:", e.target.error);
+    
+    let editingItemId = null;
 
-const request = indexedDB.open("ShareHiveDB", 21);
-
-request.onupgradeneeded = e => {
-  db = e.target.result;
-  stores.forEach(name => {
-    if (!db.objectStoreNames.contains(name)) {
-      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    function toggleForm() {
+      const formCard = document.getElementById('addFormCard');
+      const isVisible = formCard.classList.toggle('show');
+      if (!isVisible) clearForm();
     }
-  });
-};
-
-request.onsuccess = e => { 
-  db = e.target.result; 
-  displayWatchlist();  // ✅ call page-specific display function
-};
-
-request.onerror = e => console.error("DB error:", e.target.error);
-
 
     // Save / Update
-    document.getElementById("saveBtn").onclick=()=>{
-      const item={
-        title:document.getElementById("title").value.trim(),
-        type:document.getElementById("type").value,
-        genre:document.getElementById("genre").value.trim(),
-        platform:document.getElementById("platform").value.trim(),
-        link:document.getElementById("link").value.trim(),
-        status:document.getElementById("status").value,
-        episodes:document.getElementById("episodes").value.trim(),
-        rating:document.getElementById("rating").value,
-        notes:document.getElementById("notes").value.trim(),
-        start:document.getElementById("start").value,
-        end:document.getElementById("end").value,
-        pinned:false, favorite:false
+    document.getElementById("itemForm").addEventListener('submit', (e) => {
+      e.preventDefault();
+      const item = {
+        title: document.getElementById("title").value.trim(),
+        type: document.getElementById("type").value,
+        genre: document.getElementById("genre").value.trim(),
+        platform: document.getElementById("platform").value.trim(),
+        link: document.getElementById("link").value.trim(),
+        status: document.getElementById("status").value,
+        episodes: document.getElementById("episodes").value.trim(),
+        rating: document.getElementById("rating").value,
+        notes: document.getElementById("notes").value.trim(),
+        year: document.getElementById("year").value,
       };
       if(!item.title) return;
 
-      const btn=document.getElementById("saveBtn");
-      const editId=btn.getAttribute("data-edit");
+      const tx = db.transaction("watchlist","readwrite");
+      const store = tx.objectStore("watchlist");
+      
+      if(editingItemId){ 
+        store.get(editingItemId).onsuccess = (e) => {
+          const existing = e.target.result;
+          const updatedItem = { ...existing, ...item, id: editingItemId };
+          store.put(updatedItem);
+        };
+      } else {
+        item.pinned = false;
+        item.favorite = false;
+        store.add(item);
+      }
 
-      const tx=db.transaction("watchlist","readwrite");
-      const store=tx.objectStore("watchlist");
-      if(editId){ item.id=Number(editId); store.put(item); }
-      else store.add(item);
-
-      tx.oncomplete=()=>{ clearForm(); displayWatchlist(); };
-    };
+      tx.oncomplete = () => { clearForm(); toggleForm(); displayWatchlist(); };
+    });
 
     function clearForm(){
-      document.querySelectorAll(".form input, .form textarea, .form select").forEach(el=>el.value="");
-      const btn=document.getElementById("saveBtn");
-      btn.textContent="Save";
-      btn.removeAttribute("data-edit");
+      document.getElementById("itemForm").reset();
+      editingItemId = null;
+      document.getElementById("formTitle").textContent = "Add New Item";
+      document.getElementById("formIcon").textContent = "➕";
+      document.getElementById("saveBtn").textContent = "Save Item";
     }
 
     // Display
@@ -261,59 +515,82 @@ request.onerror = e => console.error("DB error:", e.target.error);
         const fs=document.getElementById("filterStatus").value;
         const ft=document.getElementById("filterType").value;
         const fp=document.getElementById("filterPlatform").value;
-        if(s) items=items.filter(i=>i.title.toLowerCase().includes(s));
-        if(fs) items=items.filter(i=>i.status===fs);
-        if(ft) items=items.filter(i=>i.type===ft);
-        if(fp) items=items.filter(i=>i.platform===fp);
+        items=items.filter(i=>
+          (!s || i.title.toLowerCase().includes(s)) &&
+          (!fs || i.status===fs) &&
+          (!ft || i.type===ft) &&
+          (!fp || i.platform===fp)
+        );
 
         // Populate platform filter
-        const platforms=[...new Set(items.map(i=>i.platform).filter(p=>p))];
-        const pf=document.getElementById("filterPlatform");
-        pf.innerHTML='<option value="">All Platforms</option>'+platforms.map(p=>`<option>${p}</option>`).join("");
+        const allPlatforms=[...new Set(e.target.result.map(i=>i.platform).filter(p=>p))];
+        const platformFilter=document.getElementById("filterPlatform");
+        platformFilter.innerHTML='<option value="">Filter by Platform</option>'+allPlatforms.map(p=>`<option>${p}</option>`).join("");
+        platformFilter.value = fp;
 
-        // Clear Kanban
-        ["To-Watch","Watching","Completed","Dropped"].forEach(col=>{
-          const el=document.getElementById(col);
-          el.innerHTML=`<h3>${col}</h3>`;
-        });
-
-        // Add to columns
-        items.sort((a,b)=>b.pinned-a.pinned || b.favorite-a.favorite);
-        items.forEach(i=>{
-          const div=document.createElement("div");
-          div.className="item";
-          let [watched,total]=i.episodes.split("/").map(Number);
-          let percent=(watched&&total)?(watched/total*100):0;
-          div.innerHTML=`
-            <h4>${i.title} ${i.favorite?"❤️":""}</h4>
-            <small>${i.type} | ${i.platform} | ${i.genre}</small><br>
-            ${i.link?`<a href="${i.link}" target="_blank">🔗 Link</a><br>`:""}
-            <div class="progress"><span style="width:${percent}%"></span></div>
-            ${i.rating?`⭐ ${i.rating}/10`:""}
-            <p>${i.notes||""}</p>
-            <small>${i.start?`Start: ${i.start}`:""} ${i.end?`End: ${i.end}`:""}</small>
-            <div class="actions">
-              <button class="edit" onclick="editItem(${i.id})">Edit</button>
-              <button class="delete" onclick="deleteItem(${i.id})">Delete</button>
-              <button class="pin" onclick="togglePin(${i.id})">${i.pinned?"Unpin":"Pin"}</button>
-              <button class="fav" onclick="toggleFav(${i.id})">${i.favorite?"Unfav":"Fav"}</button>
-            </div>`;
-          document.getElementById(i.status).appendChild(div);
-        });
-
-        updateCalendar(items);
+        // Render Kanban
+        renderKanban(items);
       };
     }
 
-    // Calendar view
-    function updateCalendar(items){
-      const table=document.getElementById("calendarTable");
-      table.innerHTML="<tr><th>Title</th><th>Start</th><th>End</th></tr>";
-      items.forEach(i=>{
-        if(i.start||i.end){
-          table.innerHTML+=`<tr><td>${i.title}</td><td>${i.start||""}</td><td>${i.end||""}</td></tr>`;
-        }
+    function renderKanban(items) {
+      ["To-Watch","Watching","Completed","Dropped"].forEach(col => {
+        const el=document.getElementById(col).querySelector('.items');
+        el.innerHTML = "";
       });
+
+      items.sort((a,b)=>b.pinned-a.pinned || b.favorite-a.favorite);
+      
+      items.forEach(i => {
+        const card = document.createElement("div");
+        card.className = `item-card ${i.pinned ? 'pinned' : ''} ${i.favorite ? 'favorite' : ''}`;
+        
+        const { watched, total, percent } = calculateProgress(i.episodes);
+        
+        card.innerHTML = `
+          <div class="item-header">
+            <h4>${i.title}</h4>
+            <div class="item-icons">
+              ${i.pinned ? '<span class="pinned-icon">📌</span>' : ''}
+              ${i.favorite ? '<span class="favorite-icon">❤️</span>' : ''}
+            </div>
+          </div>
+          <div class="item-meta">
+            <span class="badge">${i.type}</span>
+            <span class="badge">${i.platform}</span>
+            <span class="badge">${i.genre}</span>
+            ${i.year ? `<span class="badge">${i.year}</span>` : ''}
+          </div>
+          ${i.episodes ? `<div class="progress-bar"><span style="width:${percent}%" class="${getProgressBarColor(percent, i.status)}"></span></div>` : ''}
+          <div class="item-details" style="font-size:12px; opacity:0.8; margin-bottom:10px;">
+            ${i.episodes ? `<span>Progress: ${i.episodes}</span>` : ''}
+            ${i.rating ? `<span>⭐ ${i.rating}/10</span>` : ''}
+          </div>
+          ${i.notes ? `<p class="item-notes">${i.notes}</p>` : ''}
+          ${i.link ? `<a href="${i.link}" target="_blank" style="font-size:13px; color:var(--primary-color);">🔗 Visit Link</a>` : ''}
+          <div class="item-actions">
+            <button class="action-btn btn-edit" onclick="editItem(${i.id})">✏️ Edit</button>
+            <button class="action-btn btn-delete" onclick="deleteItem(${i.id})">🗑️ Delete</button>
+            <button class="action-btn btn-pin" onclick="togglePin(${i.id})">${i.pinned?"Unpin":"📌 Pin"}</button>
+            <button class="action-btn btn-fav" onclick="toggleFav(${i.id})">${i.favorite?"Unfav":"❤️ Fav"}</button>
+          </div>
+        `;
+        document.getElementById(i.status).querySelector('.items').appendChild(card);
+      });
+    }
+
+    // Helper Functions
+    function calculateProgress(episodesStr) {
+      if (!episodesStr) return { watched: 0, total: 0, percent: 0 };
+      const [watched, total] = episodesStr.split("/").map(Number);
+      const percent = (watched && total) ? Math.round((watched / total) * 100) : 0;
+      return { watched, total, percent };
+    }
+
+    function getProgressBarColor(percent, status) {
+      if (status === 'Completed' || percent === 100) return 'var(--success-color)';
+      if (status === 'Watching' || percent > 0) return 'var(--primary-color)';
+      return 'var(--border-color)';
     }
 
     // Edit
@@ -321,25 +598,25 @@ request.onerror = e => console.error("DB error:", e.target.error);
       const tx=db.transaction("watchlist","readonly");
       tx.objectStore("watchlist").get(id).onsuccess=e=>{
         const i=e.target.result;
-        document.getElementById("title").value=i.title;
-        document.getElementById("type").value=i.type;
-        document.getElementById("genre").value=i.genre;
-        document.getElementById("platform").value=i.platform;
-        document.getElementById("link").value=i.link;
-        document.getElementById("status").value=i.status;
-        document.getElementById("episodes").value=i.episodes;
-        document.getElementById("rating").value=i.rating;
-        document.getElementById("notes").value=i.notes;
-        document.getElementById("start").value=i.start;
-        document.getElementById("end").value=i.end;
-        const btn=document.getElementById("saveBtn");
-        btn.textContent="Update";
-        btn.setAttribute("data-edit",id);
+        Object.keys(i).forEach(key => {
+          const el = document.getElementById(key);
+          if (el) el.value = i[key];
+        });
+        
+        editingItemId = id;
+        document.getElementById("formTitle").textContent = "Edit Item";
+        document.getElementById("formIcon").textContent = "✏️";
+        document.getElementById("saveBtn").textContent = "Update Item";
+        
+        const formCard = document.getElementById('addFormCard');
+        if (!formCard.classList.contains('show')) formCard.classList.add('show');
+        formCard.scrollIntoView({ behavior: 'smooth' });
       };
     }
 
     // Delete
     function deleteItem(id){
+      if (!confirm('Are you sure you want to delete this item?')) return;
       const tx=db.transaction("watchlist","readwrite");
       tx.objectStore("watchlist").delete(id);
       tx.oncomplete=displayWatchlist;
@@ -362,11 +639,20 @@ request.onerror = e => console.error("DB error:", e.target.error);
       const tx=db.transaction("watchlist","readonly");
       tx.objectStore("watchlist").getAll().onsuccess=e=>{
         const list=e.target.result.filter(i=>i.status==="To-Watch");
+        const modal = document.getElementById('randomPickModal');
+        const resultEl = document.getElementById('randomPickResult');
         if(list.length){
           const pick=list[Math.floor(Math.random()*list.length)];
-          alert("🎲 Random Pick: "+pick.title);
-        } else alert("No To-Watch items.");
+          resultEl.textContent = `You should watch: ${pick.title}!`;
+        } else {
+          resultEl.textContent = "Your 'To Watch' list is empty. Add some items first!";
+        }
+        modal.classList.add('show');
       };
+    }
+    
+    function closeModal() {
+      document.getElementById('randomPickModal').classList.remove('show');
     }
 
     // Live search/filter
