@@ -6,83 +6,233 @@
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: var(--bg-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
       color: var(--text-color);
       transition:0.3s;
     }
     :root {
-      --bg-color:#fff;
-      --text-color:#222;
-      --primary-color:#0077ff;
-      --sidebar-bg:#f4f4f4;
-      --card-bg:#f8f8f8;
+      --bg-color: #f4f7fa; --text-color: #222;
+      --primary-color: #0077ff; --secondary-color: #00c896; --sidebar-bg: #ffffff; --card-bg: #ffffff;
+      --border-color: #e0e0e0; --success-color: #28a745; --warning-color: #ffc107;
+      --danger-color: #dc3545; --info-color: #17a2b8;
     }
     body.dark {
-      --bg-color:#1e1e1e;
-      --text-color:#f0f0f0;
-      --sidebar-bg:#2c2c2c;
-      --card-bg:#333;
+      --bg-color: #1e1e1e; --text-color: #f0f0f0; --sidebar-bg: #2c2c2c;
+      --card-bg: #333333; --border-color: #444;
     }
 
-    /* Navbar */
-    .navbar {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:10px 20px; background:var(--primary-color); color:#fff;
+    .navbar { 
+      display:flex; justify-content:space-between; align-items:center; 
+      padding:10px 20px; background:linear-gradient(135deg, var(--primary-color), #0056cc); color:white; 
+      box-shadow:0 2px 10px rgba(0,0,0,0.1);
     }
     .navbar h1 { font-size:20px; }
-    .toggle-btn {
-      background:#fff; border:none; color:var(--primary-color);
-      padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold;
+    .toggle-btn { 
+      background:white; border:none; color:var(--primary-color); 
+      padding:8px 15px; border-radius:20px; cursor:pointer; font-weight:bold;
+      transition:all 0.3s ease; box-shadow:0 2px 5px rgba(0,0,0,0.2);
+    }
+    .toggle-btn:hover {
+      transform:scale(1.05);
+      box-shadow:0 3px 8px rgba(0,0,0,0.3);
     }
 
-    /* Layout */
     .container { display:flex; height:calc(100vh - 50px); }
-    .sidebar {
+
+    .sidebar { 
       width:220px; background:var(--sidebar-bg); padding:20px; overflow-y:auto;
+      border-right:1px solid var(--border-color);
     }
     .sidebar h2 { font-size:16px; margin-bottom:10px; }
-    .sidebar a {
-      display:block; text-decoration:none; color:var(--text-color);
+    .sidebar a { 
+      display:block; text-decoration:none; color:var(--text-color); 
       padding:8px 10px; border-radius:5px; margin-bottom:5px;
+      transition:all 0.3s ease;
     }
-    .sidebar a:hover { background:var(--primary-color); color:#fff; }
-
-    .main { flex:1; padding:20px; overflow-y:auto; }
-
-    /* Form */
-    .form { margin-bottom:20px; }
-    .form input[type=file] {
-      margin-bottom:10px; display:block;
-    }
-    .form button {
-      padding:8px 12px; border:none; background:var(--primary-color);
-      color:#fff; border-radius:5px; cursor:pointer; font-weight:bold;
+    .sidebar a:hover { 
+      background:var(--primary-color); color:white;
+      transform:translateX(5px);
     }
 
-    /* Search + Filter */
+    .main { 
+      flex:1; 
+      padding:30px; 
+      overflow-y:auto;
+      background:var(--bg-color);
+    }
+
+    .page-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:30px; padding-bottom:20px;
+      border-bottom:2px solid var(--border-color);
+    }
+    .page-header h2 {
+      font-size:32px; color:var(--text-color);
+      display:flex; align-items:center; gap:10px;
+    }
+    
+    /* Upload Zone */
+    .upload-zone {
+      background:var(--card-bg); border:3px dashed var(--border-color);
+      border-radius:15px; padding:40px; text-align:center;
+      margin-bottom:30px; transition:all 0.3s ease; cursor:pointer;
+      animation:fadeInUp 0.6s ease-out backwards;
+    }
+    .upload-zone.dragover {
+      border-color:var(--primary-color);
+      background:rgba(0,119,255,0.1);
+    }
+    .upload-zone .icon { font-size:60px; margin-bottom:15px; }
+    .upload-zone h3 { font-size:22px; margin-bottom:10px; }
+    .upload-zone p { opacity:0.7; margin-bottom:20px; }
+    
+    .btn {
+      padding:12px 30px; border:none; border-radius:25px; font-weight:bold;
+      cursor:pointer; transition:all 0.3s ease; font-size:16px;
+      display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    }
+
+    .btn-primary {
+      background:var(--primary-color); color:white;
+      box-shadow:0 4px 10px rgba(0,119,255,0.3);
+    }
+
+    .btn-primary:hover {
+      background:#0056cc; transform:translateY(-2px);
+      box-shadow:0 6px 20px rgba(0,119,255,0.4);
+    }
+    
     .controls {
-      display:flex; gap:10px; margin-bottom:15px;
+      display:flex; gap:15px; margin-bottom:25px; align-items:center; flex-wrap:wrap;
     }
-    .controls input, .controls select {
-      padding:8px; border:1px solid #ccc; border-radius:5px;
+    .search-container { flex:1; position:relative; min-width:250px; }
+    .search-box {
+      width:100%; padding:12px 45px 12px 15px; font-size:15px;
+      border:2px solid var(--border-color); border-radius:10px;
       background:var(--card-bg); color:var(--text-color);
     }
+    .search-icon { position:absolute; right:15px; top:50%; transform:translateY(-50%); opacity:0.5; }
+    .filter-select {
+      padding:12px 15px; border:2px solid var(--border-color); border-radius:10px;
+      background:var(--card-bg); color:var(--text-color); font-size:15px;
+    }
+    .view-toggle { display:flex; border:2px solid var(--border-color); border-radius:10px; overflow:hidden; }
+    .view-btn {
+      padding:10px; background:var(--card-bg); border:none; cursor:pointer;
+      font-size:20px; color:var(--text-color); opacity:0.6; transition:all 0.3s ease;
+    }
+    .view-btn:hover { opacity:1; }
+    .view-btn.active { background:var(--primary-color); color:white; opacity:1; }
 
-    /* Uploads */
     .uploads-container {
-      display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr));
-      gap:15px;
+      display:grid; gap:20px;
     }
+    .uploads-container.grid-view {
+      grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); /* <-- FIXED SIZE */
+    }
+    .uploads-container.list-view {
+      grid-template-columns:1fr;
+    }
+    
     .upload-card {
-      background:var(--card-bg); padding:15px; border-radius:10px;
-      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      background:var(--card-bg); border-radius:15px; border:2px solid var(--border-color);
+      box-shadow:0 4px 15px rgba(0,0,0,0.08); transition:all 0.3s ease;
+      animation:fadeInUp 0.5s ease-out backwards;
+      display:flex; flex-direction:column; overflow:hidden;
     }
-    .upload-card h4 { margin-bottom:10px; font-size:14px; }
-    .actions { margin-top:10px; }
-    .delete {
-      background:#f44336; color:#fff; border:none; padding:5px 8px;
-      border-radius:5px; cursor:pointer; font-size:12px;
+    .upload-card:hover {
+      transform:translateY(-5px); box-shadow:0 8px 25px rgba(0,0,0,0.12);
+      border-color:var(--primary-color);
+    }
+
+    .file-preview {
+      width:100%; height:220px; /* <-- FIXED SIZE */ background:var(--bg-color);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .file-preview img, .file-preview video { /* <-- No embed here */
+      width:100%; height:100%; object-fit:cover;
+    }
+    .file-preview .file-icon {
+      font-size:80px; opacity:0.3;
+    }
+    .file-preview audio {
+      width:90%;
+    }
+    
+    .file-info {
+      padding:15px; flex:1; display:flex; flex-direction:column;
+    }
+    .file-name {
+      font-size:16px; font-weight:600; margin-bottom:10px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .file-details {
+      display:flex; justify-content:space-between; font-size:12px; opacity:0.7;
+      margin-bottom:15px;
+    }
+
+    .file-actions {
+      margin-top:auto; display:flex; gap:10px; padding-top:15px;
+      border-top:1px solid var(--border-color);
+    }
+    .action-btn {
+      padding:8px 15px; border:none; border-radius:20px; cursor:pointer;
+      font-size:13px; font-weight:600; transition:all 0.3s ease;
+      display:flex; align-items:center; gap:5px;
+    }
+    .btn-view { background:var(--info-color); color:white; }
+    .btn-download { background:var(--secondary-color); color:white; text-decoration:none; }
+    .btn-delete { background:var(--danger-color); color:white; margin-left:auto; }
+    .action-btn:hover { opacity:0.8; transform:scale(1.05); }
+
+    .list-view .upload-card {
+      flex-direction:row; align-items:center;
+    }
+    .list-view .file-preview {
+      width:120px; height:90px; /* <-- FIXED SIZE */ flex-shrink:0;
+    }
+    .list-view .file-preview .file-icon { font-size:40px; }
+    .list-view .file-info { flex:1; padding:15px 20px; }
+    .list-view .file-name { font-size:16px; /* <-- FIXED SIZE */ }
+    .list-view .file-details { margin-bottom:10px; }
+    .list-view .file-actions { border:none; padding:0; }
+    
+    /* Modal */
+    .modal {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .modal.show { display:flex; }
+    .modal-content {
+      max-width:90vw; max-height:90vh;
+      animation:zoomIn 0.3s ease-out;
+      display:flex; align-items:center; justify-content:center;
+    }
+    @keyframes zoomIn {
+      from { transform:scale(0.5); opacity:0; }
+      to { transform:scale(1); opacity:1; }
+    }
+    .modal-content img {
+      max-width:100%; max-height:100%;
+      border-radius:10px;
+    }
+    .modal-content.pdf-view {
+      width: 90vw; /* <-- FIXED SIZE */
+      height: 90vh; /* <-- FIXED SIZE */
+    }
+    .modal-content embed {
+      width:100%; height:100%;
+      border-radius:10px;
+    }
+    
+    @media (max-width:768px) {
+      .container { flex-direction:column; }
+      .sidebar { width:100%; }
+      .main { padding:20px; }
+      .uploads-container.grid-view { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -92,9 +242,13 @@
     <h1>🐝 ShareHive - Uploads</h1>
     <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
   </div>
+  
+  <!-- Quick View Modal -->
+  <div class="modal" id="quickViewModal" onclick="closeModal()">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
 
   <div class="container">
-    <!-- Sidebar -->
     <div class="sidebar">
       <h2>Menu</h2>
       <a href="index.html">🏠 Dashboard</a>
@@ -105,7 +259,7 @@
       <a href="expense.html">💰 Expense Tracker</a>
       <a href="planner.html">📅 Planner</a>
       <a href="wiki.html">📖 Wiki</a>
-      <a href="uploads.html">📂 Upload Files</a>
+      <a href="uploads.html"><b>📂 Upload Files</b></a>
       <a href="projects.html">📌 Projects</a>
       <a href="watchlist.html">🎥 Watchlist</a>
       <a href="courses.html">📚 Courses</a>
@@ -125,26 +279,42 @@
 
     <!-- Main -->
     <div class="main">
-      <h2>Upload Files</h2>
-      <div class="form">
-        <input type="file" id="fileInput" multiple>
-        <button onclick="saveFiles()">Upload</button>
+      <div class="page-header">
+        <h2>📂 My Files</h2>
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <div class="icon">☁️</div>
+        <h3>Drag & Drop Files Here</h3>
+        <p>or</p>
+        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+          <span>📂</span>
+          <span>Browse Files</span>
+        </button>
+        <input type="file" id="fileInput" multiple style="display:none;">
       </div>
 
       <div class="controls">
-        <input type="text" id="search" placeholder="Search files...">
-        <select id="filter">
-          <option value="all">All</option>
+        <div class="search-container">
+          <input type="text" id="search" class="search-box" placeholder="Search files by name...">
+          <span class="search-icon">🔍</span>
+        </div>
+        <select id="filter" class="filter-select">
+          <option value="all">Filter by Type: All</option>
           <option value="image">Images</option>
           <option value="video">Videos</option>
-          <option value="audio">Music</option>
+          <option value="audio">Audio</option>
           <option value="pdf">PDFs</option>
+          <option value="document">Documents</option>
           <option value="other">Other</option>
         </select>
+        <div class="view-toggle">
+          <button class="view-btn active" id="gridViewBtn" onclick="switchView('grid')">▦</button>
+          <button class="view-btn" id="listViewBtn" onclick="switchView('list')">≡</button>
+        </div>
       </div>
 
-      <h2>Your Uploads</h2>
-      <div class="uploads-container" id="uploads"></div>
+      <div class="uploads-container grid-view" id="uploadsContainer"></div>
     </div>
   </div>
 
@@ -157,46 +327,49 @@
     if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
 
    // 📦 IndexedDB (v21 unified)
-let db;
-const stores = [
-  "notes",
-  "bookmarks",
-  "videos",
-  "todos",
-  "expenses",
-  "planner",
-  "wiki",
-  "uploads",
-  "projects",
-  "watchlist",
-  "courses",
-  "profile",
-  "settings",
-  "community"
-];
+    let db;
+    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","settings","community"];
+    const request = indexedDB.open("ShareHiveDB", 21);
+    
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      stores.forEach(name => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+        }
+      });
+    };
+    
+    request.onsuccess = e => { 
+      db = e.target.result; 
+      displayUploads();
+    };
+    
+    request.onerror = e => console.error("DB error:", e.target.error);
 
-const request = indexedDB.open("ShareHiveDB", 21);
-
-request.onupgradeneeded = e => {
-  db = e.target.result;
-  stores.forEach(name => {
-    if (!db.objectStoreNames.contains(name)) {
-      db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-    }
-  });
-};
-
-request.onsuccess = e => { 
-  db = e.target.result; 
-  displayUploads();  // ✅ call page-specific display function
-};
-
-request.onerror = e => console.error("DB error:", e.target.error);
-
+    // Drag & Drop
+    const uploadZone = document.getElementById('uploadZone');
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length) {
+        saveFiles(files);
+      }
+    });
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      saveFiles(e.target.files);
+    });
 
     // Save Files
-    function saveFiles(){
-      const files=document.getElementById("fileInput").files;
+    function saveFiles(files){
       if(!files.length) return;
       Array.from(files).forEach(file=>{
         const reader=new FileReader();
@@ -205,6 +378,7 @@ request.onerror = e => console.error("DB error:", e.target.error);
           tx.objectStore("uploads").add({
             name:file.name,
             type:file.type,
+            size:file.size,
             data:reader.result,
             date:Date.now()
           });
@@ -224,64 +398,153 @@ request.onerror = e => console.error("DB error:", e.target.error);
       req.onsuccess=()=>{
         let uploads=req.result;
 
-        // Search + Filter
         const search=document.getElementById("search").value.toLowerCase();
         const filter=document.getElementById("filter").value;
 
-        if(search){
-          uploads=uploads.filter(f=>f.name.toLowerCase().includes(search));
-        }
-        if(filter!=="all"){
-          uploads=uploads.filter(f=>{
-            if(filter==="image") return f.type.startsWith("image/");
-            if(filter==="video") return f.type.startsWith("video/");
-            if(filter==="audio") return f.type.startsWith("audio/");
-            if(filter==="pdf") return f.type==="application/pdf";
-            return !f.type.startsWith("image/") && !f.type.startsWith("video/") && !f.type.startsWith("audio/") && f.type!=="application/pdf";
-          });
-        }
+        uploads = uploads.filter(f => 
+          (!search || f.name.toLowerCase().includes(search)) &&
+          (filter === "all" || getFileType(f.type) === filter)
+        );
+        
+        uploads.sort((a, b) => b.date - a.date);
 
-        const container=document.getElementById("uploads");
-        container.innerHTML="";
-        uploads.forEach(file=>{
-          const div=document.createElement("div");
-          div.className="upload-card";
-
-          let preview="";
-          if(file.type.startsWith("image/")){
-            preview=`<img src="${file.data}" alt="${file.name}" style="max-width:100%;border-radius:5px;">`;
-          } else if(file.type.startsWith("video/")){
-            preview=`<video controls style="max-width:100%;border-radius:5px;"><source src="${file.data}" type="${file.type}"></video>`;
-          } else if(file.type.startsWith("audio/")){
-            preview=`<audio controls style="width:100%;"><source src="${file.data}" type="${file.type}"></audio>`;
-          } else if(file.type==="application/pdf"){
-            preview=`<embed src="${file.data}" type="application/pdf" width="100%" height="200px"/>`;
-          } else {
-            preview=`📄 <a href="${file.data}" download="${file.name}">${file.name}</a>`;
-          }
-
-          div.innerHTML=`
-            <h4>${file.name}</h4>
-            ${preview}
-            <div class="actions">
-              <button class="delete" onclick="deleteFile(${file.id})">Delete</button>
+        const container=document.getElementById("uploadsContainer");
+        container.innerHTML = uploads.map(file => {
+          const { preview, icon } = getFilePreview(file);
+          return `
+            <div class="upload-card">
+              <div class="file-preview">${preview}</div>
+              <div class="file-info">
+                <h4 class="file-name" title="${file.name}">${file.name}</h4>
+                <div class="file-details">
+                  <span>${formatBytes(file.size)}</span>
+                  <span>${new Date(file.date).toLocaleDateString()}</span>
+                </div>
+                <div class="file-actions">
+                  ${icon === 'image' || icon === 'pdf' ? `<button class="action-btn btn-view" onclick="quickView(${file.id})">👁️ View</button>` : ''}
+                  <a href="${file.data}" download="${file.name}" class="action-btn btn-download">📥 Download</a>
+                  <button class="action-btn btn-delete" onclick="deleteFile(${file.id})">🗑️ Delete</button>
+                </div>
+              </div>
             </div>
           `;
-          container.appendChild(div);
-        });
+        }).join('');
       };
+    }
+
+    // File Type & Preview Logic
+    function getFileType(mimeType) {
+      if (mimeType.startsWith("image/")) return "image";
+      if (mimeType.startsWith("video/")) return "video";
+      if (mimeType.startsWith("audio/")) return "audio";
+      if (mimeType === "application/pdf") return "pdf";
+      if (mimeType.startsWith("text/") || mimeType.includes("document") || mimeType.includes("sheet")) return "document";
+      return "other";
+    }
+
+    function getFilePreview(file) {
+      const type = getFileType(file.type);
+      let preview = '';
+      let icon = '';
+      switch (type) {
+        case 'image':
+          preview = `<img src="${file.data}" alt="${file.name}" loading="lazy">`;
+          icon = 'image';
+          break;
+        case 'video':
+          preview = `<video controls muted loop playsinline><source src="${file.data}" type="${file.type}"></video>`;
+          icon = 'video';
+          break;
+        case 'audio':
+          preview = `<div class="file-icon">🎵</div><audio controls><source src="${file.data}" type="${file.type}"></audio>`;
+          icon = 'audio';
+          break;
+        case 'pdf':
+          preview = `<div class="file-icon">📄</div>`;
+          icon = 'pdf';
+          break;
+        case 'document':
+          preview = `<div class="file-icon">📝</div>`;
+          icon = 'document';
+          break;
+        default:
+          preview = `<div class="file-icon">📦</div>`;
+          icon = 'other';
+      }
+      return { preview, icon };
     }
 
     // Delete File
     function deleteFile(id){
+      if (!confirm('Are you sure you want to delete this file?')) return;
       const tx=db.transaction("uploads","readwrite");
       tx.objectStore("uploads").delete(id);
       tx.oncomplete=displayUploads;
     }
 
+    // Quick View Modal
+    function quickView(id) {
+      const tx = db.transaction("uploads", "readonly");
+      tx.objectStore("uploads").get(id).onsuccess = e => {
+        const file = e.target.result;
+        const modal = document.getElementById('quickViewModal');
+        const content = document.getElementById('modalContent');
+        
+        // Clear previous classes
+        content.classList.remove('pdf-view');
+
+        if (file.type.startsWith('image/')) {
+          content.innerHTML = `<img src="${file.data}" alt="${file.name}">`;
+        } else if (file.type === 'application/pdf') {
+          // Add a class to apply specific PDF styles
+          content.classList.add('pdf-view');
+          content.innerHTML = `<embed src="${file.data}" type="application/pdf">`;
+        }
+        
+        modal.classList.add('show');
+      };
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('quickViewModal');
+      const content = document.getElementById('modalContent');
+      modal.classList.remove('show');
+      content.innerHTML = '';
+      content.classList.remove('pdf-view'); // <-- FIXED: remove class on close
+    }
+
+    // View Switcher
+    function switchView(view) {
+      const container = document.getElementById('uploadsContainer');
+      const gridBtn = document.getElementById('gridViewBtn');
+      const listBtn = document.getElementById('listViewBtn');
+      
+      if (view === 'grid') {
+        container.classList.add('grid-view');
+        container.classList.remove('list-view');
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+      } else {
+        container.classList.remove('grid-view');
+        container.classList.add('list-view');
+        gridBtn.classList.remove('active');
+        listBtn.classList.add('active');
+      }
+    }
+
+    // Helpers
+    function formatBytes(bytes, decimals = 2) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
     // Live Search & Filter
-    document.getElementById("search").addEventListener("input",displayUploads);
-    document.getElementById("filter").addEventListener("change",displayUploads);
+    document.getElementById("search").addEventListener("input", displayUploads);
+    document.getElementById("filter").addEventListener("change", displayUploads);
   </script>
 </body>
 </html>
