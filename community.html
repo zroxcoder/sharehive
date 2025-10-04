@@ -6,7 +6,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
       transition: 0.3s;
@@ -15,51 +15,445 @@
       --bg-color: #ffffff;
       --text-color: #222;
       --primary-color: #0077ff;
+      --secondary-color: #00c896;
       --sidebar-bg: #f4f4f4;
       --card-bg: #f8f8f8;
+      --border-color: #e0e0e0;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --info-color: #17a2b8;
     }
     body.dark {
       --bg-color: #1e1e1e;
       --text-color: #f0f0f0;
       --sidebar-bg: #2c2c2c;
       --card-bg: #333333;
+      --border-color: #444;
     }
 
-    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
+    .navbar { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 10px 20px; 
+      background: linear-gradient(135deg, var(--primary-color), #0056cc);
+      color: white; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
     .navbar h1 { font-size: 20px; }
-    .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .toggle-btn { 
+      background: white; 
+      border: none; 
+      color: var(--primary-color); 
+      padding: 8px 15px; 
+      border-radius: 20px; 
+      cursor: pointer; 
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .toggle-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
 
     .container { display: flex; height: calc(100vh - 50px); }
-    .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
+
+    .sidebar { 
+      width: 220px; 
+      background: var(--sidebar-bg); 
+      padding: 20px; 
+      overflow-y: auto;
+      border-right: 1px solid var(--border-color);
+    }
     .sidebar h2 { font-size: 16px; margin-bottom: 10px; }
-    .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
-    .sidebar a:hover { background: var(--primary-color); color: white; }
+    .sidebar a { 
+      display: block; 
+      text-decoration: none; 
+      color: var(--text-color); 
+      padding: 8px 10px; 
+      border-radius: 5px; 
+      margin-bottom: 5px;
+      transition: all 0.3s ease;
+    }
+    .sidebar a:hover { 
+      background: var(--primary-color); 
+      color: white;
+      transform: translateX(5px);
+    }
 
-    .main { flex: 1; padding: 20px; overflow-y: auto; }
-    h2 { margin: 15px 0; }
+    .main { 
+      flex: 1; 
+      overflow-y: auto;
+      background: var(--bg-color);
+    }
 
-    .card {
-      background: var(--card-bg);
-      padding: 15px;
-      border-radius: 10px;
+    /* Hero Section */
+    .hero-section {
+      background: linear-gradient(135deg, var(--secondary-color), #00a876);
+      color: white;
+      padding: 60px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: "🌍";
+      position: absolute;
+      font-size: 300px;
+      opacity: 0.08;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-15deg);
+    }
+
+    .hero-section h1 {
+      font-size: 48px;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-section p {
+      font-size: 20px;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Content Area */
+    .content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Announcements */
+    .announcements {
+      background: linear-gradient(135deg, rgba(255,193,7,0.1), rgba(255,193,7,0.05));
+      border: 2px solid var(--warning-color);
+      border-left: 5px solid var(--warning-color);
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .announcements h2 {
+      color: var(--warning-color);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .announcements p {
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
+    /* Info Notice */
+    .info-notice {
+      background: linear-gradient(135deg, rgba(23,162,184,0.1), rgba(23,162,184,0.05));
+      border: 2px solid var(--info-color);
+      border-left: 5px solid var(--info-color);
+      padding: 20px 25px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.6s ease-out backwards;
+      animation-delay: 0.2s;
+    }
+
+    .info-notice h3 {
+      color: var(--info-color);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-notice p {
+      line-height: 1.7;
+      opacity: 0.9;
+    }
+
+    /* Posts Container */
+    .posts-container {
+      margin-bottom: 40px;
+    }
+
+    .posts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    .discussion-form textarea {
-      width: 100%; padding: 10px; border-radius: 8px;
-      border: 1px solid #ccc; margin-bottom: 10px; resize: vertical;
-    }
-    .discussion-form button {
-      background: var(--primary-color); color: white;
-      border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;
+    .posts-header h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      color: var(--text-color);
     }
 
-    .post { border-bottom: 1px solid #ddd; padding: 10px 0; }
-    .post strong { display: block; margin-bottom: 5px; }
-    .post .actions { margin-top: 5px; }
-    .like-btn { cursor: pointer; color: var(--primary-color); margin-right: 10px; }
-    .pinned { background: gold; padding: 3px 6px; border-radius: 4px; margin-left: 6px; font-size: 12px; }
+    .sort-options {
+      display: flex;
+      gap: 10px;
+    }
+
+    .sort-btn {
+      padding: 8px 16px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    .sort-btn:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .sort-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* Post Card */
+    .post-card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 15px;
+      border: 2px solid var(--border-color);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .post-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      transform: translateY(-3px);
+      border-color: var(--primary-color);
+    }
+
+    .post-card.pinned {
+      border-color: var(--warning-color);
+      background: linear-gradient(135deg, rgba(255,193,7,0.1), rgba(255,193,7,0.05));
+    }
+
+    .post-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .post-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), #0056cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      color: white;
+      font-weight: bold;
+    }
+
+    .post-info {
+      flex: 1;
+    }
+
+    .post-author {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .post-date {
+      font-size: 13px;
+      color: #888;
+      margin-top: 3px;
+    }
+
+    .pinned-badge {
+      background: var(--warning-color);
+      color: #333;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .team-badge {
+      background: var(--primary-color);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .post-content {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-color);
+      opacity: 0.95;
+      word-wrap: break-word;
+    }
+
+    .post-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text-color);
+    }
+
+    /* Guidelines & Links */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-top: 40px;
+    }
+
+    .info-card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 15px;
+      border: 2px solid var(--border-color);
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .info-card h2 {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      color: var(--text-color);
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .info-card li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-card li:last-child {
+      border-bottom: none;
+    }
+
+    .info-card a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .info-card a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sort-options {
+        flex-wrap: wrap;
+      }
+
+      .posts-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      .sidebar { width: 100%; }
+      
+      .hero-section {
+        padding: 40px 20px;
+      }
+
+      .hero-section h1 {
+        font-size: 32px;
+      }
+
+      .content {
+        padding: 20px 15px;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .post-card:nth-child(1) { animation-delay: 0.1s; }
+    .post-card:nth-child(2) { animation-delay: 0.15s; }
+    .post-card:nth-child(3) { animation-delay: 0.2s; }
+    .post-card:nth-child(4) { animation-delay: 0.25s; }
+    .post-card:nth-child(5) { animation-delay: 0.3s; }
+    .post-card:nth-child(6) { animation-delay: 0.35s; }
+    .post-card:nth-child(7) { animation-delay: 0.4s; }
+
+    .info-card:nth-child(1) { animation-delay: 0.5s; }
+    .info-card:nth-child(2) { animation-delay: 0.6s; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--sidebar-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0056cc;
+    }
   </style>
 </head>
 <body>
@@ -101,129 +495,243 @@
 
     <!-- Main -->
     <div class="main">
-      <!-- Welcome -->
-      <div class="card">
-        <h2>👋 Welcome to ShareHive Community</h2>
-        <p>Connect, share, and grow together! 🚀 This is your space to discuss, ask questions, and stay updated.</p>
+      <!-- Hero Section -->
+      <div class="hero-section">
+        <h1>ShareHive Community</h1>
+        <p>Stay updated with the latest news, announcements, and updates from the ShareHive team!</p>
       </div>
 
-      <!-- Announcements (Static) -->
-      <div class="card">
-        <h2>📢 Announcements</h2>
-        <p>🚀 New features rolling out this week! Stay tuned.</p>
-      </div>
+      <!-- Content -->
+      <div class="content">
 
-      <!-- Discussion Board -->
-      <div class="card">
-        <h2>💬 Discussion Board</h2>
-        <form class="discussion-form" onsubmit="addPost(event)">
-          <textarea id="postContent" placeholder="Write something..."></textarea>
-          <label><input type="checkbox" id="pinPost"> Pin this post</label><br>
-          <button type="submit">Post</button>
-        </form>
-        <div id="posts"></div>
-      </div>
+        <!-- Announcements -->
+        <div class="announcements">
+          <h2>📢 Latest Announcements</h2>
+          <p>🚀 <strong>New Features:</strong> We've just released dark mode improvements and better export functionality!</p>
+          <p>🎉 <strong>Community Milestone:</strong> We've reached 10,000 users! Thank you for being part of ShareHive.</p>
+          <p>💡 <strong>Upcoming:</strong> Cloud sync feature is in development! Stay tuned for updates.</p>
+        </div>
 
-      <!-- Guidelines -->
-      <div class="card">
-        <h2>📜 Community Guidelines</h2>
-        <ul>
-          <li>Be respectful to others</li>
-          <li>No spam or self-promotion</li>
-          <li>Stay on topic</li>
-          <li>Report inappropriate content</li>
-        </ul>
-      </div>
+        <!-- Info Notice -->
+        <div class="info-notice">
+          <h3>ℹ️ Official Community Board</h3>
+          <p>This is the official ShareHive community board. All posts are from the ShareHive team. Stay updated with our latest news, features, and announcements!</p>
+        </div>
 
-      <!-- Quick Links -->
-      <div class="card">
-        <h2>🔗 Quick Links</h2>
-        <ul>
-          <li><a href="faq.html">❔ FAQ</a></li>
-          <li><a href="help.html">❓ Help</a></li>
-          <li><a href="report.html">🐞 Report</a></li>
-          <li><a href="contact.html">✉️ Contact</a></li>
-        </ul>
+        <!-- Posts Container -->
+        <div class="posts-container">
+          <div class="posts-header">
+            <h2>💬 Community Updates</h2>
+            <div class="sort-options">
+              <button class="sort-btn active" onclick="sortPosts('recent')">Recent</button>
+              <button class="sort-btn" onclick="sortPosts('pinned')">Pinned</button>
+            </div>
+          </div>
+
+          <div id="postsContainer">
+            <!-- Posts will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Guidelines & Links -->
+        <div class="info-grid">
+          
+          <div class="info-card">
+            <h2>📜 Community Guidelines</h2>
+            <ul>
+              <li>✅ Stay updated with announcements</li>
+              <li>✅ Check for new features regularly</li>
+              <li>✅ Share feedback via contact form</li>
+              <li>✅ Follow us on social media</li>
+              <li>ℹ️ All posts are official updates</li>
+              <li>ℹ️ Team manages all content</li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h2>🔗 Quick Links</h2>
+            <ul>
+              <li><a href="faq.html">❔ FAQ</a></li>
+              <li><a href="help.html">❓ Help Center</a></li>
+              <li><a href="report.html">🐞 Report an Issue</a></li>
+              <li><a href="contact.html">✉️ Contact Team</a></li>
+              <li><a href="blog.html">📰 Read Our Blog</a></li>
+            </ul>
+          </div>
+
+        </div>
+
       </div>
     </div>
   </div>
 
   <script>
-    // 🌙 Dark Mode
+    // ==========================================
+    // COMMUNITY POSTS DATA
+    // ShareHive Team: Update posts here
+    // ==========================================
+    const communityPosts = [
+      {
+        id: 1,
+        title: "Welcome to ShareHive Community!",
+        content: "We're thrilled to launch the ShareHive Community! This is your space to stay updated with the latest features, announcements, and news. We'll be posting regular updates here, so make sure to check back often. Thank you for being part of our growing community!",
+        author: "ShareHive Team",
+        avatar: "🐝",
+        date: "2024-09-01",
+        pinned: true
+      },
+      {
+        id: 2,
+        title: "New Feature: Import/Export Data",
+        content: "Great news! You can now easily backup and restore all your ShareHive data. Go to Settings and use the Export/Import feature to keep your notes, bookmarks, to-dos, and everything else safe. We recommend creating regular backups!",
+        author: "Development Team",
+        avatar: "💻",
+        date: "2024-09-20",
+        pinned: false
+      },
+      {
+        id: 3,
+        title: "Dark Mode Improvements",
+        content: "We've listened to your feedback and completely revamped our dark mode! The new color palette offers better contrast, improved readability, and smoother transitions. Try it out by clicking the moon icon in the top-right corner. Let us know what you think!",
+        author: "Design Team",
+        avatar: "🎨",
+        date: "2024-09-15",
+        pinned: false
+      },
+      {
+        id: 4,
+        title: "We're Hiring!",
+        content: "ShareHive is growing and we're looking for talented developers, designers, and marketers to join our team! If you're passionate about productivity tools and want to make an impact, check out our Join Us page for open positions. Remote work available!",
+        author: "HR Team",
+        avatar: "👥",
+        date: "2024-09-25",
+        pinned: false
+      },
+      {
+        id: 5,
+        title: "Reached 10,000 Users Milestone! 🎉",
+        content: "Incredible news! ShareHive has reached 10,000 active users! This milestone wouldn't be possible without your support and trust. Thank you for choosing ShareHive to organize your digital life. Here's to the next 10,000 and beyond!",
+        author: "ShareHive Team",
+        avatar: "🎉",
+        date: "2024-10-01",
+        pinned: true
+      },
+      {
+        id: 6,
+        title: "Coming Soon: Cloud Sync",
+        content: "We're excited to announce that cloud synchronization is in development! Soon you'll be able to sync your ShareHive data across all your devices. This will be an optional feature - your data will remain private and local by default. Stay tuned for updates!",
+        author: "Product Team",
+        avatar: "☁️",
+        date: "2024-10-05",
+        pinned: false
+      },
+      {
+        id: 7,
+        title: "Privacy is Our Priority",
+        content: "Reminder: ShareHive stores all your data locally in your browser using IndexedDB. We don't collect, transmit, or store any of your personal information on our servers. Your data is 100% yours. Always export backups to keep your data safe!",
+        author: "Security Team",
+        avatar: "🔒",
+        date: "2024-09-10",
+        pinned: false
+      }
+    ];
+
+    // Dark Mode
     function toggleTheme() {
       document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      document.querySelector(".toggle-btn").textContent = isDark ? "☀️" : "🌙";
     }
-    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+    
+    if(localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark");
+      document.querySelector(".toggle-btn").textContent = "☀️";
+    }
 
-    // 📦 IndexedDB v21
-    let db;
-    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
-    const request = indexedDB.open("ShareHiveDB", 21);
-
-    request.onupgradeneeded = e => {
-      db = e.target.result;
-      stores.forEach(name => {
-        if (!db.objectStoreNames.contains(name)) {
-          db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-        }
+    // Sort Posts
+    let currentSort = 'recent';
+    function sortPosts(type) {
+      currentSort = type;
+      
+      // Update active button
+      document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.classList.remove('active');
       });
-    };
-
-    request.onsuccess = e => {
-      db = e.target.result;
-      loadPosts();
-    };
-    request.onerror = e => console.error("DB error:", e.target.error);
-
-    // Add Post
-    function addPost(e){
-      e.preventDefault();
-      const content=document.getElementById("postContent").value.trim();
-      const pinned=document.getElementById("pinPost").checked;
-      if(!content) return;
-      const tx=db.transaction("community","readwrite");
-      tx.objectStore("community").add({content,likes:0,pinned,date:new Date()});
-      tx.oncomplete=()=>{ document.getElementById("postContent").value=""; document.getElementById("pinPost").checked=false; loadPosts(); };
+      event.target.classList.add('active');
+      
+      renderPosts();
     }
 
-    // Load Posts
-    function loadPosts(){
-      const tx=db.transaction("community","readonly");
-      const store=tx.objectStore("community");
-      const req=store.getAll();
-      req.onsuccess=()=>{
-        let posts=req.result;
-        // sort pinned first, then recent
-        posts.sort((a,b)=> (b.pinned - a.pinned) || new Date(b.date)-new Date(a.date));
-        const container=document.getElementById("posts");
-        container.innerHTML="";
-        posts.forEach(p=>{
-          const div=document.createElement("div");
-          div.className="post";
-          div.innerHTML=`
-            <strong>${p.pinned ? "📌 " : ""}${p.content}</strong>
-            <div class="actions">
-              <span class="like-btn" onclick="likePost(${p.id})">👍 ${p.likes}</span>
+    // Render Posts
+    function renderPosts() {
+      const container = document.getElementById("postsContainer");
+      
+      // Clone and sort posts
+      let posts = [...communityPosts];
+      
+      switch(currentSort) {
+        case 'recent':
+          posts.sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return new Date(b.date) - new Date(a.date);
+          });
+          break;
+        case 'pinned':
+          posts.sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return new Date(b.date) - new Date(a.date);
+          });
+          break;
+      }
+      
+      container.innerHTML = posts.map(post => `
+        <div class="post-card ${post.pinned ? 'pinned' : ''}">
+          <div class="post-header">
+            <div class="post-avatar">${post.avatar}</div>
+            <div class="post-info">
+              <div class="post-author">
+                ${post.author}
+                <span class="team-badge">✓ Official</span>
+                ${post.pinned ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
+              </div>
+              <div class="post-date">${formatDate(post.date)}</div>
             </div>
-          `;
-          container.appendChild(div);
-        });
-      };
+          </div>
+          
+          ${post.title ? `<div class="post-title">${post.title}</div>` : ''}
+          <div class="post-content">${post.content}</div>
+        </div>
+      `).join('');
     }
 
-    // Like Post
-    function likePost(id){
-      const tx=db.transaction("community","readwrite");
-      const store=tx.objectStore("community");
-      const req=store.get(id);
-      req.onsuccess=()=>{
-        let post=req.result;
-        post.likes++;
-        store.put(post);
-        loadPosts();
-      };
+    // Format Date
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      
+      if (days < 7) {
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        return `${days} days ago`;
+      }
+      
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
     }
+
+    // Initialize on page load
+    renderPosts();
   </script>
 </body>
 </html>
