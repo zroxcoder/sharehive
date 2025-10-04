@@ -11,7 +11,7 @@
       color: var(--text-color);
       transition: 0.3s;
       font-size: 16px;
-      overflow: hidden; /* Prevent body scroll */
+      overflow: hidden;
     }
     :root {
       --bg-color: #ffffff; --text-color: #222;
@@ -31,84 +31,214 @@
 
     .container { display: flex; height: calc(100vh - 50px); }
     
-    /* Main Sidebar (Unchanged) */
     .sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); }
     .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; transition: all 0.3s ease; }
     .sidebar a:hover { background: var(--primary-color); color: white; transform: translateX(5px); }
     .sidebar a[href="wiki.html"] { background: var(--primary-color); color:white; font-weight:bold; }
 
-
     .main { flex: 1; display: flex; overflow: hidden; padding:0; }
 
-    /* Wiki-specific Sidebar */
     .wiki-sidebar { width: 280px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); display:flex; flex-direction:column; }
-    .main-content { flex: 1; display: flex; overflow: hidden; }
-    .editor-pane, .preview-pane { flex: 1; padding: 30px 40px; overflow-y: auto; }
-    .editor-pane { border-right: 1px solid var(--border-color); }
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     
     .sidebar-header { margin-bottom: 20px; }
     .search-box { width: 100%; padding: 10px 15px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-color); font-size: 14px; margin-bottom:15px; }
-    .add-page-btn { width: 100%; padding: 10px; border: none; background: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; display:flex; align-items:center; justify-content:center; gap:5px; }
+    .add-page-btn { width: 100%; padding: 10px; border: none; background: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:10px; }
     .add-page-btn:hover { background: #0056cc; }
+
+    .templates-btn { width: 100%; padding: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-color); border-radius: 8px; cursor: pointer; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:15px; }
+    .templates-btn:hover { background: var(--bg-color); }
+
+    .favorites-section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+    .section-title { font-size: 12px; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 10px; }
 
     .page-tree { list-style: none; padding-left: 0; flex:1; }
     .page-tree-item { margin: 5px 0; position:relative; }
-    .page-link { display: flex; align-items: center; gap: 8px; padding: 8px 10px; text-decoration: none; color: var(--text-color); border-radius: 5px; transition: background 0.2s; }
+    .page-link { display: flex; align-items: center; gap: 8px; padding: 8px 10px; text-decoration: none; color: var(--text-color); border-radius: 5px; transition: background 0.2s; cursor: pointer; }
     .page-link:hover { background: var(--bg-color); }
     .page-link.active { background: var(--primary-color); color: white; }
     .page-icon { font-size: 18px; }
     .page-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .star-icon { cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+    .page-tree-item:hover .star-icon { opacity: 1; }
+    .star-icon.starred { opacity: 1; color: gold; }
     .page-actions { display:none; }
     .page-tree-item:hover .page-actions { display:flex; gap:5px; position:absolute; right:5px; top:5px; }
     .page-actions button { background:transparent; border:none; cursor:pointer; font-size:16px; color:var(--text-color); padding:2px; }
 
-    .editor-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-    .editor-title { width: 100%; font-size: 32px; font-weight: bold; border: none; background: transparent; color: var(--text-color); padding: 10px 0; }
-    .editor-title:focus { outline:none; }
-    #contentEditor { width: 100%; height: calc(100% - 150px); font-size: 16px; border: none; background: transparent; color: var(--text-color); resize: none; line-height: 1.8; font-family: inherit; }
-    #contentEditor:focus { outline:none; }
+    /* Editor Area */
+    .editor-container { flex: 1; overflow-y: auto; padding: 0; }
+    
+    /* Page Header */
+    .page-header { padding: 40px 96px 0 96px; }
+    .page-cover { height: 200px; width: 100%; background-size: cover; background-position: center; position: relative; margin-bottom: 20px; border-radius: 3px; cursor: pointer; }
+    .page-cover:hover .cover-actions { opacity: 1; }
+    .cover-actions { position: absolute; bottom: 10px; right: 10px; opacity: 0; transition: opacity 0.2s; display: flex; gap: 8px; }
+    .cover-actions button { background: rgba(0,0,0,0.6); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .cover-actions button:hover { background: rgba(0,0,0,0.8); }
 
-    .editor-footer { display:flex; gap:10px; margin-top:15px; }
+    .page-icon-picker { display: inline-block; font-size: 78px; cursor: pointer; margin-bottom: 10px; transition: transform 0.2s; }
+    .page-icon-picker:hover { transform: scale(1.1); }
+
+    .breadcrumbs { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; font-size: 14px; color: #888; }
+    .breadcrumbs a { color: #888; text-decoration: none; }
+    .breadcrumbs a:hover { color: var(--primary-color); }
+
+    .editor-title { width: 100%; font-size: 40px; font-weight: bold; border: none; background: transparent; color: var(--text-color); padding: 4px 0; margin-bottom: 10px; font-family: inherit; }
+    .editor-title:focus { outline:none; }
+    .editor-title::placeholder { color: #999; }
+
+    /* Properties */
+    .properties-section { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .property { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--sidebar-bg); border-radius: 5px; font-size: 14px; }
+    .property-label { font-weight: 600; color: #888; }
+    .property-value { color: var(--text-color); }
+    .add-property-btn { padding: 6px 10px; background: transparent; border: 1px dashed var(--border-color); border-radius: 5px; cursor: pointer; font-size: 13px; color: #888; }
+    .add-property-btn:hover { background: var(--sidebar-bg); }
+
+    /* Block Editor */
+    .block-editor { padding: 0 96px 100px 96px; min-height: 500px; }
+    
+    .block { position: relative; margin-bottom: 2px; padding: 3px 0; cursor: text; }
+    .block:hover .block-controls { opacity: 1; }
+    
+    .block-controls { position: absolute; left: -40px; top: 3px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+    .block-handle { cursor: grab; font-size: 18px; color: #999; padding: 2px 4px; }
+    .block-handle:active { cursor: grabbing; }
+    .block-menu-btn { cursor: pointer; font-size: 16px; color: #999; padding: 2px 4px; background: none; border: none; }
+    .block-menu-btn:hover { background: var(--sidebar-bg); border-radius: 3px; }
+
+    .block.dragging { opacity: 0.5; }
+    .block.drag-over { border-top: 2px solid var(--primary-color); }
+
+    .block-content { min-height: 28px; padding: 3px 2px; outline: none; line-height: 1.6; }
+    .block-content:focus { background: rgba(0, 119, 255, 0.05); }
+    .block-content:empty:before { content: attr(data-placeholder); color: #999; }
+
+    /* Block Types */
+    .block[data-type="h1"] .block-content { font-size: 32px; font-weight: bold; margin-top: 20px; }
+    .block[data-type="h2"] .block-content { font-size: 24px; font-weight: bold; margin-top: 16px; }
+    .block[data-type="h3"] .block-content { font-size: 20px; font-weight: bold; margin-top: 12px; }
+    .block[data-type="quote"] .block-content { border-left: 3px solid var(--primary-color); padding-left: 15px; font-style: italic; color: #666; }
+    .block[data-type="code"] .block-content { font-family: 'Courier New', monospace; background: var(--sidebar-bg); padding: 12px; border-radius: 5px; white-space: pre; overflow-x: auto; }
+    .block[data-type="divider"] { height: 1px; background: var(--border-color); margin: 20px 0; }
+    
+    /* To-do */
+    .block[data-type="todo"] .block-content { display: flex; align-items: flex-start; gap: 8px; }
+    .todo-checkbox { margin-top: 3px; cursor: pointer; width: 18px; height: 18px; flex-shrink: 0; }
+    .todo-text { flex: 1; min-width: 0; }
+    .block[data-type="todo"].checked .todo-text { text-decoration: line-through; opacity: 0.6; }
+
+    /* Bulleted/Numbered Lists */
+    .block[data-type="bullet"] .block-content { display: flex; gap: 8px; padding-left: 24px; }
+    .block[data-type="bullet"] .block-content:before { content: '•'; position: absolute; left: 96px; font-size: 20px; }
+    .block[data-type="numbered"] .block-content { display: flex; gap: 8px; padding-left: 24px; }
+
+    /* Toggle Block */
+    .block[data-type="toggle"] .block-content { display: flex; gap: 8px; }
+    .toggle-arrow { cursor: pointer; user-select: none; transition: transform 0.2s; }
+    .toggle-arrow.open { transform: rotate(90deg); }
+    .toggle-children { margin-left: 24px; display: none; }
+    .toggle-children.open { display: block; }
+
+    /* Callout */
+    .block[data-type="callout"] .block-content { display: flex; gap: 12px; padding: 12px; background: var(--sidebar-bg); border-radius: 5px; border-left: 3px solid var(--primary-color); }
+    .callout-icon { font-size: 24px; flex-shrink: 0; }
+    .callout-text { flex: 1; }
+
+    /* Table */
+    .block[data-type="table"] .block-content { padding: 0; }
+    .notion-table { width: 100%; border-collapse: collapse; }
+    .notion-table td { border: 1px solid var(--border-color); padding: 8px; min-width: 100px; outline: none; }
+    .notion-table tr:first-child td { background: var(--sidebar-bg); font-weight: bold; }
+
+    /* Image */
+    .block[data-type="image"] .block-content { padding: 0; }
+    .block-image { max-width: 100%; border-radius: 5px; cursor: pointer; }
+    .image-placeholder { padding: 40px; text-align: center; border: 2px dashed var(--border-color); border-radius: 5px; cursor: pointer; color: #999; }
+
+    /* Columns */
+    .block[data-type="columns"] .block-content { display: flex; gap: 12px; }
+    .column { flex: 1; padding: 8px; border: 1px dashed transparent; border-radius: 4px; }
+    .column:hover { border-color: var(--border-color); }
+
+    /* Formatting Toolbar */
+    .formatting-toolbar { position: fixed; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .formatting-toolbar.show { display: flex; gap: 4px; }
+    .formatting-toolbar button { background: transparent; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 14px; color: var(--text-color); }
+    .formatting-toolbar button:hover { background: var(--sidebar-bg); }
+    .formatting-toolbar .separator { width: 1px; background: var(--border-color); margin: 0 4px; }
+
+    /* Slash Command Menu */
+    .slash-menu { position: absolute; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; max-height: 400px; overflow-y: auto; z-index: 100; display: none; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .slash-menu.show { display: block; }
+    .slash-menu-section { margin-bottom: 12px; }
+    .slash-menu-section:last-child { margin-bottom: 0; }
+    .slash-menu-title { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; padding: 4px 8px; margin-bottom: 4px; }
+    .slash-menu-item { padding: 8px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+    .slash-menu-item:hover, .slash-menu-item.selected { background: var(--sidebar-bg); }
+    .slash-menu-item-icon { font-size: 20px; }
+    .slash-menu-item-content { flex: 1; }
+    .slash-menu-item-title { font-weight: 600; font-size: 14px; }
+    .slash-menu-item-desc { font-size: 12px; color: #888; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: var(--card-bg); border-radius: 12px; padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-header h3 { font-size: 20px; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); }
+    .modal-body { margin-bottom: 20px; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* Templates Grid */
+    .templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .template-card { padding: 20px; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .template-card:hover { border-color: var(--primary-color); transform: translateY(-2px); }
+    .template-icon { font-size: 32px; margin-bottom: 8px; }
+    .template-name { font-weight: 600; margin-bottom: 4px; }
+    .template-desc { font-size: 12px; color: #888; }
+
+    /* Icon Picker */
+    .icon-picker-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; max-height: 300px; overflow-y: auto; }
+    .icon-option { font-size: 32px; padding: 8px; cursor: pointer; border-radius: 5px; text-align: center; }
+    .icon-option:hover { background: var(--sidebar-bg); }
+
+    /* Export Menu */
+    .export-options { display: flex; flex-direction: column; gap: 10px; }
+    .export-option { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+    .export-option:hover { background: var(--sidebar-bg); }
+
+    /* Buttons */
     .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px; }
     .btn-primary { background: var(--primary-color); color: white; }
-    .btn-danger { background: var(--danger-color); color: white; }
+    .btn-primary:hover { background: #0056cc; }
+    .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
+    .btn-secondary:hover { background: var(--sidebar-bg); }
     
-    /* Preview Pane Styles */
-    .preview-pane h1 { font-size: 32px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; }
-    .preview-pane h2 { font-size: 24px; margin: 25px 0 15px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
-    .preview-pane h3 { font-size: 20px; margin: 20px 0 10px; }
-    .preview-pane p { line-height: 1.8; margin-bottom: 15px; }
-    .preview-pane ul, .preview-pane ol { margin: 15px 0 15px 25px; }
-    .preview-pane li { margin-bottom: 8px; line-height: 1.8; }
-    .preview-pane code { background: var(--sidebar-bg); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; }
-    .preview-pane pre { background: var(--sidebar-bg); padding: 15px; border-radius: 8px; overflow-x: auto; margin-bottom:15px; }
-    .preview-pane pre code { padding: 0; background: transparent; }
-    .preview-pane blockquote { border-left: 4px solid var(--primary-color); padding-left: 15px; margin: 15px 0; color: var(--text-color); opacity: 0.8; }
-    .preview-pane a { color: var(--primary-color); text-decoration: none; font-weight:bold; }
-    .preview-pane a:hover { text-decoration: underline; }
-    .preview-pane strong { font-weight:bold; }
-    .preview-pane em { font-style:italic; }
-    .preview-pane hr { border:none; border-top:2px solid var(--border-color); margin: 30px 0; }
+    /* Page Actions Bar */
+    .page-actions-bar { display: flex; gap: 10px; padding: 10px 96px; border-bottom: 1px solid var(--border-color); }
+    .action-btn { background: transparent; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text-color); display: flex; align-items: center; gap: 6px; }
+    .action-btn:hover { background: var(--sidebar-bg); }
 
-    .page-meta { font-size: 14px; color: #888; margin-bottom: 25px; }
-    .tags-container { display:flex; gap:8px; flex-wrap:wrap; margin-top:20px; }
-    .tag { background:var(--sidebar-bg); padding: 5px 12px; border-radius: 15px; font-size:12px; }
+    /* Backlinks Panel */
+    .backlinks-panel { padding: 20px 96px; border-top: 1px solid var(--border-color); }
+    .backlinks-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #888; }
+    .backlink-item { padding: 8px 12px; border-radius: 5px; margin-bottom: 4px; cursor: pointer; }
+    .backlink-item:hover { background: var(--sidebar-bg); }
 
-    .toc { position:fixed; right:40px; top:120px; width:200px; background:var(--card-bg); padding:15px; border-radius:10px; border:2px solid var(--border-color); z-index:10; }
-    .toc h4 { margin-bottom:10px; }
-    .toc ul { list-style:none; padding-left:15px; }
-    .toc ul li a { text-decoration:none; color:var(--text-color); opacity:0.8; }
-    
     @media (max-width: 1200px) {
-      .main-content { flex-direction: column; }
-      .editor-pane { border-right: none; border-bottom: 1px solid var(--border-color); }
-      .toc { display:none; }
+      .page-header, .block-editor, .page-actions-bar, .backlinks-panel { padding-left: 40px; padding-right: 40px; }
+      .block-controls { left: -30px; }
     }
+    
     @media (max-width: 768px) {
       .container { flex-direction: column; }
-      .sidebar { display:none; } /* Hide main sidebar on small screens for wiki focus */
+      .sidebar { display:none; }
       .wiki-sidebar { width: 100%; height:auto; border-right:none; border-bottom:1px solid var(--border-color); }
-      .main-content { height:auto; }
+      .page-header, .block-editor, .page-actions-bar, .backlinks-panel { padding-left: 20px; padding-right: 20px; }
+      .block-controls { position: static; opacity: 1; margin-bottom: 5px; }
     }
   </style>
 </head>
@@ -119,7 +249,6 @@
   </div>
 
   <div class="container">
-    <!-- Main App Sidebar (Unchanged) -->
     <div class="sidebar">
       <a href="index.html">🏠 Dashboard</a>
       <a href="notes.html">📝 Notes</a>
@@ -147,44 +276,297 @@
       <a href="community.html">🌍 Community</a>
     </div>
 
-    <!-- Wiki Main Content -->
     <div class="main">
       <aside class="wiki-sidebar">
         <div class="sidebar-header">
-          <input type="text" id="search" class="search-box" placeholder="Search pages...">
+          <input type="text" id="search" class="search-box" placeholder="🔍 Search pages...">
           <button class="add-page-btn" onclick="createNewPage()"><span>➕</span> New Page</button>
+          <button class="templates-btn" onclick="showTemplates()"><span>📋</span> Templates</button>
         </div>
+        
+        <div class="favorites-section" id="favoritesSection">
+          <div class="section-title">⭐ Favorites</div>
+          <ul class="page-tree" id="favoritesTree"></ul>
+        </div>
+
+        <div class="section-title">📄 All Pages</div>
         <ul class="page-tree" id="pageTree"></ul>
       </aside>
 
       <main class="main-content">
-        <section class="editor-pane">
-          <input type="text" id="titleEditor" class="editor-title" placeholder="Untitled Page" oninput="updatePreview()">
-          <textarea id="contentEditor" placeholder="Start writing your content here. Use Markdown for formatting..." oninput="updatePreview()"></textarea>
-          <div class="editor-footer">
-            <button class="btn btn-primary" onclick="savePage()"><span>💾</span> Save Page</button>
-          </div>
-        </section>
+        <div class="page-actions-bar">
+          <button class="action-btn" onclick="showExportMenu()">
+            <span>📤</span> Export
+          </button>
+          <button class="action-btn" onclick="showPageHistory()">
+            <span>🕐</span> History
+          </button>
+          <button class="action-btn" onclick="duplicatePage()">
+            <span>📑</span> Duplicate
+          </button>
+          <button class="action-btn" onclick="deletePage(currentPageId)">
+            <span>🗑️</span> Delete
+          </button>
+        </div>
 
-        <section class="preview-pane" id="previewPane">
-          <!-- Live preview will be rendered here -->
-        </section>
+        <div class="editor-container">
+          <div class="page-header">
+            <div class="breadcrumbs" id="breadcrumbs"></div>
+            
+            <div class="page-cover" id="pageCover" style="display:none;">
+              <div class="cover-actions">
+                <button onclick="changeCover()">Change</button>
+                <button onclick="removeCover()">Remove</button>
+              </div>
+            </div>
+
+            <div class="page-icon-picker" id="pageIconPicker" onclick="showIconPicker()">📄</div>
+            
+            <input type="text" id="titleEditor" class="editor-title" placeholder="Untitled">
+
+            <div class="properties-section" id="propertiesSection"></div>
+          </div>
+
+          <div class="block-editor" id="blockEditor"></div>
+
+          <div class="backlinks-panel" id="backlinksPanel" style="display:none;">
+            <div class="backlinks-title">🔗 Backlinks</div>
+            <div id="backlinksList"></div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
-  
-  <div id="tocContainer" class="toc" style="display:none;">
-    <h4>Table of Contents</h4>
-    <ul id="tocList"></ul>
+
+  <!-- Formatting Toolbar -->
+  <div class="formatting-toolbar" id="formattingToolbar">
+    <button onclick="formatText('bold')" title="Bold (Ctrl+B)"><strong>B</strong></button>
+    <button onclick="formatText('italic')" title="Italic (Ctrl+I)"><em>I</em></button>
+    <button onclick="formatText('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+    <button onclick="formatText('strikethrough')" title="Strikethrough"><s>S</s></button>
+    <div class="separator"></div>
+    <button onclick="formatText('code')" title="Code">💻</button>
+    <button onclick="createLink()" title="Link">🔗</button>
+    <div class="separator"></div>
+    <button onclick="formatText('foreColor', '#ff0000')" title="Text Color" style="color:#ff0000;">A</button>
+    <button onclick="formatText('hiliteColor', '#ffff00')" title="Highlight" style="background:#ffff00;">🖍️</button>
+  </div>
+
+  <!-- Slash Command Menu -->
+  <div class="slash-menu" id="slashMenu">
+    <div class="slash-menu-section">
+      <div class="slash-menu-title">Basic Blocks</div>
+      <div class="slash-menu-item" onclick="insertBlock('text')">
+        <div class="slash-menu-item-icon">📝</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Text</div>
+          <div class="slash-menu-item-desc">Plain text paragraph</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('h1')">
+        <div class="slash-menu-item-icon">H1</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Heading 1</div>
+          <div class="slash-menu-item-desc">Large section heading</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('h2')">
+        <div class="slash-menu-item-icon">H2</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Heading 2</div>
+          <div class="slash-menu-item-desc">Medium section heading</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('h3')">
+        <div class="slash-menu-item-icon">H3</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Heading 3</div>
+          <div class="slash-menu-item-desc">Small section heading</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('todo')">
+        <div class="slash-menu-item-icon">☑️</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">To-do</div>
+          <div class="slash-menu-item-desc">Track tasks with checkbox</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('bullet')">
+        <div class="slash-menu-item-icon">•</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Bulleted List</div>
+          <div class="slash-menu-item-desc">Simple bullet list</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('numbered')">
+        <div class="slash-menu-item-icon">1.</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Numbered List</div>
+          <div class="slash-menu-item-desc">Ordered list</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('toggle')">
+        <div class="slash-menu-item-icon">▶️</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Toggle</div>
+          <div class="slash-menu-item-desc">Collapsible content</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="slash-menu-section">
+      <div class="slash-menu-title">Advanced</div>
+      <div class="slash-menu-item" onclick="insertBlock('quote')">
+        <div class="slash-menu-item-icon">❝</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Quote</div>
+          <div class="slash-menu-item-desc">Capture a quote</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('callout')">
+        <div class="slash-menu-item-icon">💡</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Callout</div>
+          <div class="slash-menu-item-desc">Highlighted box</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('code')">
+        <div class="slash-menu-item-icon">💻</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Code</div>
+          <div class="slash-menu-item-desc">Code block</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('divider')">
+        <div class="slash-menu-item-icon">―</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Divider</div>
+          <div class="slash-menu-item-desc">Visual separator</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('table')">
+        <div class="slash-menu-item-icon">📊</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Table</div>
+          <div class="slash-menu-item-desc">Simple table</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('columns')">
+        <div class="slash-menu-item-icon">⚏</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Columns</div>
+          <div class="slash-menu-item-desc">Multi-column layout</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('image')">
+        <div class="slash-menu-item-icon">🖼️</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Image</div>
+          <div class="slash-menu-item-desc">Upload or embed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal" id="templatesModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📋 Page Templates</h3>
+        <button class="modal-close" onclick="closeModal('templatesModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="templates-grid">
+          <div class="template-card" onclick="applyTemplate('meeting')">
+            <div class="template-icon">📅</div>
+            <div class="template-name">Meeting Notes</div>
+            <div class="template-desc">Track meeting details</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('project')">
+            <div class="template-icon">📌</div>
+            <div class="template-name">Project Plan</div>
+            <div class="template-desc">Organize project tasks</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('doc')">
+            <div class="template-icon">📄</div>
+            <div class="template-name">Document</div>
+            <div class="template-desc">Standard document</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('wiki')">
+            <div class="template-icon">📖</div>
+            <div class="template-name">Wiki Page</div>
+            <div class="template-desc">Knowledge base entry</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('roadmap')">
+            <div class="template-icon">🗺️</div>
+            <div class="template-name">Roadmap</div>
+            <div class="template-desc">Timeline planning</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('blank')">
+            <div class="template-icon">📝</div>
+            <div class="template-name">Blank Page</div>
+            <div class="template-desc">Start from scratch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="iconPickerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Choose Icon</h3>
+        <button class="modal-close" onclick="closeModal('iconPickerModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="icon-picker-grid" id="iconPickerGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="exportModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📤 Export Page</h3>
+        <button class="modal-close" onclick="closeModal('exportModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="export-options">
+          <div class="export-option" onclick="exportPage('markdown')">
+            <span style="font-size:24px;">📝</span>
+            <div>
+              <div style="font-weight:600;">Markdown</div>
+              <div style="font-size:12px;color:#888;">Plain text format</div>
+            </div>
+          </div>
+          <div class="export-option" onclick="exportPage('html')">
+            <span style="font-size:24px;">🌐</span>
+            <div>
+              <div style="font-weight:600;">HTML</div>
+              <div style="font-size:12px;color:#888;">Web page format</div>
+            </div>
+          </div>
+          <div class="export-option" onclick="exportPage('json')">
+            <span style="font-size:24px;">📋</span>
+            <div>
+              <div style="font-weight:600;">JSON</div>
+              <div style="font-size:12px;color:#888;">Data format</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
+    // Theme Toggle
     function toggleTheme() {
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     }
     if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
+    // Database Setup
     let db;
     const stores = [
   "notes",
@@ -212,195 +594,548 @@
         store.createIndex("title", "title", { unique: false });
       }
     };
+
     request.onsuccess = e => { 
       db = e.target.result; 
       displayPageTree();
       loadInitialPage();
     };
+
     request.onerror = e => console.error("DB error:", e.target.error);
 
+    // Global State
     let currentPageId = null;
-    
-    // Basic Markdown Renderer (safe-ish for this demo)
-    function renderMarkdown(text) {
-      if (!text) return '';
-      // Preserve code blocks first
-      const codeBlocks = [];
-      text = text.replace(/```([\s\S]*?)```/g, function(_, p1) {
-        const idx = codeBlocks.length;
-        codeBlocks.push('<pre><code>' + p1.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>');
-        return `@@CODEBLOCK${idx}@@`;
-      });
+    let currentBlock = null;
+    let draggedBlock = null;
+    let autoSaveTimer = null;
 
-      // Wiki-style links [[Page Title]]
-      text = text.replace(/\[\[([^\]]+)\]\]/g, function(_, p1) {
-        const safe = p1.replace(/'/g, "\\'");
-        return `<a href="#" onclick="openPageByTitle('${safe}')">${p1}</a>`;
-      });
+    // Icons for icon picker
+    const icons = ['📄', '📝', '📖', '📚', '📌', '📋', '📊', '📈', '📉', '🗂️', '📁', '📂', '🗃️', '🗄️', '📦', '🎯', '🎨', '🎭', '🎪', '🎬', '🎮', '🎲', '🎯', '🧩', '🧠', '💡', '🔔', '🔍', '🔎', '🔬', '🔭', '⚗️', '⚙️', '🔧', '🔨', '⚡', '🔥', '💧', '🌊', '🌍', '🌎', '🌏', '🌐', '🗺️', '🧭', '⛰️', '🏔️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️', '🏟️', '🏛️', '🏗️', '🏘️', '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '💒', '🗼', '🗽', '⛪', '🕌', '🛕', '🕍', '⛩️', '🕋'];
 
-      // Headings
-      text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-      text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-      text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    // Page Templates
+    const templates = {
+      meeting: {
+        title: "Meeting Notes",
+        icon: "📅",
+        blocks: [
+          { type: 'h1', content: 'Meeting Notes' },
+          { type: 'text', content: '📅 Date: ' },
+          { type: 'text', content: '👥 Attendees: ' },
+          { type: 'h2', content: 'Agenda' },
+          { type: 'bullet', content: 'Topic 1' },
+          { type: 'bullet', content: 'Topic 2' },
+          { type: 'h2', content: 'Notes' },
+          { type: 'text', content: '' },
+          { type: 'h2', content: 'Action Items' },
+          { type: 'todo', content: 'Task 1' }
+        ]
+      },
+      project: {
+        title: "Project Plan",
+        icon: "📌",
+        blocks: [
+          { type: 'h1', content: 'Project Plan' },
+          { type: 'h2', content: 'Overview' },
+          { type: 'text', content: 'Project description goes here...' },
+          { type: 'h2', content: 'Goals' },
+          { type: 'bullet', content: 'Goal 1' },
+          { type: 'bullet', content: 'Goal 2' },
+          { type: 'h2', content: 'Timeline' },
+          { type: 'text', content: 'Timeline details...' },
+          { type: 'h2', content: 'Tasks' },
+          { type: 'todo', content: 'Task 1' }
+        ]
+      },
+      doc: {
+        title: "New Document",
+        icon: "📄",
+        blocks: [
+          { type: 'h1', content: 'Document Title' },
+          { type: 'text', content: 'Start writing here...' }
+        ]
+      },
+      wiki: {
+        title: "Wiki Entry",
+        icon: "📖",
+        blocks: [
+          { type: 'h1', content: 'Wiki Entry' },
+          { type: 'callout', content: 'Summary or key takeaway', icon: '💡' },
+          { type: 'h2', content: 'Overview' },
+          { type: 'text', content: 'Main content...' },
+          { type: 'h2', content: 'Details' },
+          { type: 'text', content: 'Detailed information...' },
+          { type: 'h2', content: 'Related' },
+          { type: 'bullet', content: 'Related topic 1' }
+        ]
+      },
+      roadmap: {
+        title: "Roadmap",
+        icon: "🗺️",
+        blocks: [
+          { type: 'h1', content: 'Roadmap' },
+          { type: 'h2', content: 'Q1 2024' },
+          { type: 'todo', content: 'Milestone 1' },
+          { type: 'h2', content: 'Q2 2024' },
+          { type: 'todo', content: 'Milestone 2' }
+        ]
+      },
+      blank: {
+        title: "Untitled",
+        icon: "📄",
+        blocks: [
+          { type: 'text', content: '' }
+        ]
+      }
+    };
 
-      // Blockquote
-      text = text.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+    // Block Management
+    function createBlock(type = 'text', content = '', data = {}) {
+      const block = document.createElement('div');
+      block.className = 'block';
+      block.setAttribute('data-type', type);
+      block.setAttribute('data-id', Date.now() + Math.random());
+      block.draggable = true;
 
-      // Horizontal rule
-      text = text.replace(/^\s*---\s*$/gim, '<hr>');
-
-      // Bold & Italic
-      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-      // Inline code
-      text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-      // List items
-      text = text.replace(/^\* (.*$)/gim, '<li>$1</li>');
-      // Wrap consecutive <li> into <ul>
-      text = text.replace(/(?:<(?:li)>.*?<\/li>\s*)+/gim, function(m) {
-        // remove potential surrounding newlines
-        const content = m.trim();
-        return '<ul>' + content + '</ul>';
-      });
-
-      // Restore code blocks
-      text = text.replace(/@@CODEBLOCK(\d+)@@/g, function(_, idx) {
-        return codeBlocks[parseInt(idx, 10)] || '';
-      });
-
-      // Convert remaining line breaks to <br> for simple paragraphs
-      return text.replace(/\n/g, '<br>');
-    }
-
-    function updatePreview() {
-      const title = document.getElementById('titleEditor').value;
-      const content = document.getElementById('contentEditor').value;
-      const previewPane = document.getElementById('previewPane');
-      
-      const renderedContent = renderMarkdown(content);
-      
-      previewPane.innerHTML = `
-        <h1>${title || 'Untitled Page'}</h1>
-        <div class="page-meta">Last saved: Just now</div>
-        ${renderedContent}
+      const controls = document.createElement('div');
+      controls.className = 'block-controls';
+      controls.innerHTML = `
+        <span class="block-handle">⋮⋮</span>
+        <button class="block-menu-btn" onclick="showBlockMenu(this)">⋯</button>
       `;
-      generateTOC();
+      block.appendChild(controls);
+
+      const blockContent = document.createElement('div');
+      blockContent.className = 'block-content';
+      blockContent.contentEditable = true;
+
+      // Different block types
+      switch(type) {
+        case 'text':
+          blockContent.setAttribute('data-placeholder', 'Type \'/\' for commands');
+          blockContent.innerHTML = content;
+          break;
+        case 'h1':
+        case 'h2':
+        case 'h3':
+          blockContent.setAttribute('data-placeholder', 'Heading');
+          blockContent.innerHTML = content;
+          break;
+        case 'todo':
+          blockContent.contentEditable = false;
+          blockContent.innerHTML = `
+            <input type="checkbox" class="todo-checkbox" ${data.checked ? 'checked' : ''} onchange="toggleTodo(this)">
+            <div class="todo-text" contenteditable="true">${content}</div>
+          `;
+          if(data.checked) block.classList.add('checked');
+          break;
+        case 'bullet':
+        case 'numbered':
+          blockContent.setAttribute('data-placeholder', 'List item');
+          blockContent.innerHTML = content;
+          break;
+        case 'quote':
+          blockContent.setAttribute('data-placeholder', 'Empty quote');
+          blockContent.innerHTML = content;
+          break;
+        case 'code':
+          blockContent.setAttribute('data-placeholder', '// code');
+          blockContent.innerHTML = content;
+          break;
+        case 'callout':
+          blockContent.contentEditable = false;
+          blockContent.innerHTML = `
+            <div class="callout-icon">${data.icon || '💡'}</div>
+            <div class="callout-text" contenteditable="true">${content}</div>
+          `;
+          break;
+        case 'toggle':
+          blockContent.contentEditable = false;
+          blockContent.innerHTML = `
+            <span class="toggle-arrow" onclick="toggleContent(this)">▶</span>
+            <div class="toggle-text" contenteditable="true">${content}</div>
+          `;
+          const toggleChildren = document.createElement('div');
+          toggleChildren.className = 'toggle-children';
+          block.appendChild(toggleChildren);
+          break;
+        case 'divider':
+          blockContent.contentEditable = false;
+          break;
+        case 'table':
+          blockContent.contentEditable = false;
+          blockContent.innerHTML = `
+            <table class="notion-table">
+              <tr><td contenteditable="true">Header 1</td><td contenteditable="true">Header 2</td><td contenteditable="true">Header 3</td></tr>
+              <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
+              <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
+            </table>
+          `;
+          break;
+        case 'columns':
+          blockContent.contentEditable = false;
+          blockContent.innerHTML = `
+            <div class="column" contenteditable="true">Column 1</div>
+            <div class="column" contenteditable="true">Column 2</div>
+          `;
+          break;
+        case 'image':
+          blockContent.contentEditable = false;
+          if(data.src) {
+            blockContent.innerHTML = `<img src="${data.src}" class="block-image" alt="">`;
+          } else {
+            blockContent.innerHTML = `<div class="image-placeholder" onclick="uploadImage(this)">Click to upload image</div>`;
+          }
+          break;
+      }
+
+      block.appendChild(blockContent);
+
+      // Event Listeners
+      block.addEventListener('dragstart', handleDragStart);
+      block.addEventListener('dragend', handleDragEnd);
+      block.addEventListener('dragover', handleDragOver);
+      block.addEventListener('drop', handleDrop);
+
+      blockContent.addEventListener('input', () => {
+        scheduleAutoSave();
+      });
+
+      blockContent.addEventListener('keydown', handleBlockKeydown);
+      blockContent.addEventListener('mouseup', handleTextSelection);
+      blockContent.addEventListener('focus', () => {
+        currentBlock = block;
+      });
+
+      return block;
     }
-    
-    function generateTOC() {
-        const tocList = document.getElementById('tocList');
-        const tocContainer = document.getElementById('tocContainer');
-        tocList.innerHTML = '';
-        const headers = document.getElementById('previewPane').querySelectorAll('h2, h3');
-        if (headers.length < 2) {
-            tocContainer.style.display = 'none';
-            return;
-        }
+
+    function insertBlock(type, afterBlock = null) {
+      const block = createBlock(type);
+      const editor = document.getElementById('blockEditor');
+      
+      if(afterBlock) {
+        afterBlock.after(block);
+      } else if(currentBlock) {
+        currentBlock.after(block);
+      } else {
+        editor.appendChild(block);
+      }
+
+      const contentEl = block.querySelector('[contenteditable="true"]');
+      if(contentEl) {
+        contentEl.focus();
+      }
+
+      hideSlashMenu();
+      scheduleAutoSave();
+    }
+
+    function deleteBlock(block) {
+      if(!block) return;
+      const prev = block.previousElementSibling;
+      const next = block.nextElementSibling;
+      block.remove();
+      
+      if(prev && prev.classList.contains('block')) {
+        const contentEl = prev.querySelector('[contenteditable="true"]');
+        if(contentEl) contentEl.focus();
+      } else if(next && next.classList.contains('block')) {
+        const contentEl = next.querySelector('[contenteditable="true"]');
+        if(contentEl) contentEl.focus();
+      }
+      
+      scheduleAutoSave();
+    }
+
+    function toggleTodo(checkbox) {
+      const block = checkbox.closest('.block');
+      if(checkbox.checked) {
+        block.classList.add('checked');
+      } else {
+        block.classList.remove('checked');
+      }
+      scheduleAutoSave();
+    }
+
+    function toggleContent(arrow) {
+      arrow.classList.toggle('open');
+      const block = arrow.closest('.block');
+      const children = block.querySelector('.toggle-children');
+      if(children) {
+        children.classList.toggle('open');
+      }
+    }
+
+    // Drag and Drop
+    function handleDragStart(e) {
+      draggedBlock = this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+      document.querySelectorAll('.block').forEach(b => b.classList.remove('drag-over'));
+    }
+
+    function handleDragOver(e) {
+      if (e.preventDefault) e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      
+      const afterElement = getDragAfterElement(document.getElementById('blockEditor'), e.clientY);
+      document.querySelectorAll('.block').forEach(b => b.classList.remove('drag-over'));
+      
+      if(afterElement == null) {
+        this.classList.add('drag-over');
+      } else {
+        afterElement.classList.add('drag-over');
+      }
+      
+      return false;
+    }
+
+    function handleDrop(e) {
+      if (e.stopPropagation) e.stopPropagation();
+      
+      const afterElement = getDragAfterElement(document.getElementById('blockEditor'), e.clientY);
+      const container = document.getElementById('blockEditor');
+      
+      if(afterElement == null) {
+        container.appendChild(draggedBlock);
+      } else {
+        container.insertBefore(draggedBlock, afterElement);
+      }
+      
+      scheduleAutoSave();
+      return false;
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll('.block:not(.dragging)')];
+      
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
         
-        tocContainer.style.display = 'block';
-        headers.forEach(header => {
-            const id = header.textContent.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]/g, '');
-            header.id = id;
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = `#${id}`;
-            a.textContent = header.textContent;
-            a.style.paddingLeft = `${(parseInt(header.tagName[1]) - 2) * 15}px`; // Indent based on h2/h3
-            a.onclick = (e) => { e.preventDefault(); header.scrollIntoView({behavior: 'smooth'}); };
-            li.appendChild(a);
-            tocList.appendChild(li);
-        });
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
-    function displayPageTree() {
-      if (!db) return;
-      const tx = db.transaction("wiki", "readonly");
-      const store = tx.objectStore("wiki");
-      const getAllReq = store.getAll();
-      getAllReq.onsuccess = e => {
-        const pages = e.target.result || [];
-        const tree = document.getElementById('pageTree');
-        tree.innerHTML = '';
-        pages.sort((a,b) => (a.title || '').localeCompare(b.title || '')); // Sort alphabetically
-        pages.forEach(page => {
-          const li = document.createElement('li');
-          li.className = 'page-tree-item';
-          const link = document.createElement('a');
-          link.href = '#';
-          link.className = 'page-link' + (page.id === currentPageId ? ' active' : '');
-          link.onclick = (ev) => { ev.preventDefault(); openPage(page.id); };
-          link.innerHTML = `<span class="page-icon">📄</span><span class="page-title">${page.title || 'Untitled'}</span>`;
-          li.appendChild(link);
-
-          const actions = document.createElement('div');
-          actions.className = 'page-actions';
-          const delBtn = document.createElement('button');
-          delBtn.textContent = '🗑️';
-          delBtn.onclick = (ev) => { ev.stopPropagation(); deletePage(page.id); };
-          actions.appendChild(delBtn);
-          li.appendChild(actions);
-
-          tree.appendChild(li);
-        });
-      };
-      getAllReq.onerror = e => console.error('Failed to load pages', e);
+    // Keyboard Shortcuts
+    function handleBlockKeydown(e) {
+      const block = e.target.closest('.block');
+      
+      // Slash command
+      if(e.key === '/') {
+        setTimeout(() => showSlashMenu(block), 10);
+      }
+      
+      // Enter key
+      if(e.key === 'Enter' && !e.shiftKey) {
+        const type = block.getAttribute('data-type');
+        if(['h1', 'h2', 'h3', 'quote'].includes(type)) {
+          e.preventDefault();
+          insertBlock('text', block);
+        } else if(type === 'divider') {
+          e.preventDefault();
+          insertBlock('text', block);
+        } else if(['bullet', 'numbered', 'todo'].includes(type)) {
+          if(e.target.textContent.trim() === '') {
+            e.preventDefault();
+            insertBlock('text', block);
+            deleteBlock(block);
+          } else {
+            e.preventDefault();
+            insertBlock(type, block);
+          }
+        }
+      }
+      
+      // Backspace on empty block
+      if(e.key === 'Backspace' && e.target.textContent.trim() === '') {
+        const prevBlock = block.previousElementSibling;
+        if(prevBlock && prevBlock.classList.contains('block')) {
+          e.preventDefault();
+          deleteBlock(block);
+        }
+      }
+      
+      // Formatting shortcuts
+      if(e.ctrlKey || e.metaKey) {
+        if(e.key === 'b') {
+          e.preventDefault();
+          formatText('bold');
+        } else if(e.key === 'i') {
+          e.preventDefault();
+          formatText('italic');
+        } else if(e.key === 'u') {
+          e.preventDefault();
+          formatText('underline');
+        }
+      }
     }
-    
+
+    // Slash Menu
+    function showSlashMenu(block) {
+      const menu = document.getElementById('slashMenu');
+      const rect = block.getBoundingClientRect();
+      menu.style.top = (rect.bottom + window.scrollY) + 'px';
+      menu.style.left = rect.left + 'px';
+      menu.classList.add('show');
+      currentBlock = block;
+    }
+
+    function hideSlashMenu() {
+      document.getElementById('slashMenu').classList.remove('show');
+    }
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+      if(!e.target.closest('.slash-menu') && !e.target.closest('.block-content')) {
+        hideSlashMenu();
+      }
+    });
+
+    // Text Selection & Formatting
+    function handleTextSelection(e) {
+      const selection = window.getSelection();
+      if(selection.toString().length > 0) {
+        showFormattingToolbar(e);
+      } else {
+        hideFormattingToolbar();
+      }
+    }
+
+    function showFormattingToolbar(e) {
+      const toolbar = document.getElementById('formattingToolbar');
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      toolbar.style.top = (rect.top + window.scrollY - 45) + 'px';
+      toolbar.style.left = (rect.left + (rect.width / 2) - 150) + 'px';
+      toolbar.classList.add('show');
+    }
+
+    function hideFormattingToolbar() {
+      document.getElementById('formattingToolbar').classList.remove('show');
+    }
+
+    function formatText(command, value) {
+      document.execCommand(command, false, value);
+      scheduleAutoSave();
+    }
+
+    function createLink() {
+      const url = prompt('Enter URL:');
+      if(url) {
+        document.execCommand('createLink', false, url);
+        scheduleAutoSave();
+      }
+    }
+
+    // Page Management
     function createNewPage() {
       currentPageId = null;
       document.getElementById('titleEditor').value = '';
-      document.getElementById('contentEditor').value = '';
-      updatePreview();
-      document.getElementById('titleEditor').focus();
+      document.getElementById('pageIconPicker').textContent = '📄';
+      document.getElementById('pageCover').style.display = 'none';
+      document.getElementById('propertiesSection').innerHTML = '';
+      
+      const editor = document.getElementById('blockEditor');
+      editor.innerHTML = '';
+      editor.appendChild(createBlock('text'));
+      
+      updateBreadcrumbs();
       displayPageTree();
+      document.getElementById('titleEditor').focus();
     }
-    
-    function savePage() {
-      if (!db) { alert('Database not ready'); return; }
-      const title = document.getElementById('titleEditor').value;
-      const content = document.getElementById('contentEditor').value;
+
+    function savePage(silent = false) {
+      if (!db) { 
+        if(!silent) alert('Database not ready'); 
+        return; 
+      }
+      
+      const title = document.getElementById('titleEditor').value || 'Untitled';
+      const icon = document.getElementById('pageIconPicker').textContent;
+      const blocks = [];
+      
+      document.querySelectorAll('#blockEditor .block').forEach(block => {
+        const type = block.getAttribute('data-type');
+        const contentEl = block.querySelector('.block-content');
+        let content = '';
+        let data = {};
+        
+        if(type === 'todo') {
+          const checkbox = block.querySelector('.todo-checkbox');
+          const text = block.querySelector('.todo-text');
+          content = text ? text.textContent : '';
+          data.checked = checkbox ? checkbox.checked : false;
+        } else if(type === 'callout') {
+          const iconEl = block.querySelector('.callout-icon');
+          const textEl = block.querySelector('.callout-text');
+          data.icon = iconEl ? iconEl.textContent : '💡';
+          content = textEl ? textEl.textContent : '';
+        } else if(type === 'image') {
+          const img = block.querySelector('.block-image');
+          if(img) data.src = img.src;
+        } else {
+          content = contentEl ? contentEl.innerHTML : '';
+        }
+        
+        blocks.push({ type, content, data });
+      });
+      
+      const pageData = { 
+        title, 
+        icon,
+        blocks,
+        cover: document.getElementById('pageCover').style.backgroundImage || '',
+        lastModified: new Date(),
+        favorited: false
+      };
+      
       const tx = db.transaction("wiki", "readwrite");
       const store = tx.objectStore("wiki");
       
-      const pageData = { title, content, lastModified: new Date() };
-      
       let req;
       if (currentPageId) {
-        pageData.id = currentPageId;
-        req = store.put(pageData);
-        req.onsuccess = () => {
-          displayPageTree();
-          alert('Page updated!');
-          openPage(currentPageId);
+        // Check if page is favorited
+        const getReq = store.get(currentPageId);
+        getReq.onsuccess = (e) => {
+          const existingPage = e.target.result;
+          if(existingPage) pageData.favorited = existingPage.favorited;
+          
+          pageData.id = currentPageId;
+          store.put(pageData).onsuccess = () => {
+            displayPageTree();
+            if(!silent) alert('Page saved!');
+          };
         };
       } else {
         req = store.add(pageData);
         req.onsuccess = (e) => {
           currentPageId = e.target.result;
           displayPageTree();
-          openPage(currentPageId);
-          alert('Page saved!');
+          updateBreadcrumbs();
+          if(!silent) alert('Page created!');
         };
       }
-      req.onerror = (e) => { console.error('Save failed', e); alert('Failed to save page'); };
+      
+      req.onerror = (e) => { 
+        console.error('Save failed', e); 
+        if(!silent) alert('Failed to save page'); 
+      };
     }
-    
-    function deletePage(id) {
-        if (!id || !confirm('Are you sure you want to delete this page?')) return;
-        
-        const tx = db.transaction("wiki", "readwrite");
-        const delReq = tx.objectStore("wiki").delete(id);
-        delReq.onsuccess = () => {
-            if (id === currentPageId) {
-                currentPageId = null;
-                loadInitialPage(); // Load another page if the current one was deleted
-            }
-            displayPageTree();
-            alert('Page deleted!');
-        };
-        delReq.onerror = e => { console.error('Delete failed', e); alert('Failed to delete page'); };
+
+    function scheduleAutoSave() {
+      if(autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => savePage(true), 2000);
     }
 
     function openPage(id) {
@@ -410,33 +1145,161 @@
       getReq.onsuccess = e => {
         const page = e.target.result;
         if (!page) return;
+        
         currentPageId = page.id;
         document.getElementById('titleEditor').value = page.title || '';
-        document.getElementById('contentEditor').value = page.content || '';
-        updatePreview();
+        document.getElementById('pageIconPicker').textContent = page.icon || '📄';
+        
+        // Cover
+        if(page.cover) {
+          document.getElementById('pageCover').style.backgroundImage = page.cover;
+          document.getElementById('pageCover').style.display = 'block';
+        } else {
+          document.getElementById('pageCover').style.display = 'none';
+        }
+        
+        // Blocks
+        const editor = document.getElementById('blockEditor');
+        editor.innerHTML = '';
+        
+        if(page.blocks && page.blocks.length > 0) {
+          page.blocks.forEach(blockData => {
+            editor.appendChild(createBlock(blockData.type, blockData.content, blockData.data || {}));
+          });
+        } else {
+          editor.appendChild(createBlock('text'));
+        }
+        
+        updateBreadcrumbs();
         displayPageTree();
+        updateBacklinks();
       };
       getReq.onerror = e => console.error('Open page failed', e);
     }
-    
-    function openPageByTitle(title) {
-        if (!db) return;
+
+    function deletePage(id) {
+      if (!id || !confirm('Are you sure you want to delete this page?')) return;
+      
+      const tx = db.transaction("wiki", "readwrite");
+      const delReq = tx.objectStore("wiki").delete(id);
+      delReq.onsuccess = () => {
+        if (id === currentPageId) {
+          currentPageId = null;
+          loadInitialPage();
+        }
+        displayPageTree();
+        alert('Page deleted!');
+      };
+      delReq.onerror = e => { console.error('Delete failed', e); alert('Failed to delete page'); };
+    }
+
+    function duplicatePage() {
+      if(!currentPageId) return;
+      
+      savePage(true);
+      setTimeout(() => {
         const tx = db.transaction("wiki", "readonly");
-        const store = tx.objectStore("wiki");
-        const index = store.index("title");
-        const req = index.get(title);
-        req.onsuccess = e => {
-            if (e.target.result) {
-                openPage(e.target.result.id);
-            } else {
-                if (confirm(`Page "${title}" not found. Create it now?`)) {
-                    createNewPage();
-                    document.getElementById('titleEditor').value = title;
-                    updatePreview();
-                }
-            }
+        const getReq = tx.objectStore("wiki").get(currentPageId);
+        getReq.onsuccess = e => {
+          const page = e.target.result;
+          if(!page) return;
+          
+          const duplicateData = { ...page };
+          delete duplicateData.id;
+          duplicateData.title = page.title + ' (Copy)';
+          duplicateData.lastModified = new Date();
+          
+          const addTx = db.transaction("wiki", "readwrite");
+          const addReq = addTx.objectStore("wiki").add(duplicateData);
+          addReq.onsuccess = (ev) => {
+            openPage(ev.target.result);
+            alert('Page duplicated!');
+          };
         };
-        req.onerror = e => console.error('Search by title failed', e);
+      }, 100);
+    }
+
+    function toggleFavorite(id, e) {
+      e.stopPropagation();
+      
+      const tx = db.transaction("wiki", "readwrite");
+      const store = tx.objectStore("wiki");
+      const getReq = store.get(id);
+      
+      getReq.onsuccess = (ev) => {
+        const page = ev.target.result;
+        if(!page) return;
+        
+        page.favorited = !page.favorited;
+        store.put(page).onsuccess = () => {
+          displayPageTree();
+        };
+      };
+    }
+
+    function displayPageTree() {
+      if (!db) return;
+      const tx = db.transaction("wiki", "readonly");
+      const store = tx.objectStore("wiki");
+      const getAllReq = store.getAll();
+      
+      getAllReq.onsuccess = e => {
+        const pages = e.target.result || [];
+        pages.sort((a,b) => (a.title || '').localeCompare(b.title || ''));
+        
+        // Favorites
+        const favoritesTree = document.getElementById('favoritesTree');
+        favoritesTree.innerHTML = '';
+        const favorites = pages.filter(p => p.favorited);
+        
+        if(favorites.length === 0) {
+          document.getElementById('favoritesSection').style.display = 'none';
+        } else {
+          document.getElementById('favoritesSection').style.display = 'block';
+          favorites.forEach(page => {
+            favoritesTree.appendChild(createPageTreeItem(page));
+          });
+        }
+        
+        // All pages
+        const tree = document.getElementById('pageTree');
+        tree.innerHTML = '';
+        pages.forEach(page => {
+          tree.appendChild(createPageTreeItem(page));
+        });
+      };
+    }
+
+    function createPageTreeItem(page) {
+      const li = document.createElement('li');
+      li.className = 'page-tree-item';
+      
+      const link = document.createElement('a');
+      link.className = 'page-link' + (page.id === currentPageId ? ' active' : '');
+      link.onclick = (ev) => { ev.preventDefault(); openPage(page.id); };
+      
+      const star = document.createElement('span');
+      star.className = 'star-icon' + (page.favorited ? ' starred' : '');
+      star.textContent = page.favorited ? '⭐' : '☆';
+      star.onclick = (e) => toggleFavorite(page.id, e);
+      
+      link.innerHTML = `
+        <span class="page-icon">${page.icon || '📄'}</span>
+        <span class="page-title">${page.title || 'Untitled'}</span>
+      `;
+      link.appendChild(star);
+      
+      li.appendChild(link);
+      
+      const actions = document.createElement('div');
+      actions.className = 'page-actions';
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '🗑️';
+      delBtn.onclick = (ev) => { ev.stopPropagation(); deletePage(page.id); };
+      actions.appendChild(delBtn);
+      li.appendChild(actions);
+      
+      return li;
     }
 
     function loadInitialPage() {
@@ -444,45 +1307,279 @@
       const tx = db.transaction("wiki", "readonly");
       const store = tx.objectStore("wiki");
       const cursorReq = store.openCursor();
+      
       cursorReq.onsuccess = e => {
         const cursor = e.target.result;
         if (cursor) {
           openPage(cursor.value.id);
         } else {
-          // Create a "Welcome" page if the wiki is empty
-          const welcomePage = {
-              title: "Welcome to your Wiki!",
-              content: "This is your personal knowledge base, powered by ShareHive.\n\n## Getting Started\n\n* Click **'New Page'** to create a new entry.\n* Write content using **Markdown** in the left editor pane.\n* See a live preview on the right.\n* Link between pages using the [[Page Title]] syntax.\n\nEnjoy building your second brain! 🧠",
-              lastModified: new Date()
-          };
-          const addTx = db.transaction("wiki", "readwrite");
-          const addReq = addTx.objectStore("wiki").add(welcomePage);
-          addReq.onsuccess = (ev) => {
-              openPage(ev.target.result);
-              displayPageTree();
-          };
-          addReq.onerror = e => console.error('Failed to create welcome page', e);
+          createWelcomePage();
         }
       };
-      cursorReq.onerror = e => console.error('Cursor failed', e);
     }
-    
-    document.getElementById('search').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        document.querySelectorAll('.page-title').forEach(el => {
-            const item = el.closest('.page-tree-item');
-            if (!item) return;
-            if (el.textContent.toLowerCase().includes(query)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
+
+    function createWelcomePage() {
+      const welcomePage = {
+        title: "Welcome to ShareHive Wiki! 🐝",
+        icon: "👋",
+        blocks: [
+          { type: 'h1', content: 'Welcome to your personal knowledge base!' },
+          { type: 'callout', content: 'This is a Notion-style wiki with powerful block-based editing.', data: { icon: '💡' } },
+          { type: 'h2', content: 'Getting Started' },
+          { type: 'todo', content: 'Click "New Page" to create a page', data: { checked: false } },
+          { type: 'todo', content: 'Type "/" to see all block types', data: { checked: false } },
+          { type: 'todo', content: 'Drag blocks to reorder them', data: { checked: false } },
+          { type: 'todo', content: 'Select text to format it', data: { checked: false } },
+          { type: 'h2', content: 'Block Types' },
+          { type: 'bullet', content: 'Text, headings, lists' },
+          { type: 'bullet', content: 'To-dos, toggles, quotes' },
+          { type: 'bullet', content: 'Callouts, code blocks, tables' },
+          { type: 'bullet', content: 'Images, columns, dividers' },
+          { type: 'h2', content: 'Features' },
+          { type: 'text', content: '✨ <b>Templates</b> - Start with pre-made structures' },
+          { type: 'text', content: '🎨 <b>Icons & Covers</b> - Customize your pages' },
+          { type: 'text', content: '⭐ <b>Favorites</b> - Star important pages' },
+          { type: 'text', content: '📤 <b>Export</b> - Download as Markdown, HTML, or JSON' },
+          { type: 'divider', content: '' },
+          { type: 'quote', content: 'Build your second brain, one block at a time. 🧠' }
+        ],
+        lastModified: new Date(),
+        favorited: true
+      };
+      
+      const addTx = db.transaction("wiki", "readwrite");
+      const addReq = addTx.objectStore("wiki").add(welcomePage);
+      addReq.onsuccess = (ev) => {
+        openPage(ev.target.result);
+        displayPageTree();
+      };
+    }
+
+    // Templates
+    function showTemplates() {
+      document.getElementById('templatesModal').classList.add('show');
+    }
+
+    function applyTemplate(templateName) {
+      const template = templates[templateName];
+      if(!template) return;
+      
+      document.getElementById('titleEditor').value = template.title;
+      document.getElementById('pageIconPicker').textContent = template.icon;
+      
+      const editor = document.getElementById('blockEditor');
+      editor.innerHTML = '';
+      
+      template.blocks.forEach(blockData => {
+        editor.appendChild(createBlock(blockData.type, blockData.content, blockData.data || {}));
+      });
+      
+      closeModal('templatesModal');
+      scheduleAutoSave();
+    }
+
+    // Icon Picker
+    function showIconPicker() {
+      const grid = document.getElementById('iconPickerGrid');
+      grid.innerHTML = '';
+      
+      icons.forEach(icon => {
+        const option = document.createElement('div');
+        option.className = 'icon-option';
+        option.textContent = icon;
+        option.onclick = () => {
+          document.getElementById('pageIconPicker').textContent = icon;
+          closeModal('iconPickerModal');
+          scheduleAutoSave();
+        };
+        grid.appendChild(option);
+      });
+      
+      document.getElementById('iconPickerModal').classList.add('show');
+    }
+
+    // Cover Image
+    function changeCover() {
+      const url = prompt('Enter image URL:');
+      if(url) {
+        document.getElementById('pageCover').style.backgroundImage = `url(${url})`;
+        document.getElementById('pageCover').style.display = 'block';
+        scheduleAutoSave();
+      }
+    }
+
+    function removeCover() {
+      document.getElementById('pageCover').style.backgroundImage = '';
+      document.getElementById('pageCover').style.display = 'none';
+      scheduleAutoSave();
+    }
+
+    // Export
+    function showExportMenu() {
+      document.getElementById('exportModal').classList.add('show');
+    }
+
+    function exportPage(format) {
+      if(!currentPageId) {
+        alert('Please save the page first');
+        return;
+      }
+      
+      const title = document.getElementById('titleEditor').value || 'Untitled';
+      const blocks = [];
+      
+      document.querySelectorAll('#blockEditor .block').forEach(block => {
+        const type = block.getAttribute('data-type');
+        const contentEl = block.querySelector('.block-content');
+        blocks.push({ type, content: contentEl ? contentEl.textContent : '' });
+      });
+      
+      let output = '';
+      let filename = '';
+      let mimeType = '';
+      
+      if(format === 'markdown') {
+        output = `# ${title}\n\n`;
+        blocks.forEach(block => {
+          switch(block.type) {
+            case 'h1': output += `# ${block.content}\n\n`; break;
+            case 'h2': output += `## ${block.content}\n\n`; break;
+            case 'h3': output += `### ${block.content}\n\n`; break;
+            case 'quote': output += `> ${block.content}\n\n`; break;
+            case 'code': output += `\`\`\`\n${block.content}\n\`\`\`\n\n`; break;
+            case 'bullet': output += `- ${block.content}\n`; break;
+            case 'numbered': output += `1. ${block.content}\n`; break;
+            case 'todo': output += `- [ ] ${block.content}\n`; break;
+            case 'divider': output += `---\n\n`; break;
+            default: output += `${block.content}\n\n`;
+          }
         });
+        filename = `${title}.md`;
+        mimeType = 'text/markdown';
+      } else if(format === 'html') {
+        output = `<!DOCTYPE html><html><head><title>${title}</title></head><body>`;
+        output += `<h1>${title}</h1>`;
+        blocks.forEach(block => {
+          switch(block.type) {
+            case 'h1': output += `<h1>${block.content}</h1>`; break;
+            case 'h2': output += `<h2>${block.content}</h2>`; break;
+            case 'h3': output += `<h3>${block.content}</h3>`; break;
+            case 'quote': output += `<blockquote>${block.content}</blockquote>`; break;
+            case 'code': output += `<pre><code>${block.content}</code></pre>`; break;
+            case 'bullet': output += `<li>${block.content}</li>`; break;
+            case 'divider': output += `<hr>`; break;
+            default: output += `<p>${block.content}</p>`;
+          }
+        });
+        output += '</body></html>';
+        filename = `${title}.html`;
+        mimeType = 'text/html';
+      } else if(format === 'json') {
+        output = JSON.stringify({ title, blocks }, null, 2);
+        filename = `${title}.json`;
+        mimeType = 'application/json';
+      }
+      
+      // Download
+      const blob = new Blob([output], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      closeModal('exportModal');
+    }
+
+    // Backlinks
+    function updateBacklinks() {
+      // Simplified - just show the feature exists
+      const panel = document.getElementById('backlinksPanel');
+      panel.style.display = 'none'; // Can be expanded to show actual backlinks
+    }
+
+    // Breadcrumbs
+    function updateBreadcrumbs() {
+      const breadcrumbs = document.getElementById('breadcrumbs');
+      breadcrumbs.innerHTML = `
+        <a href="#" onclick="event.preventDefault()">📖 Wiki</a>
+        <span>›</span>
+        <span>${document.getElementById('titleEditor').value || 'Untitled'}</span>
+      `;
+    }
+
+    // Search
+    document.getElementById('search').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.page-title').forEach(el => {
+        const item = el.closest('.page-tree-item');
+        if (!item) return;
+        if (el.textContent.toLowerCase().includes(query)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
     });
 
-    // Alias for the store
-    const store = db.transaction("wiki", "readonly").objectStore("wiki");
+    // Title change
+    document.getElementById('titleEditor').addEventListener('input', () => {
+      updateBreadcrumbs();
+      scheduleAutoSave();
+    });
 
+    // Modal Functions
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    // Image Upload
+    function uploadImage(placeholder) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = document.createElement('img');
+          img.src = ev.target.result;
+          img.className = 'block-image';
+          placeholder.replaceWith(img);
+          scheduleAutoSave();
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    // Page History (Placeholder)
+    function showPageHistory() {
+      alert('Page history feature coming soon! This would show version history of the current page.');
+    }
+
+    // Block Menu (Placeholder)
+    function showBlockMenu(btn) {
+      const block = btn.closest('.block');
+      const type = block.getAttribute('data-type');
+      
+      const action = confirm(`Block options:\nOK = Delete block\nCancel = Keep`);
+      if(action) {
+        deleteBlock(block);
+      }
+    }
+
+    // Close modals on outside click
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if(e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
+    });
   </script>
 </body>
 </html>
