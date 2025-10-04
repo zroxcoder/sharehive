@@ -489,12 +489,18 @@
       const text = document.getElementById('subtaskInput').value.trim();
       if (!text) return;
       const tx = db.transaction("projects", "readwrite");
+      const store = tx.objectStore("projects"); // <-- FIXED: get store from tx
       store.get(projectId).onsuccess = e => {
         const p = e.target.result;
+        if (!p.subtasks) p.subtasks = [];
         p.subtasks.push({ text, done: false });
         store.put(p);
       };
-      tx.oncomplete = () => { document.getElementById('subtaskInput').value = ''; closeModal(); displayProjects(); };
+      tx.oncomplete = () => {
+        document.getElementById('subtaskInput').value = '';
+        closeModal();
+        displayProjects();
+      };
     }
     function toggleSubtask(projectId, index) {
       const tx = db.transaction("projects", "readwrite");
