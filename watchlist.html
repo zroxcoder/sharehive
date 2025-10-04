@@ -464,6 +464,12 @@
     // Save / Update
     document.getElementById("itemForm").addEventListener('submit', (e) => {
       e.preventDefault();
+      const ratingValue = document.getElementById("rating").value.trim();
+      const rating = ratingValue ? parseFloat(ratingValue) : "";
+      if (rating && (rating < 1 || rating > 10)) {
+        alert("Rating must be between 1 and 10.");
+        return;
+      }
       const item = {
         title: document.getElementById("title").value.trim(),
         type: document.getElementById("type").value,
@@ -472,7 +478,7 @@
         link: document.getElementById("link").value.trim(),
         status: document.getElementById("status").value,
         episodes: document.getElementById("episodes").value.trim(),
-        rating: document.getElementById("rating").value,
+        rating: rating, // use parsed float
         notes: document.getElementById("notes").value.trim(),
         year: document.getElementById("year").value,
       };
