@@ -119,7 +119,8 @@
     .note[data-color="green"] { background-color: #ccff90; border-color: #ccff90; }
     .note[data-color="yellow"] { background-color: #fff475; border-color: #fff475; }
     .note[data-color="gray"] { background-color: #e8eaed; border-color: #e8eaed; }
-    .note[data-color] h3, .note[data-color] p, .note[data-color] .timestamp, .note[data-color] .actions button { color: #202124; }
+    /* use theme text color so colored notes remain readable in dark/light themes */
+    .note[data-color] h3, .note[data-color] p, .note[data-color] .timestamp, .note[data-color] .actions button { color: var(--text-color); }
 
     /* Modal for Editing */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; }
@@ -185,7 +186,7 @@
           <input id="title" type="text" placeholder="Take a note...">
           <textarea id="content" rows="4" placeholder="Note content..."></textarea>
           <div class="form-footer">
-            <button id="saveBtn">Close</button>
+            <button id="saveBtn">Save</button>
           </div>
         </div>
       </div>
@@ -329,21 +330,44 @@
         div.className = 'note';
         div.dataset.id = note.id;
         div.dataset.color = note.color || 'default';
-        div.onclick = () => openEditModal(note.id);
+        // open editor when clicking card
+        div.addEventListener('click', () => openEditModal(note.id));
 
-        div.innerHTML = `
-            <div class="note-content">
-                <h3>${note.title || 'Untitled'}</h3>
-                <p>${note.content}</p>
-            </div>
-            <div class="note-footer">
-                <span class="timestamp">Edited ${formatRelativeTime(note.updatedAt)}</span>
-                <div class="actions">
-                    <button onclick="event.stopPropagation(); togglePin(${note.id})" title="${note.pinned ? 'Unpin' : 'Pin'}">${note.pinned ? '📌' : '📍'}</button>
-                    <button onclick="event.stopPropagation(); deleteNote(${note.id})" title="Delete">🗑️</button>
-                </div>
-            </div>
-        `;
+        const content = document.createElement('div');
+        content.className = 'note-content';
+        const h3 = document.createElement('h3');
+        h3.textContent = note.title || 'Untitled';
+        const p = document.createElement('p');
+        p.textContent = note.content || '';
+        content.appendChild(h3);
+        content.appendChild(p);
+
+        const footer = document.createElement('div');
+        footer.className = 'note-footer';
+        const ts = document.createElement('span');
+        ts.className = 'timestamp';
+        ts.textContent = `Edited ${formatRelativeTime(note.updatedAt)}`;
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const pinBtn = document.createElement('button');
+        pinBtn.title = note.pinned ? 'Unpin' : 'Pin';
+        pinBtn.textContent = note.pinned ? '📌' : '📍';
+        pinBtn.addEventListener('click', (ev) => { ev.stopPropagation(); togglePin(note.id); });
+
+        const delBtn = document.createElement('button');
+        delBtn.title = 'Delete';
+        delBtn.textContent = '🗑️';
+        delBtn.addEventListener('click', (ev) => { ev.stopPropagation(); deleteNote(note.id); });
+
+        actions.appendChild(pinBtn);
+        actions.appendChild(delBtn);
+        footer.appendChild(ts);
+        footer.appendChild(actions);
+
+        div.appendChild(content);
+        div.appendChild(footer);
         return div;
     }
     
@@ -361,13 +385,27 @@
         document.getElementById('modalTimestamp').textContent = `Edited ${formatRelativeTime(note.updatedAt)}`;
         document.getElementById('modalNoteCard').dataset.color = note.color || 'default';
         
-        // Actions
+        // Actions (use event listeners to avoid inline handler scope issues)
         const actionsContainer = document.getElementById('modalActions');
-        actionsContainer.innerHTML = `
-            <button onclick="togglePin(${id}, true)" title="${note.pinned ? 'Unpin' : 'Pin'}">${note.pinned ? '📌' : '📍'}</button>
-            <button onclick="deleteNote(${id}, true)" title="Delete">🗑️</button>
-            <button onclick="closeEditModal(true)" title="Save & Close">✅</button>
-        `;
+        actionsContainer.innerHTML = '';
+        const pinBtn = document.createElement('button');
+        pinBtn.title = note.pinned ? 'Unpin' : 'Pin';
+        pinBtn.textContent = note.pinned ? '📌' : '📍';
+        pinBtn.addEventListener('click', () => togglePin(id, true));
+
+        const delBtn = document.createElement('button');
+        delBtn.title = 'Delete';
+        delBtn.textContent = '🗑️';
+        delBtn.addEventListener('click', () => deleteNote(id, true));
+
+        const saveBtn = document.createElement('button');
+        saveBtn.title = 'Save & Close';
+        saveBtn.textContent = '✅';
+        saveBtn.addEventListener('click', () => closeEditModal(true));
+
+        actionsContainer.appendChild(pinBtn);
+        actionsContainer.appendChild(delBtn);
+        actionsContainer.appendChild(saveBtn);
         
         editModal.style.display = 'flex';
     }
