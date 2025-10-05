@@ -39,7 +39,7 @@
     .main { flex: 1; display: flex; overflow: hidden; padding:0; }
 
     .wiki-sidebar { width: 280px; background: var(--sidebar-bg); padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); display:flex; flex-direction:column; }
-    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
     
     .sidebar-header { margin-bottom: 20px; }
     .search-box { width: 100%; padding: 10px 15px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-color); font-size: 14px; margin-bottom:15px; }
@@ -50,27 +50,37 @@
     .templates-btn:hover { background: var(--bg-color); }
 
     .favorites-section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-    .section-title { font-size: 12px; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 10px; }
+    .section-title { font-size: 12px; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
 
-    .page-tree { list-style: none; padding-left: 0; flex:1; }
-    .page-tree-item { margin: 5px 0; position:relative; }
-    .page-link { display: flex; align-items: center; gap: 8px; padding: 8px 10px; text-decoration: none; color: var(--text-color); border-radius: 5px; transition: background 0.2s; cursor: pointer; }
+    .page-tree { list-style: none; padding-left: 0; }
+    .page-tree-item { margin: 2px 0; position:relative; }
+    .page-tree-item.nested { padding-left: 20px; }
+    .expand-icon { cursor: pointer; padding: 2px 4px; user-select: none; display: inline-block; width: 20px; text-align: center; }
+    .expand-icon.collapsed:before { content: '▶'; font-size: 10px; }
+    .expand-icon.expanded:before { content: '▼'; font-size: 10px; }
+    .children-pages { display: none; padding-left: 20px; }
+    .children-pages.show { display: block; }
+    
+    .page-link { display: flex; align-items: center; gap: 8px; padding: 6px 8px; text-decoration: none; color: var(--text-color); border-radius: 5px; transition: background 0.2s; cursor: pointer; }
     .page-link:hover { background: var(--bg-color); }
     .page-link.active { background: var(--primary-color); color: white; }
-    .page-icon { font-size: 18px; }
-    .page-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .star-icon { cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+    .page-icon { font-size: 16px; }
+    .page-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+    .star-icon { cursor: pointer; opacity: 0; transition: opacity 0.2s; font-size: 14px; }
     .page-tree-item:hover .star-icon { opacity: 1; }
     .star-icon.starred { opacity: 1; color: gold; }
     .page-actions { display:none; }
     .page-tree-item:hover .page-actions { display:flex; gap:5px; position:absolute; right:5px; top:5px; }
-    .page-actions button { background:transparent; border:none; cursor:pointer; font-size:16px; color:var(--text-color); padding:2px; }
+    .page-actions button { background:transparent; border:none; cursor:pointer; font-size:14px; color:var(--text-color); padding:2px; }
 
     /* Editor Area */
     .editor-container { flex: 1; overflow-y: auto; padding: 0; }
+    .editor-container.full-width .page-header,
+    .editor-container.full-width .block-editor,
+    .editor-container.full-width .page-actions-bar { max-width: 100% !important; }
     
     /* Page Header */
-    .page-header { padding: 40px 96px 0 96px; }
+    .page-header { padding: 40px 96px 0 96px; max-width: 900px; margin: 0 auto; width: 100%; }
     .page-cover { height: 200px; width: 100%; background-size: cover; background-position: center; position: relative; margin-bottom: 20px; border-radius: 3px; cursor: pointer; }
     .page-cover:hover .cover-actions { opacity: 1; }
     .cover-actions { position: absolute; bottom: 10px; right: 10px; opacity: 0; transition: opacity 0.2s; display: flex; gap: 8px; }
@@ -80,7 +90,7 @@
     .page-icon-picker { display: inline-block; font-size: 78px; cursor: pointer; margin-bottom: 10px; transition: transform 0.2s; }
     .page-icon-picker:hover { transform: scale(1.1); }
 
-    .breadcrumbs { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; font-size: 14px; color: #888; }
+    .breadcrumbs { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; font-size: 14px; color: #888; flex-wrap: wrap; }
     .breadcrumbs a { color: #888; text-decoration: none; }
     .breadcrumbs a:hover { color: var(--primary-color); }
 
@@ -90,14 +100,17 @@
 
     /* Properties */
     .properties-section { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-    .property { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--sidebar-bg); border-radius: 5px; font-size: 14px; }
-    .property-label { font-weight: 600; color: #888; }
+    .property { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--sidebar-bg); border-radius: 5px; font-size: 14px; position: relative; }
+    .property-label { font-weight: 600; color: #888; font-size: 12px; }
     .property-value { color: var(--text-color); }
-    .add-property-btn { padding: 6px 10px; background: transparent; border: 1px dashed var(--border-color); border-radius: 5px; cursor: pointer; font-size: 13px; color: #888; }
+    .property-input { border: none; background: transparent; color: var(--text-color); font-size: 14px; outline: none; min-width: 80px; }
+    .property-remove { cursor: pointer; margin-left: 6px; opacity: 0.6; }
+    .property-remove:hover { opacity: 1; color: var(--danger-color); }
+    .add-property-btn { padding: 6px 12px; background: transparent; border: 1px dashed var(--border-color); border-radius: 5px; cursor: pointer; font-size: 13px; color: #888; }
     .add-property-btn:hover { background: var(--sidebar-bg); }
 
     /* Block Editor */
-    .block-editor { padding: 0 96px 100px 96px; min-height: 500px; }
+    .block-editor { padding: 0 96px 100px 96px; min-height: 500px; max-width: 900px; margin: 0 auto; width: 100%; }
     
     .block { position: relative; margin-bottom: 2px; padding: 3px 0; cursor: text; }
     .block:hover .block-controls { opacity: 1; }
@@ -131,7 +144,7 @@
 
     /* Bulleted/Numbered Lists */
     .block[data-type="bullet"] .block-content { display: flex; gap: 8px; padding-left: 24px; }
-    .block[data-type="bullet"] .block-content:before { content: '•'; position: absolute; left: 96px; font-size: 20px; }
+    .block[data-type="bullet"] .block-content:before { content: '•'; position: absolute; left: 98px; font-size: 20px; }
     .block[data-type="numbered"] .block-content { display: flex; gap: 8px; padding-left: 24px; }
 
     /* Toggle Block */
@@ -143,24 +156,48 @@
 
     /* Callout */
     .block[data-type="callout"] .block-content { display: flex; gap: 12px; padding: 12px; background: var(--sidebar-bg); border-radius: 5px; border-left: 3px solid var(--primary-color); }
-    .callout-icon { font-size: 24px; flex-shrink: 0; }
+    .callout-icon { font-size: 24px; flex-shrink: 0; cursor: pointer; }
     .callout-text { flex: 1; }
 
     /* Table */
-    .block[data-type="table"] .block-content { padding: 0; }
-    .notion-table { width: 100%; border-collapse: collapse; }
+    .block[data-type="table"] .block-content { padding: 0; overflow-x: auto; }
+    .notion-table { width: 100%; border-collapse: collapse; min-width: 400px; }
     .notion-table td { border: 1px solid var(--border-color); padding: 8px; min-width: 100px; outline: none; }
     .notion-table tr:first-child td { background: var(--sidebar-bg); font-weight: bold; }
+    .table-controls { margin-top: 8px; display: flex; gap: 8px; }
+    .table-controls button { padding: 4px 8px; font-size: 12px; background: var(--sidebar-bg); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; }
 
     /* Image */
     .block[data-type="image"] .block-content { padding: 0; }
     .block-image { max-width: 100%; border-radius: 5px; cursor: pointer; }
     .image-placeholder { padding: 40px; text-align: center; border: 2px dashed var(--border-color); border-radius: 5px; cursor: pointer; color: #999; }
+    .image-caption { margin-top: 8px; font-size: 14px; color: #888; text-align: center; outline: none; }
 
     /* Columns */
     .block[data-type="columns"] .block-content { display: flex; gap: 12px; }
-    .column { flex: 1; padding: 8px; border: 1px dashed transparent; border-radius: 4px; }
+    .column { flex: 1; padding: 8px; border: 1px dashed transparent; border-radius: 4px; min-height: 50px; }
     .column:hover { border-color: var(--border-color); }
+
+    /* Embed */
+    .block[data-type="embed"] .block-content { padding: 0; }
+    .embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+    .embed-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+    /* Page Link */
+    .block[data-type="link"] .block-content { padding: 12px; background: var(--sidebar-bg); border-radius: 5px; border: 1px solid var(--border-color); cursor: pointer; }
+    .block[data-type="link"] .block-content:hover { background: var(--bg-color); }
+    .page-link-title { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+    /* Comments */
+    .comments-toggle { position: fixed; right: 20px; top: 80px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 100; }
+    .comments-toggle:hover { background: var(--primary-color); color: white; }
+    .comments-panel { position: fixed; right: -350px; top: 50px; width: 350px; height: calc(100vh - 50px); background: var(--card-bg); border-left: 1px solid var(--border-color); transition: right 0.3s; overflow-y: auto; z-index: 99; padding: 20px; }
+    .comments-panel.show { right: 0; }
+    .comment { padding: 12px; background: var(--sidebar-bg); border-radius: 8px; margin-bottom: 12px; }
+    .comment-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: #888; }
+    .comment-text { font-size: 14px; }
+    .comment-input { width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); resize: vertical; min-height: 80px; }
+    .add-comment-btn { margin-top: 10px; width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; }
 
     /* Formatting Toolbar */
     .formatting-toolbar { position: fixed; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
@@ -170,14 +207,14 @@
     .formatting-toolbar .separator { width: 1px; background: var(--border-color); margin: 0 4px; }
 
     /* Slash Command Menu */
-    .slash-menu { position: absolute; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; max-height: 400px; overflow-y: auto; z-index: 100; display: none; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .slash-menu { position: absolute; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; max-height: 400px; overflow-y: auto; z-index: 100; display: none; min-width: 320px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .slash-menu.show { display: block; }
     .slash-menu-section { margin-bottom: 12px; }
     .slash-menu-section:last-child { margin-bottom: 0; }
     .slash-menu-title { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; padding: 4px 8px; margin-bottom: 4px; }
     .slash-menu-item { padding: 8px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
     .slash-menu-item:hover, .slash-menu-item.selected { background: var(--sidebar-bg); }
-    .slash-menu-item-icon { font-size: 20px; }
+    .slash-menu-item-icon { font-size: 20px; width: 24px; text-align: center; }
     .slash-menu-item-content { flex: 1; }
     .slash-menu-item-title { font-weight: 600; font-size: 14px; }
     .slash-menu-item-desc { font-size: 12px; color: #888; }
@@ -185,7 +222,7 @@
     /* Modal */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
     .modal.show { display: flex; }
-    .modal-content { background: var(--card-bg); border-radius: 12px; padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-content { background: var(--card-bg); border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-header h3 { font-size: 20px; }
     .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); }
@@ -193,11 +230,11 @@
     .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
 
     /* Templates Grid */
-    .templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
     .template-card { padding: 20px; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.2s; }
     .template-card:hover { border-color: var(--primary-color); transform: translateY(-2px); }
     .template-icon { font-size: 32px; margin-bottom: 8px; }
-    .template-name { font-weight: 600; margin-bottom: 4px; }
+    .template-name { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
     .template-desc { font-size: 12px; color: #888; }
 
     /* Icon Picker */
@@ -210,35 +247,49 @@
     .export-option { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
     .export-option:hover { background: var(--sidebar-bg); }
 
+    /* Property Modal */
+    .property-type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .property-type-option { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; text-align: center; }
+    .property-type-option:hover { background: var(--sidebar-bg); }
+
     /* Buttons */
-    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
     .btn-primary { background: var(--primary-color); color: white; }
     .btn-primary:hover { background: #0056cc; }
     .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
     .btn-secondary:hover { background: var(--sidebar-bg); }
     
     /* Page Actions Bar */
-    .page-actions-bar { display: flex; gap: 10px; padding: 10px 96px; border-bottom: 1px solid var(--border-color); }
+    .page-actions-bar { display: flex; gap: 10px; padding: 10px 96px; border-bottom: 1px solid var(--border-color); max-width: 900px; margin: 0 auto; width: 100%; flex-wrap: wrap; }
     .action-btn { background: transparent; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text-color); display: flex; align-items: center; gap: 6px; }
     .action-btn:hover { background: var(--sidebar-bg); }
+    .action-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    /* Backlinks Panel */
-    .backlinks-panel { padding: 20px 96px; border-top: 1px solid var(--border-color); }
-    .backlinks-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #888; }
-    .backlink-item { padding: 8px 12px; border-radius: 5px; margin-bottom: 4px; cursor: pointer; }
-    .backlink-item:hover { background: var(--sidebar-bg); }
+    /* TOC Panel */
+    .toc-panel { position: fixed; right: 20px; top: 140px; width: 200px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; max-height: 400px; overflow-y: auto; display: none; }
+    .toc-panel.show { display: block; }
+    .toc-title { font-weight: bold; margin-bottom: 10px; font-size: 14px; }
+    .toc-list { list-style: none; }
+    .toc-list li { margin-bottom: 6px; }
+    .toc-list a { color: var(--text-color); text-decoration: none; font-size: 13px; opacity: 0.7; }
+    .toc-list a:hover { opacity: 1; color: var(--primary-color); }
+    .toc-list .toc-h2 { padding-left: 0; }
+    .toc-list .toc-h3 { padding-left: 15px; }
 
     @media (max-width: 1200px) {
-      .page-header, .block-editor, .page-actions-bar, .backlinks-panel { padding-left: 40px; padding-right: 40px; }
+      .page-header, .block-editor, .page-actions-bar { padding-left: 40px; padding-right: 40px; }
       .block-controls { left: -30px; }
+      .toc-panel { display: none !important; }
+      .comments-toggle { display: none; }
     }
     
     @media (max-width: 768px) {
       .container { flex-direction: column; }
       .sidebar { display:none; }
-      .wiki-sidebar { width: 100%; height:auto; border-right:none; border-bottom:1px solid var(--border-color); }
-      .page-header, .block-editor, .page-actions-bar, .backlinks-panel { padding-left: 20px; padding-right: 20px; }
+      .wiki-sidebar { width: 100%; height:auto; max-height: 200px; border-right:none; border-bottom:1px solid var(--border-color); }
+      .page-header, .block-editor, .page-actions-bar { padding-left: 20px; padding-right: 20px; }
       .block-controls { position: static; opacity: 1; margin-bottom: 5px; }
+      .block[data-type="bullet"] .block-content:before { left: 20px; }
     }
   </style>
 </head>
@@ -285,21 +336,31 @@
         </div>
         
         <div class="favorites-section" id="favoritesSection">
-          <div class="section-title">⭐ Favorites</div>
+          <div class="section-title">
+            <span>⭐ Favorites</span>
+          </div>
           <ul class="page-tree" id="favoritesTree"></ul>
         </div>
 
-        <div class="section-title">📄 All Pages</div>
+        <div class="section-title">
+          <span>📄 All Pages</span>
+        </div>
         <ul class="page-tree" id="pageTree"></ul>
       </aside>
 
       <main class="main-content">
         <div class="page-actions-bar">
+          <button class="action-btn" onclick="showComments()">
+            <span>💬</span> Comments
+          </button>
+          <button class="action-btn" id="fullWidthToggle" onclick="toggleFullWidth()">
+            <span>↔️</span> Full Width
+          </button>
+          <button class="action-btn" onclick="toggleTOC()">
+            <span>📑</span> TOC
+          </button>
           <button class="action-btn" onclick="showExportMenu()">
             <span>📤</span> Export
-          </button>
-          <button class="action-btn" onclick="showPageHistory()">
-            <span>🕐</span> History
           </button>
           <button class="action-btn" onclick="duplicatePage()">
             <span>📑</span> Duplicate
@@ -309,7 +370,7 @@
           </button>
         </div>
 
-        <div class="editor-container">
+        <div class="editor-container" id="editorContainer">
           <div class="page-header">
             <div class="breadcrumbs" id="breadcrumbs"></div>
             
@@ -324,18 +385,30 @@
             
             <input type="text" id="titleEditor" class="editor-title" placeholder="Untitled">
 
-            <div class="properties-section" id="propertiesSection"></div>
+            <div class="properties-section" id="propertiesSection">
+              <button class="add-property-btn" onclick="showAddProperty()">+ Add Property</button>
+            </div>
           </div>
 
           <div class="block-editor" id="blockEditor"></div>
-
-          <div class="backlinks-panel" id="backlinksPanel" style="display:none;">
-            <div class="backlinks-title">🔗 Backlinks</div>
-            <div id="backlinksList"></div>
-          </div>
         </div>
       </main>
     </div>
+  </div>
+
+  <!-- Comments Panel -->
+  <div class="comments-toggle" onclick="showComments()" title="Comments">💬</div>
+  <div class="comments-panel" id="commentsPanel">
+    <h3 style="margin-bottom:20px;">💬 Comments</h3>
+    <div id="commentsList"></div>
+    <textarea class="comment-input" id="commentInput" placeholder="Add a comment..."></textarea>
+    <button class="add-comment-btn" onclick="addComment()">Add Comment</button>
+  </div>
+
+  <!-- TOC Panel -->
+  <div class="toc-panel" id="tocPanel">
+    <div class="toc-title">📑 Table of Contents</div>
+    <ul class="toc-list" id="tocList"></ul>
   </div>
 
   <!-- Formatting Toolbar -->
@@ -345,7 +418,7 @@
     <button onclick="formatText('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
     <button onclick="formatText('strikethrough')" title="Strikethrough"><s>S</s></button>
     <div class="separator"></div>
-    <button onclick="formatText('code')" title="Code">💻</button>
+    <button onclick="formatText('insertUnorderedList')" title="Bullet List">• List</button>
     <button onclick="createLink()" title="Link">🔗</button>
     <div class="separator"></div>
     <button onclick="formatText('foreColor', '#ff0000')" title="Text Color" style="color:#ff0000;">A</button>
@@ -364,21 +437,21 @@
         </div>
       </div>
       <div class="slash-menu-item" onclick="insertBlock('h1')">
-        <div class="slash-menu-item-icon">H1</div>
+        <div class="slash-menu-item-icon"><strong>H1</strong></div>
         <div class="slash-menu-item-content">
           <div class="slash-menu-item-title">Heading 1</div>
           <div class="slash-menu-item-desc">Large section heading</div>
         </div>
       </div>
       <div class="slash-menu-item" onclick="insertBlock('h2')">
-        <div class="slash-menu-item-icon">H2</div>
+        <div class="slash-menu-item-icon"><strong>H2</strong></div>
         <div class="slash-menu-item-content">
           <div class="slash-menu-item-title">Heading 2</div>
           <div class="slash-menu-item-desc">Medium section heading</div>
         </div>
       </div>
       <div class="slash-menu-item" onclick="insertBlock('h3')">
-        <div class="slash-menu-item-icon">H3</div>
+        <div class="slash-menu-item-icon"><strong>H3</strong></div>
         <div class="slash-menu-item-content">
           <div class="slash-menu-item-title">Heading 3</div>
           <div class="slash-menu-item-desc">Small section heading</div>
@@ -444,6 +517,24 @@
           <div class="slash-menu-item-desc">Visual separator</div>
         </div>
       </div>
+    </div>
+
+    <div class="slash-menu-section">
+      <div class="slash-menu-title">Media</div>
+      <div class="slash-menu-item" onclick="insertBlock('image')">
+        <div class="slash-menu-item-icon">🖼️</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Image</div>
+          <div class="slash-menu-item-desc">Upload or embed</div>
+        </div>
+      </div>
+      <div class="slash-menu-item" onclick="insertBlock('embed')">
+        <div class="slash-menu-item-icon">🎬</div>
+        <div class="slash-menu-item-content">
+          <div class="slash-menu-item-title">Embed</div>
+          <div class="slash-menu-item-desc">Embed YouTube, etc.</div>
+        </div>
+      </div>
       <div class="slash-menu-item" onclick="insertBlock('table')">
         <div class="slash-menu-item-icon">📊</div>
         <div class="slash-menu-item-content">
@@ -458,11 +549,15 @@
           <div class="slash-menu-item-desc">Multi-column layout</div>
         </div>
       </div>
-      <div class="slash-menu-item" onclick="insertBlock('image')">
-        <div class="slash-menu-item-icon">🖼️</div>
+    </div>
+
+    <div class="slash-menu-section">
+      <div class="slash-menu-title">Links</div>
+      <div class="slash-menu-item" onclick="insertBlock('link')">
+        <div class="slash-menu-item-icon">🔗</div>
         <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Image</div>
-          <div class="slash-menu-item-desc">Upload or embed</div>
+          <div class="slash-menu-item-title">Page Link</div>
+          <div class="slash-menu-item-desc">Link to another page</div>
         </div>
       </div>
     </div>
@@ -553,7 +648,65 @@
               <div style="font-size:12px;color:#888;">Data format</div>
             </div>
           </div>
+          <div class="export-option" onclick="exportPage('pdf')">
+            <span style="font-size:24px;">📄</span>
+            <div>
+              <div style="font-weight:600;">PDF</div>
+              <div style="font-size:12px;color:#888;">Print ready format</div>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="propertyModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Property</h3>
+        <button class="modal-close" onclick="closeModal('propertyModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="propertyName" placeholder="Property name" style="width:100%;padding:10px;border:2px solid var(--border-color);border-radius:8px;margin-bottom:15px;">
+        <div class="property-type-grid">
+          <div class="property-type-option" onclick="addProperty('text')">
+            <div style="font-size:24px;">📝</div>
+            <div>Text</div>
+          </div>
+          <div class="property-type-option" onclick="addProperty('select')">
+            <div style="font-size:24px;">🏷️</div>
+            <div>Select</div>
+          </div>
+          <div class="property-type-option" onclick="addProperty('date')">
+            <div style="font-size:24px;">📅</div>
+            <div>Date</div>
+          </div>
+          <div class="property-type-option" onclick="addProperty('checkbox')">
+            <div style="font-size:24px;">☑️</div>
+            <div>Checkbox</div>
+          </div>
+          <div class="property-type-option" onclick="addProperty('url')">
+            <div style="font-size:24px;">🔗</div>
+            <div>URL</div>
+          </div>
+          <div class="property-type-option" onclick="addProperty('email')">
+            <div style="font-size:24px;">📧</div>
+            <div>Email</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="pageLinkModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Link to Page</h3>
+        <button class="modal-close" onclick="closeModal('pageLinkModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="pageLinkSearch" placeholder="Search pages..." style="width:100%;padding:10px;border:2px solid var(--border-color);border-radius:8px;margin-bottom:15px;" oninput="searchPagesForLink(this.value)">
+        <div id="pageLinkResults" style="max-height:300px;overflow-y:auto;"></div>
       </div>
     </div>
   </div>
@@ -568,30 +721,22 @@
 
     // Database Setup
     let db;
-    const stores = [
-  "notes",
-  "bookmarks",
-  "videos",
-  "todos",
-  "expenses",
-  "planner",
-  "wiki",
-  "uploads",
-  "projects",
-  "watchlist",
-  "courses",
-  "profile",
-  "settings",
-  "community"
-];
-
     const request = indexedDB.open("ShareHiveDB", 21);
 
     request.onupgradeneeded = e => {
       db = e.target.result;
+      
+      // Create wiki store
       if (!db.objectStoreNames.contains("wiki")) {
         const store = db.createObjectStore("wiki", { keyPath: "id", autoIncrement: true });
         store.createIndex("title", "title", { unique: false });
+        store.createIndex("parentId", "parentId", { unique: false });
+      }
+      
+      // Create comments store
+      if (!db.objectStoreNames.contains("wikiComments")) {
+        const commentsStore = db.createObjectStore("wikiComments", { keyPath: "id", autoIncrement: true });
+        commentsStore.createIndex("pageId", "pageId", { unique: false });
       }
     };
 
@@ -608,58 +753,69 @@
     let currentBlock = null;
     let draggedBlock = null;
     let autoSaveTimer = null;
+    let currentPageData = {};
 
     // Icons for icon picker
-    const icons = ['📄', '📝', '📖', '📚', '📌', '📋', '📊', '📈', '📉', '🗂️', '📁', '📂', '🗃️', '🗄️', '📦', '🎯', '🎨', '🎭', '🎪', '🎬', '🎮', '🎲', '🎯', '🧩', '🧠', '💡', '🔔', '🔍', '🔎', '🔬', '🔭', '⚗️', '⚙️', '🔧', '🔨', '⚡', '🔥', '💧', '🌊', '🌍', '🌎', '🌏', '🌐', '🗺️', '🧭', '⛰️', '🏔️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️', '🏟️', '🏛️', '🏗️', '🏘️', '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '💒', '🗼', '🗽', '⛪', '🕌', '🛕', '🕍', '⛩️', '🕋'];
+    const icons = ['📄', '📝', '📖', '📚', '📌', '📋', '📊', '📈', '📉', '🗂️', '📁', '📂', '🗃️', '🗄️', '📦', '🎯', '🎨', '🎭', '🎪', '🎬', '🎮', '🎲', '🧩', '🧠', '💡', '🔔', '🔍', '🔎', '🔬', '🔭', '⚗️', '⚙️', '🔧', '🔨', '⚡', '🔥', '💧', '🌊', '🌍', '🌎', '🌏', '🌐', '🗺️', '🧭', '⛰️', '🏔️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️', '🏟️', '🏛️', '🏗️', '🏘️', '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '💒', '🗼', '🗽', '⛪', '🕌', '🛕', '🕍', '⛩️', '🕋', '⭐', '✨', '🎉', '🎊', '🎈', '🎁', '🏆', '🥇', '🥈', '🥉', '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉'];
 
     // Page Templates
     const templates = {
       meeting: {
         title: "Meeting Notes",
         icon: "📅",
+        properties: [
+          { name: "Date", type: "date", value: new Date().toISOString().split('T')[0] },
+          { name: "Status", type: "select", value: "Scheduled" }
+        ],
         blocks: [
-          { type: 'h1', content: 'Meeting Notes' },
-          { type: 'text', content: '📅 Date: ' },
-          { type: 'text', content: '👥 Attendees: ' },
-          { type: 'h2', content: 'Agenda' },
-          { type: 'bullet', content: 'Topic 1' },
-          { type: 'bullet', content: 'Topic 2' },
-          { type: 'h2', content: 'Notes' },
+          { type: 'h2', content: '👥 Attendees' },
+          { type: 'bullet', content: 'Person 1' },
+          { type: 'bullet', content: 'Person 2' },
+          { type: 'h2', content: '📋 Agenda' },
+          { type: 'todo', content: 'Topic 1', data: { checked: false } },
+          { type: 'todo', content: 'Topic 2', data: { checked: false } },
+          { type: 'h2', content: '📝 Notes' },
           { type: 'text', content: '' },
-          { type: 'h2', content: 'Action Items' },
-          { type: 'todo', content: 'Task 1' }
+          { type: 'h2', content: '✅ Action Items' },
+          { type: 'todo', content: 'Task 1', data: { checked: false } }
         ]
       },
       project: {
         title: "Project Plan",
         icon: "📌",
+        properties: [
+          { name: "Status", type: "select", value: "Planning" },
+          { name: "Due Date", type: "date", value: "" }
+        ],
         blocks: [
-          { type: 'h1', content: 'Project Plan' },
-          { type: 'h2', content: 'Overview' },
+          { type: 'h2', content: '🎯 Overview' },
           { type: 'text', content: 'Project description goes here...' },
-          { type: 'h2', content: 'Goals' },
+          { type: 'h2', content: '🎯 Goals' },
           { type: 'bullet', content: 'Goal 1' },
           { type: 'bullet', content: 'Goal 2' },
-          { type: 'h2', content: 'Timeline' },
-          { type: 'text', content: 'Timeline details...' },
-          { type: 'h2', content: 'Tasks' },
-          { type: 'todo', content: 'Task 1' }
+          { type: 'h2', content: '📅 Timeline' },
+          { type: 'text', content: '' },
+          { type: 'h2', content: '✅ Tasks' },
+          { type: 'todo', content: 'Task 1', data: { checked: false } },
+          { type: 'todo', content: 'Task 2', data: { checked: false } }
         ]
       },
       doc: {
         title: "New Document",
         icon: "📄",
+        properties: [],
         blocks: [
-          { type: 'h1', content: 'Document Title' },
           { type: 'text', content: 'Start writing here...' }
         ]
       },
       wiki: {
         title: "Wiki Entry",
         icon: "📖",
+        properties: [
+          { name: "Type", type: "select", value: "Article" }
+        ],
         blocks: [
-          { type: 'h1', content: 'Wiki Entry' },
-          { type: 'callout', content: 'Summary or key takeaway', icon: '💡' },
+          { type: 'callout', content: 'Summary or key takeaway', data: { icon: '💡' } },
           { type: 'h2', content: 'Overview' },
           { type: 'text', content: 'Main content...' },
           { type: 'h2', content: 'Details' },
@@ -671,17 +827,20 @@
       roadmap: {
         title: "Roadmap",
         icon: "🗺️",
+        properties: [
+          { name: "Year", type: "text", value: "2024" }
+        ],
         blocks: [
-          { type: 'h1', content: 'Roadmap' },
-          { type: 'h2', content: 'Q1 2024' },
-          { type: 'todo', content: 'Milestone 1' },
-          { type: 'h2', content: 'Q2 2024' },
-          { type: 'todo', content: 'Milestone 2' }
+          { type: 'h2', content: '📅 Q1 2024' },
+          { type: 'todo', content: 'Milestone 1', data: { checked: false } },
+          { type: 'h2', content: '📅 Q2 2024' },
+          { type: 'todo', content: 'Milestone 2', data: { checked: false } }
         ]
       },
       blank: {
         title: "Untitled",
         icon: "📄",
+        properties: [],
         blocks: [
           { type: 'text', content: '' }
         ]
@@ -744,7 +903,7 @@
         case 'callout':
           blockContent.contentEditable = false;
           blockContent.innerHTML = `
-            <div class="callout-icon">${data.icon || '💡'}</div>
+            <div class="callout-icon" onclick="changeCalloutIcon(this)">${data.icon || '💡'}</div>
             <div class="callout-text" contenteditable="true">${content}</div>
           `;
           break;
@@ -769,6 +928,10 @@
               <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
               <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
             </table>
+            <div class="table-controls">
+              <button onclick="addTableRow(this)">+ Row</button>
+              <button onclick="addTableColumn(this)">+ Column</button>
+            </div>
           `;
           break;
         case 'columns':
@@ -781,9 +944,33 @@
         case 'image':
           blockContent.contentEditable = false;
           if(data.src) {
-            blockContent.innerHTML = `<img src="${data.src}" class="block-image" alt="">`;
+            blockContent.innerHTML = `
+              <img src="${data.src}" class="block-image" alt="" onclick="viewImage(this.src)">
+              <div class="image-caption" contenteditable="true" data-placeholder="Add a caption...">${data.caption || ''}</div>
+            `;
           } else {
-            blockContent.innerHTML = `<div class="image-placeholder" onclick="uploadImage(this)">Click to upload image</div>`;
+            blockContent.innerHTML = `<div class="image-placeholder" onclick="uploadImage(this)">Click to upload image or paste URL</div>`;
+          }
+          break;
+        case 'embed':
+          blockContent.contentEditable = false;
+          if(data.url) {
+            const embedUrl = getEmbedUrl(data.url);
+            blockContent.innerHTML = `
+              <div class="embed-container">
+                <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+              </div>
+            `;
+          } else {
+            blockContent.innerHTML = `<div class="image-placeholder" onclick="addEmbed(this)">Click to add embed (YouTube, etc.)</div>`;
+          }
+          break;
+        case 'link':
+          blockContent.contentEditable = false;
+          if(data.pageId) {
+            blockContent.innerHTML = `<div class="page-link-title" onclick="openPage(${data.pageId})">${data.icon || '📄'} ${data.title || 'Untitled'}</div>`;
+          } else {
+            blockContent.innerHTML = `<div class="image-placeholder" onclick="selectPageLink(this)">Click to select a page to link</div>`;
           }
           break;
       }
@@ -805,6 +992,28 @@
       blockContent.addEventListener('focus', () => {
         currentBlock = block;
       });
+
+      // Paste handler for images
+      if(type === 'image') {
+        blockContent.addEventListener('paste', (e) => {
+          const text = e.clipboardData.getData('text');
+          if(text && (text.startsWith('http://') || text.startsWith('https://'))) {
+            e.preventDefault();
+            const img = document.createElement('img');
+            img.src = text;
+            img.className = 'block-image';
+            img.onclick = () => viewImage(text);
+            blockContent.innerHTML = '';
+            blockContent.appendChild(img);
+            const caption = document.createElement('div');
+            caption.className = 'image-caption';
+            caption.contentEditable = true;
+            caption.setAttribute('data-placeholder', 'Add a caption...');
+            blockContent.appendChild(caption);
+            scheduleAutoSave();
+          }
+        });
+      }
 
       return block;
     }
@@ -828,6 +1037,7 @@
 
       hideSlashMenu();
       scheduleAutoSave();
+      return block;
     }
 
     function deleteBlock(block) {
@@ -864,6 +1074,104 @@
       if(children) {
         children.classList.toggle('open');
       }
+    }
+
+    function changeCalloutIcon(iconEl) {
+      const newIcon = prompt('Enter emoji icon:', iconEl.textContent);
+      if(newIcon) {
+        iconEl.textContent = newIcon;
+        scheduleAutoSave();
+      }
+    }
+
+    function addTableRow(btn) {
+      const table = btn.closest('.block-content').querySelector('table');
+      const colCount = table.rows[0].cells.length;
+      const newRow = table.insertRow();
+      for(let i = 0; i < colCount; i++) {
+        const cell = newRow.insertCell();
+        cell.contentEditable = true;
+      }
+      scheduleAutoSave();
+    }
+
+    function addTableColumn(btn) {
+      const table = btn.closest('.block-content').querySelector('table');
+      for(let i = 0; i < table.rows.length; i++) {
+        const cell = table.rows[i].insertCell();
+        cell.contentEditable = true;
+        if(i === 0) {
+          cell.textContent = 'Header ' + (table.rows[0].cells.length);
+        }
+      }
+      scheduleAutoSave();
+    }
+
+    function viewImage(src) {
+      window.open(src, '_blank');
+    }
+
+    function getEmbedUrl(url) {
+      // Convert YouTube watch URLs to embed URLs
+      if(url.includes('youtube.com/watch')) {
+        const videoId = url.split('v=')[1]?.split('&')[0];
+        return `https://www.youtube.com/embed/${videoId}`;
+      } else if(url.includes('youtu.be/')) {
+        const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+      return url;
+    }
+
+    function addEmbed(placeholder) {
+      const url = prompt('Enter embed URL (YouTube, etc.):');
+      if(url) {
+        const embedUrl = getEmbedUrl(url);
+        placeholder.outerHTML = `
+          <div class="embed-container">
+            <iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+          </div>
+        `;
+        scheduleAutoSave();
+      }
+    }
+
+    function selectPageLink(placeholder) {
+      document.getElementById('pageLinkModal').classList.add('show');
+      searchPagesForLink('');
+      window.currentLinkPlaceholder = placeholder;
+    }
+
+    function searchPagesForLink(query) {
+      const tx = db.transaction("wiki", "readonly");
+      const store = tx.objectStore("wiki");
+      const getAllReq = store.getAll();
+      
+      getAllReq.onsuccess = e => {
+        const pages = e.target.result || [];
+        const results = document.getElementById('pageLinkResults');
+        results.innerHTML = '';
+        
+        const filtered = pages.filter(p => 
+          (p.title || '').toLowerCase().includes(query.toLowerCase())
+        );
+        
+        filtered.forEach(page => {
+          const item = document.createElement('div');
+          item.style.cssText = 'padding:10px;cursor:pointer;border-radius:5px;margin-bottom:5px;';
+          item.innerHTML = `${page.icon || '📄'} ${page.title || 'Untitled'}`;
+          item.onmouseover = () => item.style.background = 'var(--sidebar-bg)';
+          item.onmouseout = () => item.style.background = 'transparent';
+          item.onclick = () => {
+            if(window.currentLinkPlaceholder) {
+              window.currentLinkPlaceholder.outerHTML = `<div class="page-link-title" onclick="openPage(${page.id})">${page.icon || '📄'} ${page.title || 'Untitled'}</div>`;
+              scheduleAutoSave();
+            }
+            closeModal('pageLinkModal');
+          };
+          results.appendChild(item);
+        });
+      };
     }
 
     // Drag and Drop
@@ -930,7 +1238,7 @@
       const block = e.target.closest('.block');
       
       // Slash command
-      if(e.key === '/') {
+      if(e.key === '/' && e.target.textContent === '') {
         setTimeout(() => showSlashMenu(block), 10);
       }
       
@@ -975,6 +1283,9 @@
         } else if(e.key === 'u') {
           e.preventDefault();
           formatText('underline');
+        } else if(e.key === 's') {
+          e.preventDefault();
+          savePage(true);
         }
       }
     }
@@ -998,6 +1309,9 @@
       if(!e.target.closest('.slash-menu') && !e.target.closest('.block-content')) {
         hideSlashMenu();
       }
+      if(!e.target.closest('.formatting-toolbar')) {
+        hideFormattingToolbar();
+      }
     });
 
     // Text Selection & Formatting
@@ -1013,6 +1327,7 @@
     function showFormattingToolbar(e) {
       const toolbar = document.getElementById('formattingToolbar');
       const selection = window.getSelection();
+      if(selection.rangeCount === 0) return;
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       
@@ -1039,12 +1354,16 @@
     }
 
     // Page Management
-    function createNewPage() {
+    function createNewPage(parentId = null) {
       currentPageId = null;
+      currentPageData = { parentId };
       document.getElementById('titleEditor').value = '';
       document.getElementById('pageIconPicker').textContent = '📄';
       document.getElementById('pageCover').style.display = 'none';
-      document.getElementById('propertiesSection').innerHTML = '';
+      
+      // Clear properties
+      const propsSection = document.getElementById('propertiesSection');
+      propsSection.innerHTML = '<button class="add-property-btn" onclick="showAddProperty()">+ Add Property</button>';
       
       const editor = document.getElementById('blockEditor');
       editor.innerHTML = '';
@@ -1074,16 +1393,29 @@
         if(type === 'todo') {
           const checkbox = block.querySelector('.todo-checkbox');
           const text = block.querySelector('.todo-text');
-          content = text ? text.textContent : '';
+          content = text ? text.innerHTML : '';
           data.checked = checkbox ? checkbox.checked : false;
         } else if(type === 'callout') {
           const iconEl = block.querySelector('.callout-icon');
           const textEl = block.querySelector('.callout-text');
           data.icon = iconEl ? iconEl.textContent : '💡';
-          content = textEl ? textEl.textContent : '';
+          content = textEl ? textEl.innerHTML : '';
         } else if(type === 'image') {
           const img = block.querySelector('.block-image');
+          const caption = block.querySelector('.image-caption');
           if(img) data.src = img.src;
+          if(caption) data.caption = caption.textContent;
+        } else if(type === 'embed') {
+          const iframe = block.querySelector('iframe');
+          if(iframe) data.url = iframe.src;
+        } else if(type === 'link') {
+          const linkEl = block.querySelector('.page-link-title');
+          if(linkEl) {
+            const match = linkEl.getAttribute('onclick').match(/openPageKATEX_INLINE_OPEN(\d+)KATEX_INLINE_CLOSE/);
+            if(match) data.pageId = parseInt(match[1]);
+            data.title = linkEl.textContent;
+            data.icon = linkEl.textContent.split(' ')[0];
+          }
         } else {
           content = contentEl ? contentEl.innerHTML : '';
         }
@@ -1091,25 +1423,43 @@
         blocks.push({ type, content, data });
       });
       
+      // Get properties
+      const properties = [];
+      document.querySelectorAll('.property').forEach(prop => {
+        const label = prop.querySelector('.property-label');
+        const input = prop.querySelector('.property-input');
+        if(label && input) {
+          properties.push({
+            name: label.textContent.replace(':', ''),
+            type: input.getAttribute('data-type') || 'text',
+            value: input.value
+          });
+        }
+      });
+      
       const pageData = { 
         title, 
         icon,
         blocks,
+        properties,
         cover: document.getElementById('pageCover').style.backgroundImage || '',
         lastModified: new Date(),
-        favorited: false
+        favorited: false,
+        parentId: currentPageData.parentId || null,
+        fullWidth: currentPageData.fullWidth || false
       };
       
       const tx = db.transaction("wiki", "readwrite");
       const store = tx.objectStore("wiki");
       
-      let req;
       if (currentPageId) {
-        // Check if page is favorited
         const getReq = store.get(currentPageId);
         getReq.onsuccess = (e) => {
           const existingPage = e.target.result;
-          if(existingPage) pageData.favorited = existingPage.favorited;
+          if(existingPage) {
+            pageData.favorited = existingPage.favorited;
+            pageData.parentId = existingPage.parentId;
+          }
           
           pageData.id = currentPageId;
           store.put(pageData).onsuccess = () => {
@@ -1118,19 +1468,18 @@
           };
         };
       } else {
-        req = store.add(pageData);
+        const req = store.add(pageData);
         req.onsuccess = (e) => {
           currentPageId = e.target.result;
           displayPageTree();
           updateBreadcrumbs();
           if(!silent) alert('Page created!');
         };
+        req.onerror = (e) => { 
+          console.error('Save failed', e); 
+          if(!silent) alert('Failed to save page'); 
+        };
       }
-      
-      req.onerror = (e) => { 
-        console.error('Save failed', e); 
-        if(!silent) alert('Failed to save page'); 
-      };
     }
 
     function scheduleAutoSave() {
@@ -1147,6 +1496,7 @@
         if (!page) return;
         
         currentPageId = page.id;
+        currentPageData = page;
         document.getElementById('titleEditor').value = page.title || '';
         document.getElementById('pageIconPicker').textContent = page.icon || '📄';
         
@@ -1157,6 +1507,26 @@
         } else {
           document.getElementById('pageCover').style.display = 'none';
         }
+        
+        // Full width
+        const container = document.getElementById('editorContainer');
+        if(page.fullWidth) {
+          container.classList.add('full-width');
+          document.getElementById('fullWidthToggle').classList.add('active');
+        } else {
+          container.classList.remove('full-width');
+          document.getElementById('fullWidthToggle').classList.remove('active');
+        }
+        
+        // Properties
+        const propsSection = document.getElementById('propertiesSection');
+        propsSection.innerHTML = '';
+        if(page.properties && page.properties.length > 0) {
+          page.properties.forEach(prop => {
+            renderProperty(prop);
+          });
+        }
+        propsSection.innerHTML += '<button class="add-property-btn" onclick="showAddProperty()">+ Add Property</button>';
         
         // Blocks
         const editor = document.getElementById('blockEditor');
@@ -1172,7 +1542,8 @@
         
         updateBreadcrumbs();
         displayPageTree();
-        updateBacklinks();
+        loadComments();
+        generateTOC();
       };
       getReq.onerror = e => console.error('Open page failed', e);
     }
@@ -1237,6 +1608,23 @@
       };
     }
 
+    function toggleFullWidth() {
+      const container = document.getElementById('editorContainer');
+      const btn = document.getElementById('fullWidthToggle');
+      
+      if(container.classList.contains('full-width')) {
+        container.classList.remove('full-width');
+        btn.classList.remove('active');
+        currentPageData.fullWidth = false;
+      } else {
+        container.classList.add('full-width');
+        btn.classList.add('active');
+        currentPageData.fullWidth = true;
+      }
+      
+      scheduleAutoSave();
+    }
+
     function displayPageTree() {
       if (!db) return;
       const tx = db.transaction("wiki", "readonly");
@@ -1245,7 +1633,24 @@
       
       getAllReq.onsuccess = e => {
         const pages = e.target.result || [];
-        pages.sort((a,b) => (a.title || '').localeCompare(b.title || ''));
+        
+        // Organize pages by parent
+        const pageMap = {};
+        const rootPages = [];
+        
+        pages.forEach(page => {
+          pageMap[page.id] = { ...page, children: [] };
+        });
+        
+        pages.forEach(page => {
+          if(page.parentId && pageMap[page.parentId]) {
+            pageMap[page.parentId].children.push(pageMap[page.id]);
+          } else {
+            rootPages.push(pageMap[page.id]);
+          }
+        });
+        
+        rootPages.sort((a,b) => (a.title || '').localeCompare(b.title || ''));
         
         // Favorites
         const favoritesTree = document.getElementById('favoritesTree');
@@ -1257,47 +1662,96 @@
         } else {
           document.getElementById('favoritesSection').style.display = 'block';
           favorites.forEach(page => {
-            favoritesTree.appendChild(createPageTreeItem(page));
+            favoritesTree.appendChild(createPageTreeItem(pageMap[page.id], true));
           });
         }
         
         // All pages
         const tree = document.getElementById('pageTree');
         tree.innerHTML = '';
-        pages.forEach(page => {
+        rootPages.forEach(page => {
           tree.appendChild(createPageTreeItem(page));
         });
       };
     }
 
-    function createPageTreeItem(page) {
+    function createPageTreeItem(page, skipChildren = false) {
       const li = document.createElement('li');
       li.className = 'page-tree-item';
       
-      const link = document.createElement('a');
+      const link = document.createElement('div');
       link.className = 'page-link' + (page.id === currentPageId ? ' active' : '');
-      link.onclick = (ev) => { ev.preventDefault(); openPage(page.id); };
+      
+      // Expand icon if has children
+      if(!skipChildren && page.children && page.children.length > 0) {
+        const expandIcon = document.createElement('span');
+        expandIcon.className = 'expand-icon collapsed';
+        expandIcon.onclick = (e) => {
+          e.stopPropagation();
+          expandIcon.classList.toggle('collapsed');
+          expandIcon.classList.toggle('expanded');
+          const children = li.querySelector('.children-pages');
+          if(children) children.classList.toggle('show');
+        };
+        link.appendChild(expandIcon);
+      } else {
+        const spacer = document.createElement('span');
+        spacer.style.width = '20px';
+        spacer.style.display = 'inline-block';
+        link.appendChild(spacer);
+      }
+      
+      const icon = document.createElement('span');
+      icon.className = 'page-icon';
+      icon.textContent = page.icon || '📄';
+      link.appendChild(icon);
+      
+      const title = document.createElement('span');
+      title.className = 'page-title';
+      title.textContent = page.title || 'Untitled';
+      link.appendChild(title);
       
       const star = document.createElement('span');
       star.className = 'star-icon' + (page.favorited ? ' starred' : '');
       star.textContent = page.favorited ? '⭐' : '☆';
       star.onclick = (e) => toggleFavorite(page.id, e);
-      
-      link.innerHTML = `
-        <span class="page-icon">${page.icon || '📄'}</span>
-        <span class="page-title">${page.title || 'Untitled'}</span>
-      `;
       link.appendChild(star);
+      
+      link.onclick = (e) => { 
+        if(e.target === link || e.target === icon || e.target === title) {
+          openPage(page.id); 
+        }
+      };
       
       li.appendChild(link);
       
       const actions = document.createElement('div');
       actions.className = 'page-actions';
+      
+      const addSubBtn = document.createElement('button');
+      addSubBtn.textContent = '➕';
+      addSubBtn.title = 'Add subpage';
+      addSubBtn.onclick = (ev) => { 
+        ev.stopPropagation(); 
+        createNewPage(page.id); 
+      };
+      actions.appendChild(addSubBtn);
+      
       const delBtn = document.createElement('button');
       delBtn.textContent = '🗑️';
       delBtn.onclick = (ev) => { ev.stopPropagation(); deletePage(page.id); };
       actions.appendChild(delBtn);
       li.appendChild(actions);
+      
+      // Add children
+      if(!skipChildren && page.children && page.children.length > 0) {
+        const childrenUl = document.createElement('ul');
+        childrenUl.className = 'children-pages';
+        page.children.forEach(child => {
+          childrenUl.appendChild(createPageTreeItem(child));
+        });
+        li.appendChild(childrenUl);
+      }
       
       return li;
     }
@@ -1322,29 +1776,38 @@
       const welcomePage = {
         title: "Welcome to ShareHive Wiki! 🐝",
         icon: "👋",
+        properties: [
+          { name: "Type", type: "select", value: "Guide" },
+          { name: "Created", type: "date", value: new Date().toISOString().split('T')[0] }
+        ],
         blocks: [
-          { type: 'h1', content: 'Welcome to your personal knowledge base!' },
-          { type: 'callout', content: 'This is a Notion-style wiki with powerful block-based editing.', data: { icon: '💡' } },
+          { type: 'callout', content: 'This is a powerful Notion-style wiki with all the features you need to build your knowledge base.', data: { icon: '💡' } },
           { type: 'h2', content: 'Getting Started' },
           { type: 'todo', content: 'Click "New Page" to create a page', data: { checked: false } },
           { type: 'todo', content: 'Type "/" to see all block types', data: { checked: false } },
           { type: 'todo', content: 'Drag blocks to reorder them', data: { checked: false } },
           { type: 'todo', content: 'Select text to format it', data: { checked: false } },
           { type: 'h2', content: 'Block Types' },
-          { type: 'bullet', content: 'Text, headings, lists' },
+          { type: 'bullet', content: 'Text, headings (H1, H2, H3), lists' },
           { type: 'bullet', content: 'To-dos, toggles, quotes' },
           { type: 'bullet', content: 'Callouts, code blocks, tables' },
-          { type: 'bullet', content: 'Images, columns, dividers' },
+          { type: 'bullet', content: 'Images, embeds, columns' },
+          { type: 'bullet', content: 'Page links and dividers' },
           { type: 'h2', content: 'Features' },
-          { type: 'text', content: '✨ <b>Templates</b> - Start with pre-made structures' },
-          { type: 'text', content: '🎨 <b>Icons & Covers</b> - Customize your pages' },
-          { type: 'text', content: '⭐ <b>Favorites</b> - Star important pages' },
-          { type: 'text', content: '📤 <b>Export</b> - Download as Markdown, HTML, or JSON' },
+          { type: 'columns', content: '', data: {} },
+          { type: 'text', content: '✨ <b>Templates</b> - Start with pre-made structures<br>🎨 <b>Icons & Covers</b> - Customize your pages<br>⭐ <b>Favorites</b> - Star important pages' },
+          { type: 'text', content: '📤 <b>Export</b> - Download as Markdown, HTML, or JSON<br>💬 <b>Comments</b> - Collaborate with comments<br>📑 <b>TOC</b> - Auto-generated table of contents' },
+          { type: 'h2', content: 'Properties' },
+          { type: 'text', content: 'Add custom properties to organize your pages with metadata like tags, dates, status, and more.' },
+          { type: 'h2', content: 'Nested Pages' },
+          { type: 'text', content: 'Create hierarchical page structures by adding subpages. Hover over pages and click the + icon.' },
           { type: 'divider', content: '' },
           { type: 'quote', content: 'Build your second brain, one block at a time. 🧠' }
         ],
         lastModified: new Date(),
-        favorited: true
+        favorited: true,
+        parentId: null,
+        fullWidth: false
       };
       
       const addTx = db.transaction("wiki", "readwrite");
@@ -1366,6 +1829,16 @@
       
       document.getElementById('titleEditor').value = template.title;
       document.getElementById('pageIconPicker').textContent = template.icon;
+      
+      // Apply properties
+      const propsSection = document.getElementById('propertiesSection');
+      propsSection.innerHTML = '';
+      if(template.properties && template.properties.length > 0) {
+        template.properties.forEach(prop => {
+          renderProperty(prop);
+        });
+      }
+      propsSection.innerHTML += '<button class="add-property-btn" onclick="showAddProperty()">+ Add Property</button>';
       
       const editor = document.getElementById('blockEditor');
       editor.innerHTML = '';
@@ -1414,6 +1887,74 @@
       scheduleAutoSave();
     }
 
+    // Properties
+    function showAddProperty() {
+      document.getElementById('propertyModal').classList.add('show');
+      document.getElementById('propertyName').value = '';
+      document.getElementById('propertyName').focus();
+    }
+
+    function addProperty(type) {
+      const name = document.getElementById('propertyName').value || 'Property';
+      const property = { name, type, value: '' };
+      renderProperty(property);
+      closeModal('propertyModal');
+      scheduleAutoSave();
+    }
+
+    function renderProperty(prop) {
+      const propsSection = document.getElementById('propertiesSection');
+      const addBtn = propsSection.querySelector('.add-property-btn');
+      
+      const propEl = document.createElement('div');
+      propEl.className = 'property';
+      
+      const label = document.createElement('span');
+      label.className = 'property-label';
+      label.textContent = prop.name + ':';
+      propEl.appendChild(label);
+      
+      let input;
+      if(prop.type === 'checkbox') {
+        input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = prop.value === 'true' || prop.value === true;
+        input.onchange = () => scheduleAutoSave();
+      } else if(prop.type === 'date') {
+        input = document.createElement('input');
+        input.type = 'date';
+        input.value = prop.value;
+        input.className = 'property-input';
+        input.setAttribute('data-type', prop.type);
+        input.oninput = () => scheduleAutoSave();
+      } else {
+        input = document.createElement('input');
+        input.type = 'text';
+        input.value = prop.value;
+        input.className = 'property-input';
+        input.setAttribute('data-type', prop.type);
+        input.placeholder = prop.type === 'url' ? 'https://...' : prop.type === 'email' ? 'email@example.com' : 'Value';
+        input.oninput = () => scheduleAutoSave();
+      }
+      
+      propEl.appendChild(input);
+      
+      const removeBtn = document.createElement('span');
+      removeBtn.className = 'property-remove';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = () => {
+        propEl.remove();
+        scheduleAutoSave();
+      };
+      propEl.appendChild(removeBtn);
+      
+      if(addBtn) {
+        propsSection.insertBefore(propEl, addBtn);
+      } else {
+        propsSection.appendChild(propEl);
+      }
+    }
+
     // Export
     function showExportMenu() {
       document.getElementById('exportModal').classList.add('show');
@@ -1457,7 +1998,7 @@
         filename = `${title}.md`;
         mimeType = 'text/markdown';
       } else if(format === 'html') {
-        output = `<!DOCTYPE html><html><head><title>${title}</title></head><body>`;
+        output = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:system-ui;max-width:800px;margin:40px auto;padding:20px;line-height:1.6;}</style></head><body>`;
         output += `<h1>${title}</h1>`;
         blocks.forEach(block => {
           switch(block.type) {
@@ -1478,6 +2019,11 @@
         output = JSON.stringify({ title, blocks }, null, 2);
         filename = `${title}.json`;
         mimeType = 'application/json';
+      } else if(format === 'pdf') {
+        alert('PDF export: Print this page (Ctrl+P) and select "Save as PDF"');
+        window.print();
+        closeModal('exportModal');
+        return;
       }
       
       // Download
@@ -1492,21 +2038,131 @@
       closeModal('exportModal');
     }
 
-    // Backlinks
-    function updateBacklinks() {
-      // Simplified - just show the feature exists
-      const panel = document.getElementById('backlinksPanel');
-      panel.style.display = 'none'; // Can be expanded to show actual backlinks
+    // Comments
+    function showComments() {
+      const panel = document.getElementById('commentsPanel');
+      panel.classList.toggle('show');
+    }
+
+    function loadComments() {
+      if(!db || !currentPageId) return;
+      
+      const tx = db.transaction("wikiComments", "readonly");
+      const store = tx.objectStore("wikiComments");
+      const index = store.index("pageId");
+      const getReq = index.getAll(currentPageId);
+      
+      getReq.onsuccess = e => {
+        const comments = e.target.result || [];
+        const list = document.getElementById('commentsList');
+        list.innerHTML = '';
+        
+        comments.forEach(comment => {
+          const div = document.createElement('div');
+          div.className = 'comment';
+          div.innerHTML = `
+            <div class="comment-header">
+              <span>You</span>
+              <span>${new Date(comment.date).toLocaleDateString()}</span>
+            </div>
+            <div class="comment-text">${comment.text}</div>
+          `;
+          list.appendChild(div);
+        });
+      };
+    }
+
+    function addComment() {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      if(!text || !currentPageId) return;
+      
+      const tx = db.transaction("wikiComments", "readwrite");
+      const store = tx.objectStore("wikiComments");
+      const comment = {
+        pageId: currentPageId,
+        text,
+        date: new Date(),
+        author: 'You'
+      };
+      
+      store.add(comment).onsuccess = () => {
+        input.value = '';
+        loadComments();
+      };
+    }
+
+    // TOC
+    function toggleTOC() {
+      const panel = document.getElementById('tocPanel');
+      panel.classList.toggle('show');
+      if(panel.classList.contains('show')) {
+        generateTOC();
+      }
+    }
+
+    function generateTOC() {
+      const tocList = document.getElementById('tocList');
+      tocList.innerHTML = '';
+      
+      const headings = document.querySelectorAll('#blockEditor .block[data-type="h1"], #blockEditor .block[data-type="h2"], #blockEditor .block[data-type="h3"]');
+      
+      if(headings.length === 0) {
+        document.getElementById('tocPanel').classList.remove('show');
+        return;
+      }
+      
+      headings.forEach((heading, index) => {
+        const type = heading.getAttribute('data-type');
+        const content = heading.querySelector('.block-content');
+        const text = content ? content.textContent : '';
+        
+        const id = `heading-${index}`;
+        heading.id = id;
+        
+        const li = document.createElement('li');
+        li.className = `toc-${type}`;
+        const a = document.createElement('a');
+        a.href = `#${id}`;
+        a.textContent = text;
+        a.onclick = (e) => {
+          e.preventDefault();
+          heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
     }
 
     // Breadcrumbs
     function updateBreadcrumbs() {
       const breadcrumbs = document.getElementById('breadcrumbs');
-      breadcrumbs.innerHTML = `
-        <a href="#" onclick="event.preventDefault()">📖 Wiki</a>
-        <span>›</span>
-        <span>${document.getElementById('titleEditor').value || 'Untitled'}</span>
-      `;
+      const title = document.getElementById('titleEditor').value || 'Untitled';
+      
+      if(!currentPageId || !currentPageData.parentId) {
+        breadcrumbs.innerHTML = `
+          <a href="#" onclick="event.preventDefault()">📖 Wiki</a>
+          <span>›</span>
+          <span>${title}</span>
+        `;
+        return;
+      }
+      
+      // Get parent page
+      const tx = db.transaction("wiki", "readonly");
+      const getReq = tx.objectStore("wiki").get(currentPageData.parentId);
+      getReq.onsuccess = e => {
+        const parent = e.target.result;
+        if(parent) {
+          breadcrumbs.innerHTML = `
+            <a href="#" onclick="event.preventDefault()">📖 Wiki</a>
+            <span>›</span>
+            <a href="#" onclick="event.preventDefault();openPage(${parent.id})">${parent.icon || '📄'} ${parent.title || 'Untitled'}</a>
+            <span>›</span>
+            <span>${title}</span>
+          `;
+        }
+      };
     }
 
     // Search
@@ -1545,10 +2201,10 @@
         
         const reader = new FileReader();
         reader.onload = (ev) => {
-          const img = document.createElement('img');
-          img.src = ev.target.result;
-          img.className = 'block-image';
-          placeholder.replaceWith(img);
+          placeholder.outerHTML = `
+            <img src="${ev.target.result}" class="block-image" alt="" onclick="viewImage('${ev.target.result}')">
+            <div class="image-caption" contenteditable="true" data-placeholder="Add a caption..."></div>
+          `;
           scheduleAutoSave();
         };
         reader.readAsDataURL(file);
@@ -1556,19 +2212,25 @@
       input.click();
     }
 
-    // Page History (Placeholder)
-    function showPageHistory() {
-      alert('Page history feature coming soon! This would show version history of the current page.');
-    }
-
-    // Block Menu (Placeholder)
+    // Block Menu
     function showBlockMenu(btn) {
       const block = btn.closest('.block');
       const type = block.getAttribute('data-type');
       
-      const action = confirm(`Block options:\nOK = Delete block\nCancel = Keep`);
-      if(action) {
+      const menu = [
+        'Delete block',
+        'Duplicate block',
+        'Turn into...'
+      ];
+      
+      const choice = prompt('Block menu:\n1. Delete\n2. Duplicate\n3. Cancel', '3');
+      
+      if(choice === '1') {
         deleteBlock(block);
+      } else if(choice === '2') {
+        const clone = block.cloneNode(true);
+        block.after(clone);
+        scheduleAutoSave();
       }
     }
 
@@ -1579,6 +2241,14 @@
           modal.classList.remove('show');
         }
       });
+    });
+
+    // Save on Ctrl+S
+    document.addEventListener('keydown', (e) => {
+      if((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        savePage(false);
+      }
     });
   </script>
 </body>
