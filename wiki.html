@@ -597,7 +597,7 @@
     let db;
     const request = indexedDB.open("ShareHiveDB", 21);
 
-    request.onupgradeneeded = e => {
+    request.onupgradeneeded = function(e) {
       db = e.target.result;
       
       if (!db.objectStoreNames.contains("wiki")) {
@@ -612,13 +612,17 @@
       }
     };
 
-    request.onsuccess = e => { 
+    request.onsuccess = function(e) { 
       db = e.target.result; 
       displayPageTree();
       loadInitialPage();
     };
 
-    request.onerror = e => console.error("DB error:", e.target.error);
+    request.onerror = function(e) { 
+      console.error("DB error:", e.target.error);
+      // If DB fails, still create the welcome page in memory
+      createWelcomePage();
+    };
 
     // Global State
     let currentPageId = null;
@@ -743,7 +747,11 @@
     };
 
     // Block Management
-    function createBlock(type = 'text', content = '', data = {}) {
+    function createBlock(type, content, data) {
+      type = type || 'text';
+      content = content || '';
+      data = data || {};
+      
       const block = document.createElement('div');
       block.className = 'block';
       block.setAttribute('data-type', type);
@@ -878,27 +886,27 @@
       block.addEventListener('dragover', handleDragOver);
       block.addEventListener('drop', handleDrop);
 
-      blockContent.addEventListener('input', (e) => {
+      blockContent.addEventListener('input', function(e) {
         handleSlashCommand(e);
         scheduleAutoSave();
       });
 
       blockContent.addEventListener('keydown', handleBlockKeydown);
       blockContent.addEventListener('mouseup', handleTextSelection);
-      blockContent.addEventListener('focus', () => {
+      blockContent.addEventListener('focus', function() {
         currentBlock = block;
       });
 
       // Paste handler for images
       if(type === 'image') {
-        blockContent.addEventListener('paste', (e) => {
+        blockContent.addEventListener('paste', function(e) {
           const text = e.clipboardData.getData('text');
           if(text && (text.startsWith('http://') || text.startsWith('https://'))) {
             e.preventDefault();
             const img = document.createElement('img');
             img.src = text;
             img.className = 'block-image';
-            img.onclick = () => viewImage(text);
+            img.onclick = function() { viewImage(text); };
             blockContent.innerHTML = '';
             blockContent.appendChild(img);
             const caption = document.createElement('div');
@@ -914,7 +922,7 @@
       return block;
     }
 
-    function insertBlock(type, afterBlock = null) {
+    function insertBlock(type, afterBlock) {
       const block = createBlock(type);
       const editor = document.getElementById('blockEditor');
       
@@ -1085,22 +1093,22 @@
       const store = tx.objectStore("wiki");
       const getAllReq = store.getAll();
       
-      getAllReq.onsuccess = e => {
+      getAllReq.onsuccess = function(e) {
         const pages = e.target.result || [];
         const results = document.getElementById('pageLinkResults');
         results.innerHTML = '';
         
-        const filtered = pages.filter(p => 
-          (p.title || '').toLowerCase().includes(query.toLowerCase())
-        );
+        const filtered = pages.filter(function(p) {
+          return (p.title || '').toLowerCase().includes(query.toLowerCase());
+        });
         
-        filtered.forEach(page => {
+        filtered.forEach(function(page) {
           const item = document.createElement('div');
           item.style.cssText = 'padding:10px;cursor:pointer;border-radius:5px;margin-bottom:5px;';
           item.innerHTML = `${page.icon || '📄'} ${page.title || 'Untitled'}`;
-          item.onmouseover = () => item.style.background = 'var(--sidebar-bg)';
-          item.onmouseout = () => item.style.background = 'transparent';
-          item.onclick = () => {
+          item.onmouseover = function() { item.style.background = 'var(--sidebar-bg)'; };
+          item.onmouseout = function() { item.style.background = 'transparent'; };
+          item.onclick = function() {
             if(window.currentLinkPlaceholder) {
               window.currentLinkPlaceholder.outerHTML = `<div class="page-link-title" onclick="openPage(${page.id})">${page.icon || '📄'} ${page.title || 'Untitled'}</div>`;
               scheduleAutoSave();
@@ -1121,7 +1129,9 @@
 
     function handleDragEnd(e) {
       this.classList.remove('dragging');
-      document.querySelectorAll('.block').forEach(b => b.classList.remove('drag-over'));
+      document.querySelectorAll('.block').forEach(function(b) {
+        b.classList.remove('drag-over');
+      });
     }
 
     function handleDragOver(e) {
@@ -1129,7 +1139,9 @@
       e.dataTransfer.dropEffect = 'move';
       
       const afterElement = getDragAfterElement(document.getElementById('blockEditor'), e.clientY);
-      document.querySelectorAll('.block').forEach(b => b.classList.remove('drag-over'));
+      document.querySelectorAll('.block').forEach(function(b) {
+        b.classList.remove('drag-over');
+      });
       
       if(afterElement == null) {
         this.classList.add('drag-over');
@@ -1159,7 +1171,7 @@
     function getDragAfterElement(container, y) {
       const draggableElements = [...container.querySelectorAll('.block:not(.dragging)')];
       
-      return draggableElements.reduce((closest, child) => {
+      return draggableElements.reduce(function(closest, child) {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
         
@@ -1257,29 +1269,30 @@
       }
     }
 
-    function showSlashMenu(block, query = '') {
+    function showSlashMenu(block, query) {
+      query = query || '';
       const menu = document.getElementById('slashMenu');
       const rect = block.getBoundingClientRect();
       menu.style.top = (rect.bottom + window.scrollY) + 'px';
       menu.style.left = rect.left + 'px';
       
       // Filter block types
-      const filtered = blockTypes.filter(bt => 
-        bt.title.toLowerCase().includes(query) || 
-        bt.desc.toLowerCase().includes(query) ||
-        bt.id.includes(query)
-      );
+      const filtered = blockTypes.filter(function(bt) {
+        return bt.title.toLowerCase().includes(query) || 
+               bt.desc.toLowerCase().includes(query) ||
+               bt.id.includes(query);
+      });
       
       // Group by section
       const sections = {};
-      filtered.forEach(bt => {
+      filtered.forEach(function(bt) {
         if(!sections[bt.section]) sections[bt.section] = [];
         sections[bt.section].push(bt);
       });
       
       // Render menu
       menu.innerHTML = '';
-      Object.keys(sections).forEach(sectionName => {
+      Object.keys(sections).forEach(function(sectionName) {
         const section = document.createElement('div');
         section.className = 'slash-menu-section';
         
@@ -1288,7 +1301,7 @@
         title.textContent = sectionName;
         section.appendChild(title);
         
-        sections[sectionName].forEach(bt => {
+        sections[sectionName].forEach(function(bt) {
           const item = document.createElement('div');
           item.className = 'slash-menu-item';
           item.setAttribute('data-type', bt.id);
@@ -1299,7 +1312,7 @@
               <div class="slash-menu-item-desc">${bt.desc}</div>
             </div>
           `;
-          item.onclick = () => executeSlashCommand(bt.id);
+          item.onclick = function() { executeSlashCommand(bt.id); };
           section.appendChild(item);
         });
         
@@ -1315,7 +1328,7 @@
     }
 
     function updateSlashMenuSelection() {
-      slashMenuItems.forEach((item, index) => {
+      slashMenuItems.forEach(function(item, index) {
         if(index === slashMenuSelectedIndex) {
           item.classList.add('selected');
           item.scrollIntoView({ block: 'nearest' });
@@ -1407,7 +1420,7 @@
     }
 
     // Click outside to close
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', function(e) {
       if(!e.target.closest('.slash-menu') && !e.target.closest('.block-content')) {
         hideSlashMenu();
       }
@@ -1459,9 +1472,9 @@
     }
 
     // Page Management
-    function createNewPage(parentId = null) {
+    function createNewPage(parentId) {
       currentPageId = null;
-      currentPageData = { parentId };
+      currentPageData = { parentId: parentId || null };
       document.getElementById('titleEditor').value = '';
       document.getElementById('pageIconPicker').textContent = '📄';
       document.getElementById('pageCover').style.display = 'none';
@@ -1478,7 +1491,9 @@
       document.getElementById('titleEditor').focus();
     }
 
-    function savePage(silent = false) {
+    function savePage(silent) {
+      silent = silent || false;
+      
       if (!db) { 
         if(!silent) alert('Database not ready'); 
         return; 
@@ -1488,7 +1503,7 @@
       const icon = document.getElementById('pageIconPicker').textContent;
       const blocks = [];
       
-      document.querySelectorAll('#blockEditor .block').forEach(block => {
+      document.querySelectorAll('#blockEditor .block').forEach(function(block) {
         const type = block.getAttribute('data-type');
         const contentEl = block.querySelector('.block-content');
         let content = '';
@@ -1515,7 +1530,7 @@
         } else if(type === 'link') {
           const linkEl = block.querySelector('.page-link-title');
           if(linkEl) {
-            const match = linkEl.getAttribute('onclick').match(/openPageKATEX_INLINE_OPEN(\d+)KATEX_INLINE_CLOSE/);
+            const match = linkEl.getAttribute('onclick').match(/openPage\((\d+)\)/);
             if(match) data.pageId = parseInt(match[1]);
             data.title = linkEl.textContent;
             data.icon = linkEl.textContent.split(' ')[0];
@@ -1528,7 +1543,7 @@
       });
       
       const properties = [];
-      document.querySelectorAll('.property').forEach(prop => {
+      document.querySelectorAll('.property').forEach(function(prop) {
         const label = prop.querySelector('.property-label');
         const input = prop.querySelector('.property-input');
         if(label && input) {
@@ -1541,10 +1556,10 @@
       });
       
       const pageData = { 
-        title, 
-        icon,
-        blocks,
-        properties,
+        title: title, 
+        icon: icon,
+        blocks: blocks,
+        properties: properties,
         cover: document.getElementById('pageCover').style.backgroundImage || '',
         lastModified: new Date(),
         favorited: false,
@@ -1557,7 +1572,7 @@
       
       if (currentPageId) {
         const getReq = store.get(currentPageId);
-        getReq.onsuccess = (e) => {
+        getReq.onsuccess = function(e) {
           const existingPage = e.target.result;
           if(existingPage) {
             pageData.favorited = existingPage.favorited;
@@ -1565,20 +1580,20 @@
           }
           
           pageData.id = currentPageId;
-          store.put(pageData).onsuccess = () => {
+          store.put(pageData).onsuccess = function() {
             displayPageTree();
             if(!silent) alert('✅ Page saved!');
           };
         };
       } else {
         const req = store.add(pageData);
-        req.onsuccess = (e) => {
+        req.onsuccess = function(e) {
           currentPageId = e.target.result;
           displayPageTree();
           updateBreadcrumbs();
           if(!silent) alert('✅ Page created!');
         };
-        req.onerror = (e) => { 
+        req.onerror = function(e) { 
           console.error('Save failed', e); 
           if(!silent) alert('❌ Failed to save page'); 
         };
@@ -1587,14 +1602,14 @@
 
     function scheduleAutoSave() {
       if(autoSaveTimer) clearTimeout(autoSaveTimer);
-      autoSaveTimer = setTimeout(() => savePage(true), 2000);
+      autoSaveTimer = setTimeout(function() { savePage(true); }, 2000);
     }
 
     function openPage(id) {
       if (!db) return;
       const tx = db.transaction("wiki", "readonly");
       const getReq = tx.objectStore("wiki").get(id);
-      getReq.onsuccess = e => {
+      getReq.onsuccess = function(e) {
         const page = e.target.result;
         if (!page) return;
         
@@ -1622,7 +1637,7 @@
         const propsSection = document.getElementById('propertiesSection');
         propsSection.innerHTML = '';
         if(page.properties && page.properties.length > 0) {
-          page.properties.forEach(prop => {
+          page.properties.forEach(function(prop) {
             renderProperty(prop);
           });
         }
@@ -1632,7 +1647,7 @@
         editor.innerHTML = '';
         
         if(page.blocks && page.blocks.length > 0) {
-          page.blocks.forEach(blockData => {
+          page.blocks.forEach(function(blockData) {
             editor.appendChild(createBlock(blockData.type, blockData.content, blockData.data || {}));
           });
         } else {
@@ -1644,7 +1659,7 @@
         loadComments();
         generateTOC();
       };
-      getReq.onerror = e => console.error('Open page failed', e);
+      getReq.onerror = function(e) { console.error('Open page failed', e); };
     }
 
     function confirmDeletePage() {
@@ -1657,7 +1672,7 @@
       
       const tx = db.transaction("wiki", "readwrite");
       const delReq = tx.objectStore("wiki").delete(id);
-      delReq.onsuccess = () => {
+      delReq.onsuccess = function() {
         if (id === currentPageId) {
           currentPageId = null;
           loadInitialPage();
@@ -1665,28 +1680,28 @@
         displayPageTree();
         alert('✅ Page deleted!');
       };
-      delReq.onerror = e => { console.error('Delete failed', e); alert('❌ Failed to delete page'); };
+      delReq.onerror = function(e) { console.error('Delete failed', e); alert('❌ Failed to delete page'); };
     }
 
     function duplicatePage() {
       if(!currentPageId) return;
       
       savePage(true);
-      setTimeout(() => {
+      setTimeout(function() {
         const tx = db.transaction("wiki", "readonly");
         const getReq = tx.objectStore("wiki").get(currentPageId);
-        getReq.onsuccess = e => {
+        getReq.onsuccess = function(e) {
           const page = e.target.result;
           if(!page) return;
           
-          const duplicateData = { ...page };
+          const duplicateData = Object.assign({}, page);
           delete duplicateData.id;
           duplicateData.title = page.title + ' (Copy)';
           duplicateData.lastModified = new Date();
           
           const addTx = db.transaction("wiki", "readwrite");
           const addReq = addTx.objectStore("wiki").add(duplicateData);
-          addReq.onsuccess = (ev) => {
+          addReq.onsuccess = function(ev) {
             openPage(ev.target.result);
             alert('✅ Page duplicated!');
           };
@@ -1701,12 +1716,12 @@
       const store = tx.objectStore("wiki");
       const getReq = store.get(id);
       
-      getReq.onsuccess = (ev) => {
+      getReq.onsuccess = function(ev) {
         const page = ev.target.result;
         if(!page) return;
         
         page.favorited = !page.favorited;
-        store.put(page).onsuccess = () => {
+        store.put(page).onsuccess = function() {
           displayPageTree();
         };
       };
@@ -1735,17 +1750,17 @@
       const store = tx.objectStore("wiki");
       const getAllReq = store.getAll();
       
-      getAllReq.onsuccess = e => {
+      getAllReq.onsuccess = function(e) {
         const pages = e.target.result || [];
         
         const pageMap = {};
         const rootPages = [];
         
-        pages.forEach(page => {
-          pageMap[page.id] = { ...page, children: [] };
+        pages.forEach(function(page) {
+          pageMap[page.id] = Object.assign({}, page, { children: [] });
         });
         
-        pages.forEach(page => {
+        pages.forEach(function(page) {
           if(page.parentId && pageMap[page.parentId]) {
             pageMap[page.parentId].children.push(pageMap[page.id]);
           } else {
@@ -1753,30 +1768,34 @@
           }
         });
         
-        rootPages.sort((a,b) => (a.title || '').localeCompare(b.title || ''));
+        rootPages.sort(function(a,b) {
+          return (a.title || '').localeCompare(b.title || '');
+        });
         
         const favoritesTree = document.getElementById('favoritesTree');
         favoritesTree.innerHTML = '';
-        const favorites = pages.filter(p => p.favorited);
+        const favorites = pages.filter(function(p) { return p.favorited; });
         
         if(favorites.length === 0) {
           document.getElementById('favoritesSection').style.display = 'none';
         } else {
           document.getElementById('favoritesSection').style.display = 'block';
-          favorites.forEach(page => {
+          favorites.forEach(function(page) {
             favoritesTree.appendChild(createPageTreeItem(pageMap[page.id], true));
           });
         }
         
         const tree = document.getElementById('pageTree');
         tree.innerHTML = '';
-        rootPages.forEach(page => {
+        rootPages.forEach(function(page) {
           tree.appendChild(createPageTreeItem(page));
         });
       };
     }
 
-    function createPageTreeItem(page, skipChildren = false) {
+    function createPageTreeItem(page, skipChildren) {
+      skipChildren = skipChildren || false;
+      
       const li = document.createElement('li');
       li.className = 'page-tree-item';
       
@@ -1786,7 +1805,7 @@
       if(!skipChildren && page.children && page.children.length > 0) {
         const expandIcon = document.createElement('span');
         expandIcon.className = 'expand-icon collapsed';
-        expandIcon.onclick = (e) => {
+        expandIcon.onclick = function(e) {
           e.stopPropagation();
           expandIcon.classList.toggle('collapsed');
           expandIcon.classList.toggle('expanded');
@@ -1809,7 +1828,7 @@
       const title = document.createElement('span');
       title.className = 'page-title';
       title.textContent = page.title || 'Untitled';
-      title.onclick = () => openPage(page.id);
+      title.onclick = function() { openPage(page.id); };
       link.appendChild(title);
       
       const actions = document.createElement('div');
@@ -1819,14 +1838,14 @@
       star.className = 'star-icon' + (page.favorited ? ' starred' : '');
       star.textContent = page.favorited ? '⭐' : '☆';
       star.title = 'Favorite';
-      star.onclick = (e) => toggleFavorite(page.id, e);
+      star.onclick = function(e) { toggleFavorite(page.id, e); };
       actions.appendChild(star);
       
       const addSub = document.createElement('span');
       addSub.className = 'add-sub-icon';
       addSub.textContent = '➕';
       addSub.title = 'Add subpage';
-      addSub.onclick = (e) => { 
+      addSub.onclick = function(e) { 
         e.stopPropagation(); 
         createNewPage(page.id); 
       };
@@ -1836,7 +1855,7 @@
       delBtn.className = 'delete-icon';
       delBtn.textContent = '🗑️';
       delBtn.title = 'Delete';
-      delBtn.onclick = (e) => { 
+      delBtn.onclick = function(e) { 
         e.stopPropagation(); 
         if(confirm('Delete this page?')) deletePage(page.id); 
       };
@@ -1848,7 +1867,7 @@
       if(!skipChildren && page.children && page.children.length > 0) {
         const childrenUl = document.createElement('ul');
         childrenUl.className = 'children-pages';
-        page.children.forEach(child => {
+        page.children.forEach(function(child) {
           childrenUl.appendChild(createPageTreeItem(child));
         });
         li.appendChild(childrenUl);
@@ -1858,12 +1877,16 @@
     }
 
     function loadInitialPage() {
-      if (!db) return;
+      if (!db) {
+        createWelcomePage();
+        return;
+      }
+      
       const tx = db.transaction("wiki", "readonly");
       const store = tx.objectStore("wiki");
       const cursorReq = store.openCursor();
       
-      cursorReq.onsuccess = e => {
+      cursorReq.onsuccess = function(e) {
         const cursor = e.target.result;
         if (cursor) {
           openPage(cursor.value.id);
@@ -1917,12 +1940,42 @@
         fullWidth: false
       };
       
-      const addTx = db.transaction("wiki", "readwrite");
-      const addReq = addTx.objectStore("wiki").add(welcomePage);
-      addReq.onsuccess = (ev) => {
-        openPage(ev.target.result);
-        displayPageTree();
-      };
+      if (db) {
+        const addTx = db.transaction("wiki", "readwrite");
+        const addReq = addTx.objectStore("wiki").add(welcomePage);
+        addReq.onsuccess = function(ev) {
+          openPage(ev.target.result);
+          displayPageTree();
+        };
+      } else {
+        // If no DB, just render the page directly
+        currentPageData = welcomePage;
+        document.getElementById('titleEditor').value = welcomePage.title;
+        document.getElementById('pageIconPicker').textContent = welcomePage.icon;
+        
+        const propsSection = document.getElementById('propertiesSection');
+        propsSection.innerHTML = '';
+        if(welcomePage.properties && welcomePage.properties.length > 0) {
+          welcomePage.properties.forEach(function(prop) {
+            renderProperty(prop);
+          });
+        }
+        propsSection.innerHTML += '<button class="add-property-btn" onclick="showAddProperty()">+ Add Property</button>';
+        
+        const editor = document.getElementById('blockEditor');
+        editor.innerHTML = '';
+        
+        if(welcomePage.blocks && welcomePage.blocks.length > 0) {
+          welcomePage.blocks.forEach(function(blockData) {
+            editor.appendChild(createBlock(blockData.type, blockData.content, blockData.data || {}));
+          });
+        } else {
+          editor.appendChild(createBlock('text'));
+        }
+        
+        updateBreadcrumbs();
+        generateTOC();
+      }
     }
 
     // Templates
@@ -1940,7 +1993,7 @@
       const propsSection = document.getElementById('propertiesSection');
       propsSection.innerHTML = '';
       if(template.properties && template.properties.length > 0) {
-        template.properties.forEach(prop => {
+        template.properties.forEach(function(prop) {
           renderProperty(prop);
         });
       }
@@ -1949,7 +2002,7 @@
       const editor = document.getElementById('blockEditor');
       editor.innerHTML = '';
       
-      template.blocks.forEach(blockData => {
+      template.blocks.forEach(function(blockData) {
         editor.appendChild(createBlock(blockData.type, blockData.content, blockData.data || {}));
       });
       
@@ -1962,11 +2015,11 @@
       const grid = document.getElementById('iconPickerGrid');
       grid.innerHTML = '';
       
-      icons.forEach(icon => {
+      icons.forEach(function(icon) {
         const option = document.createElement('div');
         option.className = 'icon-option';
         option.textContent = icon;
-        option.onclick = () => {
+        option.onclick = function() {
           document.getElementById('pageIconPicker').textContent = icon;
           closeModal('iconPickerModal');
           scheduleAutoSave();
@@ -2002,7 +2055,7 @@
 
     function addProperty(type) {
       const name = document.getElementById('propertyName').value || 'Property';
-      const property = { name, type, value: '' };
+      const property = { name: name, type: type, value: '' };
       renderProperty(property);
       closeModal('propertyModal');
       scheduleAutoSave();
@@ -2025,14 +2078,14 @@
         input = document.createElement('input');
         input.type = 'checkbox';
         input.checked = prop.value === 'true' || prop.value === true;
-        input.onchange = () => scheduleAutoSave();
+        input.onchange = function() { scheduleAutoSave(); };
       } else if(prop.type === 'date') {
         input = document.createElement('input');
         input.type = 'date';
         input.value = prop.value;
         input.className = 'property-input';
         input.setAttribute('data-type', prop.type);
-        input.oninput = () => scheduleAutoSave();
+        input.oninput = function() { scheduleAutoSave(); };
       } else {
         input = document.createElement('input');
         input.type = 'text';
@@ -2040,7 +2093,7 @@
         input.className = 'property-input';
         input.setAttribute('data-type', prop.type);
         input.placeholder = prop.type === 'url' ? 'https://...' : prop.type === 'email' ? 'email@example.com' : 'Value';
-        input.oninput = () => scheduleAutoSave();
+        input.oninput = function() { scheduleAutoSave(); };
       }
       
       propEl.appendChild(input);
@@ -2048,7 +2101,7 @@
       const removeBtn = document.createElement('span');
       removeBtn.className = 'property-remove';
       removeBtn.textContent = '×';
-      removeBtn.onclick = () => {
+      removeBtn.onclick = function() {
         propEl.remove();
         scheduleAutoSave();
       };
@@ -2075,10 +2128,10 @@
       const title = document.getElementById('titleEditor').value || 'Untitled';
       const blocks = [];
       
-      document.querySelectorAll('#blockEditor .block').forEach(block => {
+      document.querySelectorAll('#blockEditor .block').forEach(function(block) {
         const type = block.getAttribute('data-type');
         const contentEl = block.querySelector('.block-content');
-        blocks.push({ type, content: contentEl ? contentEl.textContent : '' });
+        blocks.push({ type: type, content: contentEl ? contentEl.textContent : '' });
       });
       
       let output = '';
@@ -2087,7 +2140,7 @@
       
       if(format === 'markdown') {
         output = `# ${title}\n\n`;
-        blocks.forEach(block => {
+        blocks.forEach(function(block) {
           switch(block.type) {
             case 'h1': output += `# ${block.content}\n\n`; break;
             case 'h2': output += `## ${block.content}\n\n`; break;
@@ -2106,7 +2159,7 @@
       } else if(format === 'html') {
         output = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:system-ui;max-width:800px;margin:40px auto;padding:20px;line-height:1.6;}</style></head><body>`;
         output += `<h1>${title}</h1>`;
-        blocks.forEach(block => {
+        blocks.forEach(function(block) {
           switch(block.type) {
             case 'h1': output += `<h1>${block.content}</h1>`; break;
             case 'h2': output += `<h2>${block.content}</h2>`; break;
@@ -2122,7 +2175,7 @@
         filename = `${title}.html`;
         mimeType = 'text/html';
       } else if(format === 'json') {
-        output = JSON.stringify({ title, blocks }, null, 2);
+        output = JSON.stringify({ title: title, blocks: blocks }, null, 2);
         filename = `${title}.json`;
         mimeType = 'application/json';
       } else if(format === 'pdf') {
@@ -2161,7 +2214,7 @@
       const index = store.index("pageId");
       const getReq = index.getAll(currentPageId);
       
-      getReq.onsuccess = e => {
+      getReq.onsuccess = function(e) {
         const comments = e.target.result || [];
         const list = document.getElementById('commentsList');
         list.innerHTML = '';
@@ -2169,7 +2222,7 @@
         if(comments.length === 0) {
           list.innerHTML = '<p style="color:#888;font-size:14px;">No comments yet. Be the first to comment!</p>';
         } else {
-          comments.forEach(comment => {
+          comments.forEach(function(comment) {
             const div = document.createElement('div');
             div.className = 'comment';
             div.innerHTML = `
@@ -2197,12 +2250,12 @@
       const store = tx.objectStore("wikiComments");
       const comment = {
         pageId: currentPageId,
-        text,
+        text: text,
         date: new Date(),
         author: 'You'
       };
       
-      store.add(comment).onsuccess = () => {
+      store.add(comment).onsuccess = function() {
         input.value = '';
         loadComments();
         alert('✅ Comment added!');
@@ -2229,7 +2282,7 @@
         return;
       }
       
-      headings.forEach((heading, index) => {
+      headings.forEach(function(heading, index) {
         const type = heading.getAttribute('data-type');
         const content = heading.querySelector('.block-content');
         const text = content ? content.textContent : '';
@@ -2242,7 +2295,7 @@
         const a = document.createElement('a');
         a.href = `#${id}`;
         a.textContent = text;
-        a.onclick = (e) => {
+        a.onclick = function(e) {
           e.preventDefault();
           heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
@@ -2267,7 +2320,7 @@
       
       const tx = db.transaction("wiki", "readonly");
       const getReq = tx.objectStore("wiki").get(currentPageData.parentId);
-      getReq.onsuccess = e => {
+      getReq.onsuccess = function(e) {
         const parent = e.target.result;
         if(parent) {
           breadcrumbs.innerHTML = `
@@ -2282,9 +2335,9 @@
     }
 
     // Search
-    document.getElementById('search').addEventListener('input', (e) => {
+    document.getElementById('search').addEventListener('input', function(e) {
       const query = e.target.value.toLowerCase();
-      document.querySelectorAll('.page-tree-item').forEach(item => {
+      document.querySelectorAll('.page-tree-item').forEach(function(item) {
         const titleEl = item.querySelector('.page-title');
         if (!titleEl) return;
         if (titleEl.textContent.toLowerCase().includes(query)) {
@@ -2296,7 +2349,7 @@
     });
 
     // Title change
-    document.getElementById('titleEditor').addEventListener('input', () => {
+    document.getElementById('titleEditor').addEventListener('input', function() {
       updateBreadcrumbs();
       scheduleAutoSave();
     });
@@ -2311,12 +2364,12 @@
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.onchange = (e) => {
+      input.onchange = function(e) {
         const file = e.target.files[0];
         if(!file) return;
         
         const reader = new FileReader();
-        reader.onload = (ev) => {
+        reader.onload = function(ev) {
           placeholder.outerHTML = `
             <img src="${ev.target.result}" class="block-image" alt="" onclick="viewImage('${ev.target.result}')">
             <div class="image-caption" contenteditable="true" data-placeholder="Add a caption..."></div>
@@ -2329,8 +2382,8 @@
     }
 
     // Close modals on outside click
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
+    document.querySelectorAll('.modal').forEach(function(modal) {
+      modal.addEventListener('click', function(e) {
         if(e.target === modal) {
           modal.classList.remove('show');
         }
@@ -2338,7 +2391,7 @@
     });
 
     // Save on Ctrl+S
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', function(e) {
       if((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         savePage(false);
@@ -2360,14 +2413,17 @@
       const commentsReq = commentsStore.getAll();
       
       Promise.all([
-        new Promise(resolve => wikiReq.onsuccess = () => resolve(wikiReq.result)),
-        new Promise(resolve => commentsReq.onsuccess = () => resolve(commentsReq.result))
-      ]).then(([pages, comments]) => {
+        new Promise(function(resolve) { wikiReq.onsuccess = function() { resolve(wikiReq.result); }; }),
+        new Promise(function(resolve) { commentsReq.onsuccess = function() { resolve(commentsReq.result); }; })
+      ]).then(function(results) {
+        const pages = results[0];
+        const comments = results[1];
+        
         const exportData = {
           version: '1.0',
           exportDate: new Date().toISOString(),
-          pages,
-          comments
+          pages: pages,
+          comments: comments
         };
         
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
