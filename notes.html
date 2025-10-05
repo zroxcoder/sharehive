@@ -20,6 +20,7 @@
       --card-bg: #ffffff;
       --border-color: #e0e0e0;
       --shadow-color: rgba(0,0,0,0.08);
+      --note-default-bg: #ffffff; /* default note background (light theme) */
     }
     body.dark {
       --bg-color: #1e1e1e;
@@ -28,6 +29,7 @@
       --card-bg: #333333;
       --border-color: #444;
       --shadow-color: rgba(0,0,0,0.25);
+      --note-default-bg: #2f2f2f; /* slightly lighter than card-bg so note content is visible */
     }
 
     /* --- Navbar & Sidebar (Unchanged) --- */
@@ -96,7 +98,7 @@
         display: inline-block;
         width: 100%;
         margin-bottom: 15px;
-        background: var(--card-bg);
+        background: var(--note-default-bg);
         border-radius: 10px;
         box-shadow: 0 2px 8px var(--shadow-color);
         border: 1px solid var(--border-color);
@@ -354,7 +356,7 @@
         const pinBtn = document.createElement('button');
         pinBtn.title = note.pinned ? 'Unpin' : 'Pin';
         pinBtn.textContent = note.pinned ? '📌' : '📍';
-        pinBtn.addEventListener('click', (ev) => { ev.stopPropagation(); togglePin(note.id); });
+        pinBtn.addEventListener('click', (ev) => { ev.stopPropagation(); togglePin(Number(note.id)); });
 
         const delBtn = document.createElement('button');
         delBtn.title = 'Delete';
@@ -391,16 +393,16 @@
         const pinBtn = document.createElement('button');
         pinBtn.title = note.pinned ? 'Unpin' : 'Pin';
         pinBtn.textContent = note.pinned ? '📌' : '📍';
-        pinBtn.addEventListener('click', () => togglePin(id, true));
+        pinBtn.addEventListener('click', () => togglePin(Number(id), true));
 
         const delBtn = document.createElement('button');
         delBtn.title = 'Delete';
         delBtn.textContent = '🗑️';
-        delBtn.addEventListener('click', () => deleteNote(id, true));
+        delBtn.addEventListener('click', () => deleteNote(Number(id), true));
 
         const saveBtn = document.createElement('button');
         saveBtn.title = 'Save & Close';
-        saveBtn.textContent = '✅';
+        saveBtn.textContent = 'Done';
         saveBtn.addEventListener('click', () => closeEditModal(true));
 
         actionsContainer.appendChild(pinBtn);
@@ -424,6 +426,7 @@
 
     // --- CRUD & Actions ---
     function deleteNote(id, fromModal = false) {
+        id = Number(id);
         if (confirm('Are you sure you want to delete this note?')) {
             const tx = db.transaction("notes", "readwrite");
             tx.objectStore("notes").delete(id);
@@ -438,21 +441,24 @@
         updateNote(id, null, (note) => ({ pinned: !note.pinned }), fromModal);
     }
     
-    async function updateNote(id, data, transformFn, fromModal = false) {
+    function updateNote(id, data, transformFn, fromModal = false) {
+        id = Number(id);
         const tx = db.transaction("notes", "readwrite");
         const store = tx.objectStore("notes");
-        const note = await getNoteById(id);
-        
-        let updatedData = { ...note };
-        if (data) Object.assign(updatedData, data);
-        if (transformFn) Object.assign(updatedData, transformFn(note));
-        
-        updatedData.updatedAt = new Date().toISOString();
-        store.put(updatedData);
+        const req = store.get(id);
+        req.onsuccess = (e) => {
+            const note = e.target.result;
+            if (!note) return; // nothing to update
+            let updatedData = { ...note };
+            if (data) Object.assign(updatedData, data);
+            if (transformFn) Object.assign(updatedData, transformFn(note));
+            updatedData.updatedAt = new Date().toISOString();
+            store.put(updatedData);
+        };
+        req.onerror = () => { console.error('Failed to read note for update', id); };
 
         tx.oncomplete = () => {
             if (fromModal) {
-                // If modal is open, refresh its content instead of closing
                 if (editModal.style.display === 'flex') {
                     openEditModal(id);
                 } else {
@@ -465,8 +471,11 @@
     }
     
     async function getNoteById(id) {
+        id = Number(id);
         const tx = db.transaction("notes", "readonly");
-        return new Promise(res => tx.objectStore("notes").get(id).onsuccess = e => res(e.target.result));
+        return new Promise(res => {
+            tx.objectStore("notes").get(id).onsuccess = e => res(e.target.result);
+        });
     }
     
     // --- Utils ---
