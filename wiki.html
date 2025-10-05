@@ -61,17 +61,16 @@
     .children-pages { display: none; padding-left: 20px; }
     .children-pages.show { display: block; }
     
-    .page-link { display: flex; align-items: center; gap: 8px; padding: 6px 8px; text-decoration: none; color: var(--text-color); border-radius: 5px; transition: background 0.2s; cursor: pointer; }
+    .page-link { display: flex; align-items: center; gap: 8px; padding: 6px 8px; text-decoration: none; color: var(--text-color); border-radius: 5px; transition: background 0.2s; cursor: pointer; position: relative; }
     .page-link:hover { background: var(--bg-color); }
     .page-link.active { background: var(--primary-color); color: white; }
-    .page-icon { font-size: 16px; }
-    .page-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
-    .star-icon { cursor: pointer; opacity: 0; transition: opacity 0.2s; font-size: 14px; }
-    .page-tree-item:hover .star-icon { opacity: 1; }
+    .page-icon { font-size: 16px; flex-shrink: 0; }
+    .page-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; min-width: 0; }
+    .page-link-actions { display: none; align-items: center; gap: 4px; margin-left: auto; }
+    .page-tree-item:hover .page-link-actions { display: flex; }
+    .star-icon, .add-sub-icon, .delete-icon { cursor: pointer; font-size: 14px; padding: 2px 4px; opacity: 0.6; flex-shrink: 0; }
+    .star-icon:hover, .add-sub-icon:hover, .delete-icon:hover { opacity: 1; }
     .star-icon.starred { opacity: 1; color: gold; }
-    .page-actions { display:none; }
-    .page-tree-item:hover .page-actions { display:flex; gap:5px; position:absolute; right:5px; top:5px; }
-    .page-actions button { background:transparent; border:none; cursor:pointer; font-size:14px; color:var(--text-color); padding:2px; }
 
     /* Editor Area */
     .editor-container { flex: 1; overflow-y: auto; padding: 0; }
@@ -196,7 +195,7 @@
     .comment { padding: 12px; background: var(--sidebar-bg); border-radius: 8px; margin-bottom: 12px; }
     .comment-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: #888; }
     .comment-text { font-size: 14px; }
-    .comment-input { width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); resize: vertical; min-height: 80px; }
+    .comment-input { width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); resize: vertical; min-height: 80px; font-family: inherit; }
     .add-comment-btn { margin-top: 10px; width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; }
 
     /* Formatting Toolbar */
@@ -213,11 +212,21 @@
     .slash-menu-section:last-child { margin-bottom: 0; }
     .slash-menu-title { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; padding: 4px 8px; margin-bottom: 4px; }
     .slash-menu-item { padding: 8px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-    .slash-menu-item:hover, .slash-menu-item.selected { background: var(--sidebar-bg); }
+    .slash-menu-item:hover, .slash-menu-item.selected { background: var(--primary-color); color: white; }
+    .slash-menu-item.selected .slash-menu-item-desc { color: #e0e0e0; }
     .slash-menu-item-icon { font-size: 20px; width: 24px; text-align: center; }
     .slash-menu-item-content { flex: 1; }
     .slash-menu-item-title { font-weight: 600; font-size: 14px; }
     .slash-menu-item-desc { font-size: 12px; color: #888; }
+
+    /* Block Context Menu */
+    .block-context-menu { position: absolute; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; min-width: 200px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; display: none; }
+    .block-context-menu.show { display: block; }
+    .context-menu-item { padding: 8px 12px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .context-menu-item:hover { background: var(--sidebar-bg); }
+    .context-menu-separator { height: 1px; background: var(--border-color); margin: 4px 0; }
+    .context-menu-section { padding: 4px 0; }
+    .context-menu-section-title { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; padding: 4px 12px; }
 
     /* Modal */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
@@ -350,7 +359,7 @@
 
       <main class="main-content">
         <div class="page-actions-bar">
-          <button class="action-btn" onclick="showComments()">
+          <button class="action-btn" onclick="toggleComments()">
             <span>💬</span> Comments
           </button>
           <button class="action-btn" id="fullWidthToggle" onclick="toggleFullWidth()">
@@ -365,7 +374,7 @@
           <button class="action-btn" onclick="duplicatePage()">
             <span>📑</span> Duplicate
           </button>
-          <button class="action-btn" onclick="deletePage(currentPageId)">
+          <button class="action-btn" onclick="confirmDeletePage()">
             <span>🗑️</span> Delete
           </button>
         </div>
@@ -397,7 +406,7 @@
   </div>
 
   <!-- Comments Panel -->
-  <div class="comments-toggle" onclick="showComments()" title="Comments">💬</div>
+  <div class="comments-toggle" onclick="toggleComments()" title="Comments">💬</div>
   <div class="comments-panel" id="commentsPanel">
     <h3 style="margin-bottom:20px;">💬 Comments</h3>
     <div id="commentsList"></div>
@@ -420,148 +429,13 @@
     <div class="separator"></div>
     <button onclick="formatText('insertUnorderedList')" title="Bullet List">• List</button>
     <button onclick="createLink()" title="Link">🔗</button>
-    <div class="separator"></div>
-    <button onclick="formatText('foreColor', '#ff0000')" title="Text Color" style="color:#ff0000;">A</button>
-    <button onclick="formatText('hiliteColor', '#ffff00')" title="Highlight" style="background:#ffff00;">🖍️</button>
   </div>
 
   <!-- Slash Command Menu -->
-  <div class="slash-menu" id="slashMenu">
-    <div class="slash-menu-section">
-      <div class="slash-menu-title">Basic Blocks</div>
-      <div class="slash-menu-item" onclick="insertBlock('text')">
-        <div class="slash-menu-item-icon">📝</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Text</div>
-          <div class="slash-menu-item-desc">Plain text paragraph</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('h1')">
-        <div class="slash-menu-item-icon"><strong>H1</strong></div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Heading 1</div>
-          <div class="slash-menu-item-desc">Large section heading</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('h2')">
-        <div class="slash-menu-item-icon"><strong>H2</strong></div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Heading 2</div>
-          <div class="slash-menu-item-desc">Medium section heading</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('h3')">
-        <div class="slash-menu-item-icon"><strong>H3</strong></div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Heading 3</div>
-          <div class="slash-menu-item-desc">Small section heading</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('todo')">
-        <div class="slash-menu-item-icon">☑️</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">To-do</div>
-          <div class="slash-menu-item-desc">Track tasks with checkbox</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('bullet')">
-        <div class="slash-menu-item-icon">•</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Bulleted List</div>
-          <div class="slash-menu-item-desc">Simple bullet list</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('numbered')">
-        <div class="slash-menu-item-icon">1.</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Numbered List</div>
-          <div class="slash-menu-item-desc">Ordered list</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('toggle')">
-        <div class="slash-menu-item-icon">▶️</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Toggle</div>
-          <div class="slash-menu-item-desc">Collapsible content</div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="slash-menu-section">
-      <div class="slash-menu-title">Advanced</div>
-      <div class="slash-menu-item" onclick="insertBlock('quote')">
-        <div class="slash-menu-item-icon">❝</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Quote</div>
-          <div class="slash-menu-item-desc">Capture a quote</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('callout')">
-        <div class="slash-menu-item-icon">💡</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Callout</div>
-          <div class="slash-menu-item-desc">Highlighted box</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('code')">
-        <div class="slash-menu-item-icon">💻</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Code</div>
-          <div class="slash-menu-item-desc">Code block</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('divider')">
-        <div class="slash-menu-item-icon">―</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Divider</div>
-          <div class="slash-menu-item-desc">Visual separator</div>
-        </div>
-      </div>
-    </div>
+  <div class="slash-menu" id="slashMenu"></div>
 
-    <div class="slash-menu-section">
-      <div class="slash-menu-title">Media</div>
-      <div class="slash-menu-item" onclick="insertBlock('image')">
-        <div class="slash-menu-item-icon">🖼️</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Image</div>
-          <div class="slash-menu-item-desc">Upload or embed</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('embed')">
-        <div class="slash-menu-item-icon">🎬</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Embed</div>
-          <div class="slash-menu-item-desc">Embed YouTube, etc.</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('table')">
-        <div class="slash-menu-item-icon">📊</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Table</div>
-          <div class="slash-menu-item-desc">Simple table</div>
-        </div>
-      </div>
-      <div class="slash-menu-item" onclick="insertBlock('columns')">
-        <div class="slash-menu-item-icon">⚏</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Columns</div>
-          <div class="slash-menu-item-desc">Multi-column layout</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="slash-menu-section">
-      <div class="slash-menu-title">Links</div>
-      <div class="slash-menu-item" onclick="insertBlock('link')">
-        <div class="slash-menu-item-icon">🔗</div>
-        <div class="slash-menu-item-content">
-          <div class="slash-menu-item-title">Page Link</div>
-          <div class="slash-menu-item-desc">Link to another page</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Block Context Menu -->
+  <div class="block-context-menu" id="blockContextMenu"></div>
 
   <!-- Modals -->
   <div class="modal" id="templatesModal">
@@ -726,14 +600,12 @@
     request.onupgradeneeded = e => {
       db = e.target.result;
       
-      // Create wiki store
       if (!db.objectStoreNames.contains("wiki")) {
         const store = db.createObjectStore("wiki", { keyPath: "id", autoIncrement: true });
         store.createIndex("title", "title", { unique: false });
         store.createIndex("parentId", "parentId", { unique: false });
       }
       
-      // Create comments store
       if (!db.objectStoreNames.contains("wikiComments")) {
         const commentsStore = db.createObjectStore("wikiComments", { keyPath: "id", autoIncrement: true });
         commentsStore.createIndex("pageId", "pageId", { unique: false });
@@ -754,9 +626,32 @@
     let draggedBlock = null;
     let autoSaveTimer = null;
     let currentPageData = {};
+    let slashMenuSelectedIndex = 0;
+    let slashMenuItems = [];
 
     // Icons for icon picker
     const icons = ['📄', '📝', '📖', '📚', '📌', '📋', '📊', '📈', '📉', '🗂️', '📁', '📂', '🗃️', '🗄️', '📦', '🎯', '🎨', '🎭', '🎪', '🎬', '🎮', '🎲', '🧩', '🧠', '💡', '🔔', '🔍', '🔎', '🔬', '🔭', '⚗️', '⚙️', '🔧', '🔨', '⚡', '🔥', '💧', '🌊', '🌍', '🌎', '🌏', '🌐', '🗺️', '🧭', '⛰️', '🏔️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️', '🏟️', '🏛️', '🏗️', '🏘️', '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '💒', '🗼', '🗽', '⛪', '🕌', '🛕', '🕍', '⛩️', '🕋', '⭐', '✨', '🎉', '🎊', '🎈', '🎁', '🏆', '🥇', '🥈', '🥉', '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉'];
+
+    // Block Types Configuration
+    const blockTypes = [
+      { id: 'text', icon: '📝', title: 'Text', desc: 'Plain text paragraph', section: 'Basic Blocks' },
+      { id: 'h1', icon: 'H1', title: 'Heading 1', desc: 'Large section heading', section: 'Basic Blocks' },
+      { id: 'h2', icon: 'H2', title: 'Heading 2', desc: 'Medium section heading', section: 'Basic Blocks' },
+      { id: 'h3', icon: 'H3', title: 'Heading 3', desc: 'Small section heading', section: 'Basic Blocks' },
+      { id: 'todo', icon: '☑️', title: 'To-do', desc: 'Track tasks with checkbox', section: 'Basic Blocks' },
+      { id: 'bullet', icon: '•', title: 'Bulleted List', desc: 'Simple bullet list', section: 'Basic Blocks' },
+      { id: 'numbered', icon: '1.', title: 'Numbered List', desc: 'Ordered list', section: 'Basic Blocks' },
+      { id: 'toggle', icon: '▶️', title: 'Toggle', desc: 'Collapsible content', section: 'Basic Blocks' },
+      { id: 'quote', icon: '❝', title: 'Quote', desc: 'Capture a quote', section: 'Advanced' },
+      { id: 'callout', icon: '💡', title: 'Callout', desc: 'Highlighted box', section: 'Advanced' },
+      { id: 'code', icon: '💻', title: 'Code', desc: 'Code block', section: 'Advanced' },
+      { id: 'divider', icon: '―', title: 'Divider', desc: 'Visual separator', section: 'Advanced' },
+      { id: 'image', icon: '🖼️', title: 'Image', desc: 'Upload or embed', section: 'Media' },
+      { id: 'embed', icon: '🎬', title: 'Embed', desc: 'Embed YouTube, etc.', section: 'Media' },
+      { id: 'table', icon: '📊', title: 'Table', desc: 'Simple table', section: 'Media' },
+      { id: 'columns', icon: '⚏', title: 'Columns', desc: 'Multi-column layout', section: 'Media' },
+      { id: 'link', icon: '🔗', title: 'Page Link', desc: 'Link to another page', section: 'Links' }
+    ];
 
     // Page Templates
     const templates = {
@@ -859,7 +754,7 @@
       controls.className = 'block-controls';
       controls.innerHTML = `
         <span class="block-handle">⋮⋮</span>
-        <button class="block-menu-btn" onclick="showBlockMenu(this)">⋯</button>
+        <button class="block-menu-btn" onclick="showBlockContextMenu(event, this)">⋯</button>
       `;
       block.appendChild(controls);
 
@@ -983,7 +878,8 @@
       block.addEventListener('dragover', handleDragOver);
       block.addEventListener('drop', handleDrop);
 
-      blockContent.addEventListener('input', () => {
+      blockContent.addEventListener('input', (e) => {
+        handleSlashCommand(e);
         scheduleAutoSave();
       });
 
@@ -1057,6 +953,49 @@
       scheduleAutoSave();
     }
 
+    function duplicateBlock(block) {
+      if(!block) return;
+      const type = block.getAttribute('data-type');
+      const contentEl = block.querySelector('.block-content');
+      let content = '';
+      let data = {};
+      
+      if(type === 'todo') {
+        const checkbox = block.querySelector('.todo-checkbox');
+        const text = block.querySelector('.todo-text');
+        content = text ? text.innerHTML : '';
+        data.checked = checkbox ? checkbox.checked : false;
+      } else if(type === 'callout') {
+        const iconEl = block.querySelector('.callout-icon');
+        const textEl = block.querySelector('.callout-text');
+        data.icon = iconEl ? iconEl.textContent : '💡';
+        content = textEl ? textEl.innerHTML : '';
+      } else {
+        content = contentEl ? contentEl.innerHTML : '';
+      }
+      
+      const newBlock = createBlock(type, content, data);
+      block.after(newBlock);
+      scheduleAutoSave();
+    }
+
+    function convertBlockType(block, newType) {
+      if(!block) return;
+      
+      const contentEl = block.querySelector('.block-content');
+      const currentContent = contentEl ? contentEl.textContent : '';
+      
+      const newBlock = createBlock(newType, currentContent);
+      block.replaceWith(newBlock);
+      
+      const newContentEl = newBlock.querySelector('[contenteditable="true"]');
+      if(newContentEl) {
+        newContentEl.focus();
+      }
+      
+      scheduleAutoSave();
+    }
+
     function toggleTodo(checkbox) {
       const block = checkbox.closest('.block');
       if(checkbox.checked) {
@@ -1112,7 +1051,6 @@
     }
 
     function getEmbedUrl(url) {
-      // Convert YouTube watch URLs to embed URLs
       if(url.includes('youtube.com/watch')) {
         const videoId = url.split('v=')[1]?.split('&')[0];
         return `https://www.youtube.com/embed/${videoId}`;
@@ -1237,11 +1175,6 @@
     function handleBlockKeydown(e) {
       const block = e.target.closest('.block');
       
-      // Slash command
-      if(e.key === '/' && e.target.textContent === '') {
-        setTimeout(() => showSlashMenu(block), 10);
-      }
-      
       // Enter key
       if(e.key === 'Enter' && !e.shiftKey) {
         const type = block.getAttribute('data-type');
@@ -1272,6 +1205,27 @@
         }
       }
       
+      // Slash menu navigation
+      if(document.getElementById('slashMenu').classList.contains('show')) {
+        if(e.key === 'ArrowDown') {
+          e.preventDefault();
+          slashMenuSelectedIndex = Math.min(slashMenuSelectedIndex + 1, slashMenuItems.length - 1);
+          updateSlashMenuSelection();
+        } else if(e.key === 'ArrowUp') {
+          e.preventDefault();
+          slashMenuSelectedIndex = Math.max(slashMenuSelectedIndex - 1, 0);
+          updateSlashMenuSelection();
+        } else if(e.key === 'Enter') {
+          e.preventDefault();
+          if(slashMenuItems[slashMenuSelectedIndex]) {
+            const selectedType = slashMenuItems[slashMenuSelectedIndex].getAttribute('data-type');
+            executeSlashCommand(selectedType);
+          }
+        } else if(e.key === 'Escape') {
+          hideSlashMenu();
+        }
+      }
+      
       // Formatting shortcuts
       if(e.ctrlKey || e.metaKey) {
         if(e.key === 'b') {
@@ -1290,24 +1244,175 @@
       }
     }
 
-    // Slash Menu
-    function showSlashMenu(block) {
+    // Slash Command
+    function handleSlashCommand(e) {
+      const target = e.target;
+      const text = target.textContent;
+      
+      if(text.startsWith('/')) {
+        const query = text.substring(1).toLowerCase();
+        showSlashMenu(target.closest('.block'), query);
+      } else {
+        hideSlashMenu();
+      }
+    }
+
+    function showSlashMenu(block, query = '') {
       const menu = document.getElementById('slashMenu');
       const rect = block.getBoundingClientRect();
       menu.style.top = (rect.bottom + window.scrollY) + 'px';
       menu.style.left = rect.left + 'px';
+      
+      // Filter block types
+      const filtered = blockTypes.filter(bt => 
+        bt.title.toLowerCase().includes(query) || 
+        bt.desc.toLowerCase().includes(query) ||
+        bt.id.includes(query)
+      );
+      
+      // Group by section
+      const sections = {};
+      filtered.forEach(bt => {
+        if(!sections[bt.section]) sections[bt.section] = [];
+        sections[bt.section].push(bt);
+      });
+      
+      // Render menu
+      menu.innerHTML = '';
+      Object.keys(sections).forEach(sectionName => {
+        const section = document.createElement('div');
+        section.className = 'slash-menu-section';
+        
+        const title = document.createElement('div');
+        title.className = 'slash-menu-title';
+        title.textContent = sectionName;
+        section.appendChild(title);
+        
+        sections[sectionName].forEach(bt => {
+          const item = document.createElement('div');
+          item.className = 'slash-menu-item';
+          item.setAttribute('data-type', bt.id);
+          item.innerHTML = `
+            <div class="slash-menu-item-icon">${bt.icon.length > 2 ? bt.icon : '<strong>' + bt.icon + '</strong>'}</div>
+            <div class="slash-menu-item-content">
+              <div class="slash-menu-item-title">${bt.title}</div>
+              <div class="slash-menu-item-desc">${bt.desc}</div>
+            </div>
+          `;
+          item.onclick = () => executeSlashCommand(bt.id);
+          section.appendChild(item);
+        });
+        
+        menu.appendChild(section);
+      });
+      
+      slashMenuItems = Array.from(menu.querySelectorAll('.slash-menu-item'));
+      slashMenuSelectedIndex = 0;
+      updateSlashMenuSelection();
+      
       menu.classList.add('show');
       currentBlock = block;
     }
 
+    function updateSlashMenuSelection() {
+      slashMenuItems.forEach((item, index) => {
+        if(index === slashMenuSelectedIndex) {
+          item.classList.add('selected');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+    }
+
+    function executeSlashCommand(type) {
+      if(!currentBlock) return;
+      
+      const contentEl = currentBlock.querySelector('.block-content');
+      if(contentEl) {
+        contentEl.textContent = '';
+      }
+      
+      convertBlockType(currentBlock, type);
+      hideSlashMenu();
+    }
+
     function hideSlashMenu() {
       document.getElementById('slashMenu').classList.remove('show');
+      slashMenuItems = [];
+      slashMenuSelectedIndex = 0;
+    }
+
+    // Block Context Menu (3 dots)
+    function showBlockContextMenu(event, btn) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const block = btn.closest('.block');
+      const menu = document.getElementById('blockContextMenu');
+      const rect = btn.getBoundingClientRect();
+      
+      menu.style.top = (rect.bottom + window.scrollY) + 'px';
+      menu.style.left = rect.left + 'px';
+      
+      menu.innerHTML = `
+        <div class="context-menu-item" onclick="deleteBlock(currentBlock)">
+          <span>🗑️</span> Delete
+        </div>
+        <div class="context-menu-item" onclick="duplicateBlock(currentBlock)">
+          <span>📑</span> Duplicate
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-section">
+          <div class="context-menu-section-title">Turn Into</div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'text')">
+            <span>📝</span> Text
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'h1')">
+            <span><strong>H1</strong></span> Heading 1
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'h2')">
+            <span><strong>H2</strong></span> Heading 2
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'h3')">
+            <span><strong>H3</strong></span> Heading 3
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'todo')">
+            <span>☑️</span> To-do
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'bullet')">
+            <span>•</span> Bulleted List
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'numbered')">
+            <span>1.</span> Numbered List
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'quote')">
+            <span>❝</span> Quote
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'code')">
+            <span>💻</span> Code
+          </div>
+          <div class="context-menu-item" onclick="convertBlockType(currentBlock, 'callout')">
+            <span>💡</span> Callout
+          </div>
+        </div>
+      `;
+      
+      currentBlock = block;
+      menu.classList.add('show');
+    }
+
+    function hideBlockContextMenu() {
+      document.getElementById('blockContextMenu').classList.remove('show');
     }
 
     // Click outside to close
     document.addEventListener('click', (e) => {
       if(!e.target.closest('.slash-menu') && !e.target.closest('.block-content')) {
         hideSlashMenu();
+      }
+      if(!e.target.closest('.block-context-menu') && !e.target.closest('.block-menu-btn')) {
+        hideBlockContextMenu();
       }
       if(!e.target.closest('.formatting-toolbar')) {
         hideFormattingToolbar();
@@ -1361,7 +1466,6 @@
       document.getElementById('pageIconPicker').textContent = '📄';
       document.getElementById('pageCover').style.display = 'none';
       
-      // Clear properties
       const propsSection = document.getElementById('propertiesSection');
       propsSection.innerHTML = '<button class="add-property-btn" onclick="showAddProperty()">+ Add Property</button>';
       
@@ -1423,7 +1527,6 @@
         blocks.push({ type, content, data });
       });
       
-      // Get properties
       const properties = [];
       document.querySelectorAll('.property').forEach(prop => {
         const label = prop.querySelector('.property-label');
@@ -1464,7 +1567,7 @@
           pageData.id = currentPageId;
           store.put(pageData).onsuccess = () => {
             displayPageTree();
-            if(!silent) alert('Page saved!');
+            if(!silent) alert('✅ Page saved!');
           };
         };
       } else {
@@ -1473,11 +1576,11 @@
           currentPageId = e.target.result;
           displayPageTree();
           updateBreadcrumbs();
-          if(!silent) alert('Page created!');
+          if(!silent) alert('✅ Page created!');
         };
         req.onerror = (e) => { 
           console.error('Save failed', e); 
-          if(!silent) alert('Failed to save page'); 
+          if(!silent) alert('❌ Failed to save page'); 
         };
       }
     }
@@ -1500,7 +1603,6 @@
         document.getElementById('titleEditor').value = page.title || '';
         document.getElementById('pageIconPicker').textContent = page.icon || '📄';
         
-        // Cover
         if(page.cover) {
           document.getElementById('pageCover').style.backgroundImage = page.cover;
           document.getElementById('pageCover').style.display = 'block';
@@ -1508,7 +1610,6 @@
           document.getElementById('pageCover').style.display = 'none';
         }
         
-        // Full width
         const container = document.getElementById('editorContainer');
         if(page.fullWidth) {
           container.classList.add('full-width');
@@ -1518,7 +1619,6 @@
           document.getElementById('fullWidthToggle').classList.remove('active');
         }
         
-        // Properties
         const propsSection = document.getElementById('propertiesSection');
         propsSection.innerHTML = '';
         if(page.properties && page.properties.length > 0) {
@@ -1528,7 +1628,6 @@
         }
         propsSection.innerHTML += '<button class="add-property-btn" onclick="showAddProperty()">+ Add Property</button>';
         
-        // Blocks
         const editor = document.getElementById('blockEditor');
         editor.innerHTML = '';
         
@@ -1548,8 +1647,13 @@
       getReq.onerror = e => console.error('Open page failed', e);
     }
 
+    function confirmDeletePage() {
+      if (!currentPageId || !confirm('🗑️ Are you sure you want to delete this page?')) return;
+      deletePage(currentPageId);
+    }
+
     function deletePage(id) {
-      if (!id || !confirm('Are you sure you want to delete this page?')) return;
+      if (!id) return;
       
       const tx = db.transaction("wiki", "readwrite");
       const delReq = tx.objectStore("wiki").delete(id);
@@ -1559,9 +1663,9 @@
           loadInitialPage();
         }
         displayPageTree();
-        alert('Page deleted!');
+        alert('✅ Page deleted!');
       };
-      delReq.onerror = e => { console.error('Delete failed', e); alert('Failed to delete page'); };
+      delReq.onerror = e => { console.error('Delete failed', e); alert('❌ Failed to delete page'); };
     }
 
     function duplicatePage() {
@@ -1584,7 +1688,7 @@
           const addReq = addTx.objectStore("wiki").add(duplicateData);
           addReq.onsuccess = (ev) => {
             openPage(ev.target.result);
-            alert('Page duplicated!');
+            alert('✅ Page duplicated!');
           };
         };
       }, 100);
@@ -1634,7 +1738,6 @@
       getAllReq.onsuccess = e => {
         const pages = e.target.result || [];
         
-        // Organize pages by parent
         const pageMap = {};
         const rootPages = [];
         
@@ -1652,7 +1755,6 @@
         
         rootPages.sort((a,b) => (a.title || '').localeCompare(b.title || ''));
         
-        // Favorites
         const favoritesTree = document.getElementById('favoritesTree');
         favoritesTree.innerHTML = '';
         const favorites = pages.filter(p => p.favorited);
@@ -1666,7 +1768,6 @@
           });
         }
         
-        // All pages
         const tree = document.getElementById('pageTree');
         tree.innerHTML = '';
         rootPages.forEach(page => {
@@ -1682,7 +1783,6 @@
       const link = document.createElement('div');
       link.className = 'page-link' + (page.id === currentPageId ? ' active' : '');
       
-      // Expand icon if has children
       if(!skipChildren && page.children && page.children.length > 0) {
         const expandIcon = document.createElement('span');
         expandIcon.className = 'expand-icon collapsed';
@@ -1709,41 +1809,42 @@
       const title = document.createElement('span');
       title.className = 'page-title';
       title.textContent = page.title || 'Untitled';
+      title.onclick = () => openPage(page.id);
       link.appendChild(title);
+      
+      const actions = document.createElement('div');
+      actions.className = 'page-link-actions';
       
       const star = document.createElement('span');
       star.className = 'star-icon' + (page.favorited ? ' starred' : '');
       star.textContent = page.favorited ? '⭐' : '☆';
+      star.title = 'Favorite';
       star.onclick = (e) => toggleFavorite(page.id, e);
-      link.appendChild(star);
+      actions.appendChild(star);
       
-      link.onclick = (e) => { 
-        if(e.target === link || e.target === icon || e.target === title) {
-          openPage(page.id); 
-        }
-      };
-      
-      li.appendChild(link);
-      
-      const actions = document.createElement('div');
-      actions.className = 'page-actions';
-      
-      const addSubBtn = document.createElement('button');
-      addSubBtn.textContent = '➕';
-      addSubBtn.title = 'Add subpage';
-      addSubBtn.onclick = (ev) => { 
-        ev.stopPropagation(); 
+      const addSub = document.createElement('span');
+      addSub.className = 'add-sub-icon';
+      addSub.textContent = '➕';
+      addSub.title = 'Add subpage';
+      addSub.onclick = (e) => { 
+        e.stopPropagation(); 
         createNewPage(page.id); 
       };
-      actions.appendChild(addSubBtn);
+      actions.appendChild(addSub);
       
-      const delBtn = document.createElement('button');
+      const delBtn = document.createElement('span');
+      delBtn.className = 'delete-icon';
       delBtn.textContent = '🗑️';
-      delBtn.onclick = (ev) => { ev.stopPropagation(); deletePage(page.id); };
+      delBtn.title = 'Delete';
+      delBtn.onclick = (e) => { 
+        e.stopPropagation(); 
+        if(confirm('Delete this page?')) deletePage(page.id); 
+      };
       actions.appendChild(delBtn);
-      li.appendChild(actions);
       
-      // Add children
+      link.appendChild(actions);
+      li.appendChild(link);
+      
       if(!skipChildren && page.children && page.children.length > 0) {
         const childrenUl = document.createElement('ul');
         childrenUl.className = 'children-pages';
@@ -1785,6 +1886,7 @@
           { type: 'h2', content: 'Getting Started' },
           { type: 'todo', content: 'Click "New Page" to create a page', data: { checked: false } },
           { type: 'todo', content: 'Type "/" to see all block types', data: { checked: false } },
+          { type: 'todo', content: 'Click the ⋯ button to convert blocks', data: { checked: false } },
           { type: 'todo', content: 'Drag blocks to reorder them', data: { checked: false } },
           { type: 'todo', content: 'Select text to format it', data: { checked: false } },
           { type: 'h2', content: 'Block Types' },
@@ -1794,13 +1896,18 @@
           { type: 'bullet', content: 'Images, embeds, columns' },
           { type: 'bullet', content: 'Page links and dividers' },
           { type: 'h2', content: 'Features' },
-          { type: 'columns', content: '', data: {} },
-          { type: 'text', content: '✨ <b>Templates</b> - Start with pre-made structures<br>🎨 <b>Icons & Covers</b> - Customize your pages<br>⭐ <b>Favorites</b> - Star important pages' },
-          { type: 'text', content: '📤 <b>Export</b> - Download as Markdown, HTML, or JSON<br>💬 <b>Comments</b> - Collaborate with comments<br>📑 <b>TOC</b> - Auto-generated table of contents' },
-          { type: 'h2', content: 'Properties' },
-          { type: 'text', content: 'Add custom properties to organize your pages with metadata like tags, dates, status, and more.' },
-          { type: 'h2', content: 'Nested Pages' },
-          { type: 'text', content: 'Create hierarchical page structures by adding subpages. Hover over pages and click the + icon.' },
+          { type: 'text', content: '✨ <b>Templates</b> - Start with pre-made structures' },
+          { type: 'text', content: '🎨 <b>Icons & Covers</b> - Customize your pages' },
+          { type: 'text', content: '⭐ <b>Favorites</b> - Star important pages' },
+          { type: 'text', content: '📤 <b>Export</b> - Download as Markdown, HTML, or JSON' },
+          { type: 'text', content: '💬 <b>Comments</b> - Add comments to pages' },
+          { type: 'text', content: '📑 <b>TOC</b> - Auto-generated table of contents' },
+          { type: 'h2', content: 'Keyboard Shortcuts' },
+          { type: 'bullet', content: 'Type <b>/</b> for block menu' },
+          { type: 'bullet', content: 'Click <b>⋯</b> to convert block types' },
+          { type: 'bullet', content: '<b>Ctrl+S</b> to save' },
+          { type: 'bullet', content: '<b>Ctrl+B</b> for bold' },
+          { type: 'bullet', content: '<b>Ctrl+I</b> for italic' },
           { type: 'divider', content: '' },
           { type: 'quote', content: 'Build your second brain, one block at a time. 🧠' }
         ],
@@ -1830,7 +1937,6 @@
       document.getElementById('titleEditor').value = template.title;
       document.getElementById('pageIconPicker').textContent = template.icon;
       
-      // Apply properties
       const propsSection = document.getElementById('propertiesSection');
       propsSection.innerHTML = '';
       if(template.properties && template.properties.length > 0) {
@@ -2026,7 +2132,6 @@
         return;
       }
       
-      // Download
       const blob = new Blob([output], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -2036,12 +2141,16 @@
       URL.revokeObjectURL(url);
       
       closeModal('exportModal');
+      alert('✅ Page exported successfully!');
     }
 
     // Comments
-    function showComments() {
+    function toggleComments() {
       const panel = document.getElementById('commentsPanel');
       panel.classList.toggle('show');
+      if(panel.classList.contains('show')) {
+        loadComments();
+      }
     }
 
     function loadComments() {
@@ -2057,25 +2166,32 @@
         const list = document.getElementById('commentsList');
         list.innerHTML = '';
         
-        comments.forEach(comment => {
-          const div = document.createElement('div');
-          div.className = 'comment';
-          div.innerHTML = `
-            <div class="comment-header">
-              <span>You</span>
-              <span>${new Date(comment.date).toLocaleDateString()}</span>
-            </div>
-            <div class="comment-text">${comment.text}</div>
-          `;
-          list.appendChild(div);
-        });
+        if(comments.length === 0) {
+          list.innerHTML = '<p style="color:#888;font-size:14px;">No comments yet. Be the first to comment!</p>';
+        } else {
+          comments.forEach(comment => {
+            const div = document.createElement('div');
+            div.className = 'comment';
+            div.innerHTML = `
+              <div class="comment-header">
+                <span><strong>${comment.author}</strong></span>
+                <span>${new Date(comment.date).toLocaleDateString()}</span>
+              </div>
+              <div class="comment-text">${comment.text}</div>
+            `;
+            list.appendChild(div);
+          });
+        }
       };
     }
 
     function addComment() {
       const input = document.getElementById('commentInput');
       const text = input.value.trim();
-      if(!text || !currentPageId) return;
+      if(!text || !currentPageId) {
+        alert('Please enter a comment');
+        return;
+      }
       
       const tx = db.transaction("wikiComments", "readwrite");
       const store = tx.objectStore("wikiComments");
@@ -2089,6 +2205,7 @@
       store.add(comment).onsuccess = () => {
         input.value = '';
         loadComments();
+        alert('✅ Comment added!');
       };
     }
 
@@ -2108,7 +2225,7 @@
       const headings = document.querySelectorAll('#blockEditor .block[data-type="h1"], #blockEditor .block[data-type="h2"], #blockEditor .block[data-type="h3"]');
       
       if(headings.length === 0) {
-        document.getElementById('tocPanel').classList.remove('show');
+        tocList.innerHTML = '<li style="color:#888;font-size:13px;">No headings found</li>';
         return;
       }
       
@@ -2148,7 +2265,6 @@
         return;
       }
       
-      // Get parent page
       const tx = db.transaction("wiki", "readonly");
       const getReq = tx.objectStore("wiki").get(currentPageData.parentId);
       getReq.onsuccess = e => {
@@ -2168,10 +2284,10 @@
     // Search
     document.getElementById('search').addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
-      document.querySelectorAll('.page-title').forEach(el => {
-        const item = el.closest('.page-tree-item');
-        if (!item) return;
-        if (el.textContent.toLowerCase().includes(query)) {
+      document.querySelectorAll('.page-tree-item').forEach(item => {
+        const titleEl = item.querySelector('.page-title');
+        if (!titleEl) return;
+        if (titleEl.textContent.toLowerCase().includes(query)) {
           item.style.display = 'block';
         } else {
           item.style.display = 'none';
@@ -2212,28 +2328,6 @@
       input.click();
     }
 
-    // Block Menu
-    function showBlockMenu(btn) {
-      const block = btn.closest('.block');
-      const type = block.getAttribute('data-type');
-      
-      const menu = [
-        'Delete block',
-        'Duplicate block',
-        'Turn into...'
-      ];
-      
-      const choice = prompt('Block menu:\n1. Delete\n2. Duplicate\n3. Cancel', '3');
-      
-      if(choice === '1') {
-        deleteBlock(block);
-      } else if(choice === '2') {
-        const clone = block.cloneNode(true);
-        block.after(clone);
-        scheduleAutoSave();
-      }
-    }
-
     // Close modals on outside click
     document.querySelectorAll('.modal').forEach(modal => {
       modal.addEventListener('click', (e) => {
@@ -2250,6 +2344,46 @@
         savePage(false);
       }
     });
+
+    // Export all data functionality (for settings page integration)
+    function exportAllWikiData() {
+      if(!db) {
+        alert('Database not ready');
+        return;
+      }
+      
+      const tx = db.transaction(["wiki", "wikiComments"], "readonly");
+      const wikiStore = tx.objectStore("wiki");
+      const commentsStore = tx.objectStore("wikiComments");
+      
+      const wikiReq = wikiStore.getAll();
+      const commentsReq = commentsStore.getAll();
+      
+      Promise.all([
+        new Promise(resolve => wikiReq.onsuccess = () => resolve(wikiReq.result)),
+        new Promise(resolve => commentsReq.onsuccess = () => resolve(commentsReq.result))
+      ]).then(([pages, comments]) => {
+        const exportData = {
+          version: '1.0',
+          exportDate: new Date().toISOString(),
+          pages,
+          comments
+        };
+        
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sharehive-wiki-export-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        alert('✅ All wiki data exported successfully!');
+      });
+    }
+
+    // Make it available globally for settings page
+    window.exportAllWikiData = exportAllWikiData;
   </script>
 </body>
 </html>
