@@ -220,26 +220,11 @@
         document.body.classList.add("dark");
         toggleBtn.textContent = '☀️';
     }
-
-    // 📦 IndexedDB Setup
+ // 📦 IndexedDB (v21 unified)
     let db;
-    const stores = [
-  "notes",
-  "bookmarks",
-  "videos",
-  "todos",
-  "expenses",
-  "planner",
-  "wiki",
-  "uploads",
-  "projects",
-  "watchlist",
-  "courses",
-  "profile",
-  "settings",
-  "community"
-];
-    const request = indexedDB.open("ShareHiveDB_Todos", 21); // Version bump for new schema
+    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
+    const request = indexedDB.open("ShareHiveDB", 21);
+
     request.onupgradeneeded = e => {
       db = e.target.result;
       if (!db.objectStoreNames.contains("todos")) {

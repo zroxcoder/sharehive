@@ -593,9 +593,11 @@
     }
     if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 
-    // Database Setup
+     // 📦 IndexedDB (v21 unified)
     let db;
+    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
     const request = indexedDB.open("ShareHiveDB", 21);
+
 
     request.onupgradeneeded = function(e) {
       db = e.target.result;
