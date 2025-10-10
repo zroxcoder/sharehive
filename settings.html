@@ -717,7 +717,8 @@
       "community"
     ];
 
-    const request = indexedDB.open("ShareHiveDB", 21);
+    const request = indexedDB.open("ShareHiveDB", 22);
+
 
     request.onupgradeneeded = e => {
       db = e.target.result;

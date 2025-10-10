@@ -217,7 +217,8 @@
      // 📦 IndexedDB (v21 unified)
     let db;
     const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
-    const request = indexedDB.open("ShareHiveDB", 21);
+    const request = indexedDB.open("ShareHiveDB", 22);
+
 
 
     request.onupgradeneeded = e => {

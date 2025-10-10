@@ -225,32 +225,43 @@
     </div>
   </div>
 
-  <script>
-    // 🌙 Dark Mode
-    const toggleBtn = document.querySelector('.toggle-btn');
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      const isDark = document.body.classList.contains("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-      toggleBtn.textContent = isDark ? '☀️' : '🌙';
-    }
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
-        toggleBtn.textContent = '☀️';
-    }
- // 📦 IndexedDB (v21 unified)
-    let db;
-    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
-    const request = indexedDB.open("ShareHiveDB", 21);
+  <!-- ✅ Updated to IndexedDB v22 -->
 
-    request.onupgradeneeded = e => {
-      db = e.target.result;
-      if (!db.objectStoreNames.contains("notes")) {
-        db.createObjectStore("notes", { keyPath: "id", autoIncrement: true });
+<script>
+
+// 🌙 Dark Mode (unchanged)
+  const toggleBtn = document.querySelector('.toggle-btn');
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    toggleBtn.textContent = isDark ? '☀️' : '🌙';
+  }
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+    toggleBtn.textContent = '☀️';
+  }
+
+  // 📦 IndexedDB (v22 unified)
+  let db;
+  const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
+  const request = indexedDB.open("ShareHiveDB", 22); // 🔥 version bumped to v22
+
+  request.onupgradeneeded = e => {
+    db = e.target.result;
+    // ensure all stores exist
+    stores.forEach(storeName => {
+      if (!db.objectStoreNames.contains(storeName)) {
+        db.createObjectStore(storeName, { keyPath: "id", autoIncrement: true });
       }
-    };
-    request.onsuccess = e => { db = e.target.result; displayNotes(); };
-    request.onerror = e => console.error("DB error:", e.target.error);
+    });
+  };
+
+  request.onsuccess = e => { db = e.target.result; displayNotes(); };
+  request.onerror = e => console.error("DB error:", e.target.error);
+
+  // (Everything else below unchanged)
+
 
     // --- Main Form Logic ---
     const addNoteForm = document.getElementById('addNoteForm');
