@@ -277,11 +277,11 @@
         document.body.classList.add("dark");
         toggleBtn.textContent = '☀️';
     }
+ // 📦 IndexedDB (v22 unified)
+  let db;
+  const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
+  const request = indexedDB.open("ShareHiveDB", 22); // 🔥 version bumped to v22
 
-     // 📦 IndexedDB (v21 unified)
-    let db;
-    const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
-   const request = indexedDB.open("ShareHiveDB", 22);
 
     request.onupgradeneeded = e => {
       db = e.target.result;
