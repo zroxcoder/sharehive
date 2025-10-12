@@ -279,25 +279,31 @@
     }
  // 📦 IndexedDB (v22 unified)
   let db;
+  // ensure same master store list as other pages
   const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
-  const request = indexedDB.open("ShareHiveDB", 22); // 🔥 version bumped to v22
+  const request = indexedDB.open("ShareHiveDB", 22); // unified DB version
 
+  request.onupgradeneeded = e => {
+    db = e.target.result;
+    // create all expected stores if missing (non-destructive)
+    stores.forEach(name => {
+      if (!db.objectStoreNames.contains(name)) {
+        db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+      }
+    });
+    // expense_categories uses name as primary key (keep existing behaviour)
+    if (!db.objectStoreNames.contains("expense_categories")) {
+      db.createObjectStore("expense_categories", { keyPath: "name" });
+    }
+  };
 
-    request.onupgradeneeded = e => {
-      db = e.target.result;
-      if (!db.objectStoreNames.contains("expenses")) {
-        db.createObjectStore("expenses", { keyPath: "id", autoIncrement: true });
-      }
-      if (!db.objectStoreNames.contains("expense_categories")) {
-        // Store for custom categories
-        db.createObjectStore("expense_categories", { keyPath: "name" });
-      }
-    };
-    request.onsuccess = e => { 
-      db = e.target.result; 
-      loadInitialData();
-    };
-    request.onerror = e => console.error("DB error:", e.target.error);
+  request.onsuccess = e => {
+    db = e.target.result;
+    // log unexpected close/abort for debugging
+    db.onversionchange = () => { db.close(); console.warn('DB version change - connection closed'); };
+    loadInitialData();
+  };
+  request.onerror = e => console.error("DB error:", e.target.error);
 
     // --- Modal Handling ---
     const modal = document.getElementById('expenseModal');
@@ -458,7 +464,8 @@
     // --- CRUD Operations ---
     saveBtn.onclick = async () => {
       const title = form.title.value.trim();
-      const amount = parseFloat(form.amount.value);
+      const amountRaw = form.amount.value.trim();
+      const amount = amountRaw === "" ? NaN : Number(parseFloat(amountRaw));
       const category = form.category.value.trim();
       const date = form.date.value;
 
@@ -466,26 +473,44 @@
         alert("Please fill all fields correctly.");
         return;
       }
-      
+
       const editId = saveBtn.dataset.editId;
       const tx = db.transaction(["expenses", "expense_categories"], "readwrite");
       const expensesStore = tx.objectStore("expenses");
-      
-      const expenseData = { title, amount, category, date };
-      if (editId) {
-        expenseData.id = Number(editId);
-        expensesStore.put(expenseData);
-      } else {
-        expensesStore.add(expenseData);
-      }
 
-      // Add new category if it doesn't exist
-      tx.objectStore("expense_categories").put({ name: category });
-
-      tx.oncomplete = () => {
-        closeModal();
-        loadInitialData(); // Reload everything to reflect changes
+      // robust error handlers for the transaction
+      tx.onerror = (e) => {
+        console.error("Transaction error saving expense:", e.target.error);
+        alert("Failed to save expense (see console).");
       };
+      tx.onabort = (e) => {
+        console.error("Transaction aborted:", e);
+        alert("Transaction aborted while saving expense.");
+      };
+
+      const expenseData = { title, amount: Number(amount), category, date, updatedAt: new Date().toISOString() };
+      try {
+        if (editId) {
+          expenseData.id = Number(editId);
+          expensesStore.put(expenseData);
+        } else {
+          // ensure we do not accidentally write an invalid id
+          if ('id' in expenseData) delete expenseData.id;
+          expensesStore.add(expenseData);
+        }
+
+        // Add new category if it doesn't exist (safe put)
+        tx.objectStore("expense_categories").put({ name: category });
+
+        tx.oncomplete = () => {
+          closeModal();
+          // refresh categories and dashboard
+          loadInitialData();
+        };
+      } catch (err) {
+        console.error("Unexpected error while saving expense:", err);
+        alert("Failed to save (unexpected error). Check console.");
+      }
     };
 
     function editExpense(id) {
@@ -551,4 +576,3 @@
   </script>
 </body>
 </html>
-```
