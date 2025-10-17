@@ -467,25 +467,47 @@
 
     // --- CRUD Operations ---
     saveBtn.onclick = async () => {
+      console.log("Save button clicked.");
+
+      if (!db) {
+        console.error("IndexedDB not initialized yet. 'db' object is null.");
+        alert("Database is not ready. Please try again in a moment.");
+        return;
+      }
+
       const title = form.title.value.trim();
       const amountRaw = form.amount.value.trim();
       const amount = amountRaw === "" ? NaN : Number(parseFloat(amountRaw));
       const category = form.category.value.trim();
       const date = form.date.value;
 
+      console.log("Form values:", { title, amount, category, date });
+
       if (!title || isNaN(amount) || !category || !date) {
         alert("Please fill all fields correctly.");
+        console.warn("Validation failed: Missing or invalid fields.");
         return;
       }
 
       const editId = saveBtn.dataset.editId;
-      const tx = db.transaction(["expenses", "expense_categories"], "readwrite");
-      const expensesStore = tx.objectStore("expenses");
+      console.log("Edit ID:", editId);
 
-      // robust error handlers for the transaction
+      let tx;
+      try {
+        tx = db.transaction(["expenses", "expense_categories"], "readwrite");
+        console.log("Transaction created successfully.");
+      } catch (e) {
+        console.error("Failed to create transaction:", e);
+        alert("Failed to create database transaction.");
+        return;
+      }
+
+      const expensesStore = tx.objectStore("expenses");
+      const categoriesStore = tx.objectStore("expense_categories");
+
       tx.onerror = (e) => {
         console.error("Transaction error saving expense:", e.target.error);
-        alert("Failed to save expense (see console).");
+        alert(`Failed to save expense: ${e.target.error.message || "Unknown error"}. Check console for details.`);
       };
       tx.onabort = (e) => {
         console.error("Transaction aborted:", e);
@@ -493,26 +515,30 @@
       };
 
       const expenseData = { title, amount: Number(amount), category, date, updatedAt: new Date().toISOString() };
+      console.log("Expense data to save:", expenseData);
+
       try {
         if (editId) {
           expenseData.id = Number(editId);
+          console.log("Attempting to update expense:", expenseData);
           expensesStore.put(expenseData);
         } else {
-          // ensure we do not accidentally write an invalid id
-          if ('id' in expenseData) delete expenseData.id;
+          if ('id' in expenseData) delete expenseData.id; // Ensure autoIncrement works
+          console.log("Attempting to add new expense:", expenseData);
           expensesStore.add(expenseData);
         }
 
         // Add new category if it doesn't exist (safe put)
-        tx.objectStore("expense_categories").put({ name: category });
+        console.log("Attempting to add/update category:", { name: category });
+        categoriesStore.put({ name: category });
 
         tx.oncomplete = () => {
+          console.log("Transaction completed successfully. Expense saved.");
           closeModal();
-          // refresh categories and dashboard
-          loadInitialData();
+          loadInitialData(); // Refresh categories and dashboard
         };
       } catch (err) {
-        console.error("Unexpected error while saving expense:", err);
+        console.error("Unexpected error during IndexedDB operation:", err);
         alert("Failed to save (unexpected error). Check console.");
       }
     };
