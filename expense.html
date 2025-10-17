@@ -277,39 +277,65 @@
         document.body.classList.add("dark");
         toggleBtn.textContent = '☀️';
     }
- // 📦 IndexedDB (v22 unified) - expense must use the exact same DB & stores as other pages
-  let db;
-  const STORES = [
+  const DB_NAME = "ShareHiveDB";
+  const TARGET_VERSION = 22;
+  const REQUIRED_STORES = [
     "notes","bookmarks","videos","todos","expenses","planner","wiki",
     "uploads","projects","watchlist","courses","profile","community"
   ];
-  const request = indexedDB.open("ShareHiveDB", 22);
 
-  request.onupgradeneeded = (e) => {
-    db = e.target.result;
-    // create missing stores non-destructively
-    STORES.forEach(name => {
-      if (!db.objectStoreNames.contains(name)) {
-        db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-      }
+  let db = null;
+  let dbReady = null;
+
+  // open DB and create any missing stores in onupgradeneeded
+  function openAndEnsure(versionTarget = TARGET_VERSION) {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, versionTarget);
+      req.onupgradeneeded = (e) => {
+        const d = e.target.result;
+        REQUIRED_STORES.forEach(name => {
+          if (!d.objectStoreNames.contains(name)) {
+            d.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+          }
+        });
+        if (!d.objectStoreNames.contains("expense_categories")) {
+          d.createObjectStore("expense_categories", { keyPath: "name" });
+        }
+      };
+      req.onsuccess = (e) => {
+        db = e.target.result;
+        db.onversionchange = () => { db.close(); console.warn("DB version change detected, connection closed"); };
+        resolve(db);
+      };
+      req.onerror = (e) => reject(e.target.error || e);
     });
-    // keep expense_categories (string key) if used by this page
-    if (!db.objectStoreNames.contains("expense_categories")) {
-      db.createObjectStore("expense_categories", { keyPath: "name" });
+  }
+
+  // ensure all required stores exist; if not, reopen with higher version to create them
+  async function ensureStoresExist() {
+    if (!db) await openAndEnsure(TARGET_VERSION);
+    const missing = REQUIRED_STORES.filter(s => !db.objectStoreNames.contains(s));
+    const needExpenseCategories = !db.objectStoreNames.contains("expense_categories");
+    if (missing.length === 0 && !needExpenseCategories) return;
+    // close and bump version to force onupgradeneeded
+    const newVersion = (db && db.version ? db.version + 1 : TARGET_VERSION + 1);
+    if (db) db.close();
+    await openAndEnsure(newVersion);
+  }
+
+  // initialize DB on page load
+  dbReady = (async () => {
+    try {
+      await openAndEnsure(TARGET_VERSION);
+      // If stores are missing because DB created earlier with different schema, upgrade
+      await ensureStoresExist();
+      if (typeof loadInitialData === "function") loadInitialData();
+    } catch (err) {
+      console.error("DB init error (expense):", err);
     }
-  };
+  })();
 
-  request.onsuccess = (e) => {
-    db = e.target.result;
-    db.onversionchange = () => { db.close(); console.warn("DB version changed - connection closed"); };
-    // call existing loader if present
-    if (typeof loadInitialData === "function") loadInitialData();
-  };
-
-  request.onerror = (e) => {
-    console.error("IndexedDB open error (expense):", e.target.error);
-  };
-    // --- Modal Handling ---
+  // --- Modal Handling ---
     const modal = document.getElementById('expenseModal');
     const addExpenseBtn = document.getElementById('addExpenseBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -468,6 +494,14 @@
     // --- CRUD Operations ---
     saveBtn.onclick = async () => {
       console.log("Save button clicked.");
+      await dbReady; // wait for DB ready
+      try {
+        await ensureStoresExist(); // ensure stores present (may upgrade DB)
+      } catch (err) {
+        console.error("Failed to ensure DB stores:", err);
+        alert("Database schema error. See console.");
+        return;
+      }
 
       if (!db) {
         console.error("IndexedDB not initialized yet. 'db' object is null.");
@@ -481,25 +515,26 @@
       const category = form.category.value.trim();
       const date = form.date.value;
 
-      console.log("Form values:", { title, amount, category, date });
-
       if (!title || isNaN(amount) || !category || !date) {
         alert("Please fill all fields correctly.");
-        console.warn("Validation failed: Missing or invalid fields.");
         return;
       }
 
       const editId = saveBtn.dataset.editId;
-      console.log("Edit ID:", editId);
-
       let tx;
       try {
         tx = db.transaction(["expenses", "expense_categories"], "readwrite");
-        console.log("Transaction created successfully.");
       } catch (e) {
         console.error("Failed to create transaction:", e);
-        alert("Failed to create database transaction.");
-        return;
+        // Attempt one upgrade then retry once
+        try {
+          await ensureStoresExist();
+          tx = db.transaction(["expenses", "expense_categories"], "readwrite");
+        } catch (err) {
+          console.error("Retry failed to create transaction:", err);
+          alert("Failed to create database transaction. See console.");
+          return;
+        }
       }
 
       const expensesStore = tx.objectStore("expenses");
@@ -507,7 +542,7 @@
 
       tx.onerror = (e) => {
         console.error("Transaction error saving expense:", e.target.error);
-        alert(`Failed to save expense: ${e.target.error.message || "Unknown error"}. Check console for details.`);
+        alert(`Failed to save expense: ${e.target.error?.message || "Unknown error"}. Check console.`);
       };
       tx.onabort = (e) => {
         console.error("Transaction aborted:", e);
@@ -515,27 +550,21 @@
       };
 
       const expenseData = { title, amount: Number(amount), category, date, updatedAt: new Date().toISOString() };
-      console.log("Expense data to save:", expenseData);
 
       try {
         if (editId) {
           expenseData.id = Number(editId);
-          console.log("Attempting to update expense:", expenseData);
           expensesStore.put(expenseData);
         } else {
-          if ('id' in expenseData) delete expenseData.id; // Ensure autoIncrement works
-          console.log("Attempting to add new expense:", expenseData);
+          if ('id' in expenseData) delete expenseData.id;
           expensesStore.add(expenseData);
         }
-
-        // Add new category if it doesn't exist (safe put)
-        console.log("Attempting to add/update category:", { name: category });
         categoriesStore.put({ name: category });
 
         tx.oncomplete = () => {
           console.log("Transaction completed successfully. Expense saved.");
           closeModal();
-          loadInitialData(); // Refresh categories and dashboard
+          if (typeof loadInitialData === "function") loadInitialData();
         };
       } catch (err) {
         console.error("Unexpected error during IndexedDB operation:", err);
