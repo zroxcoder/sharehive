@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>ShareHive - To-Do List</title>
   <style>
-    /* --- Base & Theme (Unchanged) --- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -32,7 +31,6 @@
       --shadow-color: rgba(0,0,0,0.2);
     }
 
-    /* --- Navbar & Sidebar (Unchanged) --- */
     .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--primary-color); color: white; }
     .navbar h1 { font-size: 20px; }
     .toggle-btn { background: white; border: none; color: var(--primary-color); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
@@ -42,15 +40,12 @@
     .sidebar a { display: block; text-decoration: none; color: var(--text-color); padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; }
     .sidebar a:hover { background: var(--primary-color); color: white; }
 
-    /* --- Main Content Area (Modernized) --- */
     .main { flex: 1; padding: 25px; overflow-y: auto; max-width: 800px; margin: 0 auto; }
-    
-    .add-task-form { 
-      display: flex; gap: 10px; margin-bottom: 30px; 
-    }
-    .add-task-form input { 
-      flex: 1; padding: 12px 15px; font-size: 16px; 
-      border: 1px solid var(--border-color); border-radius: 8px; 
+
+    .add-task-form { display: flex; gap: 10px; margin-bottom: 30px; }
+    .add-task-form input {
+      flex: 1; padding: 12px 15px; font-size: 16px;
+      border: 1px solid var(--border-color); border-radius: 8px;
       background: var(--card-bg); color: var(--text-color);
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -59,44 +54,33 @@
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.2);
     }
-    .add-task-form button { 
-      padding: 12px 20px; border: none; background: var(--primary-color); 
+    .add-task-form button {
+      padding: 12px 20px; border: none; background: var(--primary-color);
       color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;
       transition: background-color 0.2s;
     }
     .add-task-form button:hover { background-color: #005fcc; }
 
     .tasks-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-color);
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);
     }
     .tasks-header h2 { font-size: 20px; margin: 0; }
     .tasks-header .counter { font-size: 14px; background: #eee; color: #555; padding: 3px 8px; border-radius: 12px; }
     body.dark .tasks-header .counter { background: #444; color: #ccc; }
     .clear-btn { background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: bold; }
 
-    /* --- Task List & Items (Modernized) --- */
     .tasks-list { list-style: none; padding: 0; margin-top: 15px; }
     .task {
       display: flex; align-items: center; padding: 12px;
       background: var(--card-bg); border-radius: 8px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 8px var(--shadow-color);
+      margin-bottom: 10px; box-shadow: 0 2px 8px var(--shadow-color);
       transition: background-color 0.2s, opacity 0.3s;
     }
     .task-content { flex: 1; margin: 0 10px; }
-
-    /* Edit Mode */
-    .task .edit-input { width: 100%; font-size: 16px; border: none; background: transparent; color: var(--text-color); outline: none; border-bottom: 2px solid var(--primary-color); }
-    
-    /* Completed State */
     .task.done { opacity: 0.6; }
     .task.done .task-content { text-decoration: line-through; }
-    
+
     .actions { display: flex; gap: 8px; }
     .actions button {
       background: none; border: none; cursor: pointer; font-size: 20px;
@@ -106,80 +90,61 @@
     .actions .edit-btn:hover { color: var(--primary-color); }
     .actions .delete-btn:hover { color: var(--danger-color); }
 
-    /* Custom Checkbox */
     .task input[type="checkbox"] { display: none; }
     .task .custom-checkbox {
-        width: 22px; height: 22px; border: 2px solid var(--border-color);
-        border-radius: 50%; cursor: pointer; display: inline-block;
-        transition: border-color 0.2s, background-color 0.2s;
-        position: relative;
+      width: 22px; height: 22px; border: 2px solid var(--border-color);
+      border-radius: 50%; cursor: pointer; display: inline-block;
+      transition: border-color 0.2s, background-color 0.2s; position: relative;
     }
     .task input[type="checkbox"]:checked + .custom-checkbox {
-        background-color: var(--success-color);
-        border-color: var(--success-color);
+      background-color: var(--success-color); border-color: var(--success-color);
     }
     .task input[type="checkbox"]:checked + .custom-checkbox::after {
-        content: '✔';
-        color: white;
-        font-size: 14px;
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
+      content: '✔'; color: white; font-size: 14px;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     }
 
-    /* --- Animations --- */
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeOutUp {
-      from { opacity: 1; transform: scale(1); }
-      to { opacity: 0; transform: scale(0.9); }
-    }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOutUp { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.9); } }
     .task.adding { animation: fadeInDown 0.3s ease-out forwards; }
     .task.deleting { animation: fadeOutUp 0.3s ease-in forwards; }
-
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <div class="navbar">
     <h1>🐝 ShareHive - To-Do List</h1>
     <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
   </div>
 
   <div class="container">
-    <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Sidebar content remains the same -->
-        <h2>Menu</h2>
-        <a href="index.html">🏠 Dashboard</a>
-        <a href="notes.html">📝 Notes</a>
-        <a href="bookmarks.html">🔖 Bookmarks</a>
-        <a href="videos.html">🎬 Video Links</a>
-        <a href="todo.html"><b>✅ To-Do List</b></a>
-        <a href="expense.html">💰 Expense Tracker</a>
-        <a href="planner.html">📅 Planner</a>
-        <a href="wiki.html">📖 Wiki</a>
-        <a href="uploads.html">📂 Upload Files</a>
-        <a href="projects.html">📌 Projects</a>
-        <a href="watchlist.html">🎥 Watchlist</a>
-        <a href="courses.html">📚 Courses</a>
-        <a href="profile.html">👤 Profile</a>
-        <a href="settings.html">⚙️ Settings</a>
-        <hr>
-        <a href="about.html">ℹ️ About</a>
-        <a href="help.html">❓ Help</a>
-        <a href="faq.html">❔ FAQ</a>
-        <a href="blog.html">📰 Blog</a>
-        <a href="contact.html">✉️ Contact</a>
-        <a href="join.html">🤝 Join Us</a>
-        <a href="report.html">🐞 Report</a>
-        <a href="privacy.html">📜 Privacy & Policy</a>
-        <a href="community.html">🌍 Community</a>
+      <h2>Menu</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="notes.html">📝 Notes</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
+      <a href="videos.html">🎬 Video Links</a>
+      <a href="todo.html"><b>✅ To-Do List</b></a>
+      <a href="expense.html">💰 Expense Tracker</a>
+      <a href="planner.html">📅 Planner</a>
+      <a href="wiki.html">📖 Wiki</a>
+      <a href="uploads.html">📂 Upload Files</a>
+      <a href="projects.html">📌 Projects</a>
+      <a href="watchlist.html">🎥 Watchlist</a>
+      <a href="courses.html">📚 Courses</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <hr>
+      <a href="about.html">ℹ️ About</a>
+      <a href="help.html">❓ Help</a>
+      <a href="faq.html">❔ FAQ</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">✉️ Contact</a>
+      <a href="join.html">🤝 Join Us</a>
+      <a href="report.html">🐞 Report</a>
+      <a href="privacy.html">📜 Privacy & Policy</a>
+      <a href="community.html">🌍 Community</a>
     </div>
 
-    <!-- Main -->
     <div class="main">
       <form id="todoForm" class="add-task-form">
         <input type="text" id="todoInput" placeholder="e.g., Finish the project report">
@@ -207,227 +172,154 @@
     </div>
   </div>
 
-  <script>
-  // 🌙 Dark Mode
-  const toggleBtn = document.querySelector('.toggle-btn');
-  function toggleTheme() {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-    toggleBtn.textContent = isDark ? '☀️' : '🌙';
-  }
-  if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark");
-      toggleBtn.textContent = '☀️';
-  }
+<script>
+/* 🌙 THEME HANDLING */
+const toggleBtn = document.querySelector('.toggle-btn');
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  const isDark = document.body.classList.contains("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  toggleBtn.textContent = isDark ? '☀️' : '🌙';
+}
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+  toggleBtn.textContent = '☀️';
+}
 
-  // IndexedDB initialization - use same DB + stores as other pages
-  let db;
-  const STORES = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
-  const request = indexedDB.open("ShareHiveDB", 22);
+/* 📦 IndexedDB v22 unified setup */
+let db;
+const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
+const request = indexedDB.open("ShareHiveDB", 22);
 
-  request.onupgradeneeded = e => {
-    const d = e.target.result;
-    // create all expected stores non-destructively
-    STORES.forEach(name => {
-      if (!d.objectStoreNames.contains(name)) {
-        d.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-      }
-    });
-    // keep expense_categories if used
-    if (!d.objectStoreNames.contains("expense_categories")) {
-      d.createObjectStore("expense_categories", { keyPath: "name" });
+request.onupgradeneeded = e => {
+  const d = e.target.result;
+  stores.forEach(name => {
+    if (!d.objectStoreNames.contains(name)) {
+      d.createObjectStore(name, { keyPath: "id", autoIncrement: true });
     }
-  };
+  });
+  if (!d.objectStoreNames.contains("expense_categories")) {
+    d.createObjectStore("expense_categories", { keyPath: "name" });
+  }
+};
+request.onsuccess = e => { db = e.target.result; displayTodos(); };
+request.onerror = e => console.error("DB error (todo):", e.target.error);
 
-  request.onsuccess = e => {
-    db = e.target.result;
-    db.onversionchange = () => { db.close(); console.warn("DB version change - connection closed"); };
+/* 📝 CRUD Functions */
+function saveTodo(e) {
+  e.preventDefault();
+  const title = document.getElementById("todoInput").value.trim();
+  if (!title || !db) return;
+
+  const todo = { title, completed: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  const tx = db.transaction("todos", "readwrite");
+  tx.objectStore("todos").add(todo);
+  tx.oncomplete = () => {
+    document.getElementById("todoInput").value = "";
     displayTodos();
   };
+}
 
-  request.onerror = e => console.error("DB open error (todo):", e.target.error);
+function displayTodos() {
+  if (!db) return;
+  const tx = db.transaction("todos", "readonly");
+  const req = tx.objectStore("todos").getAll();
+  req.onsuccess = e => {
+    const todos = e.target.result || [];
+    const pending = todos.filter(t => !t.completed);
+    const completed = todos.filter(t => t.completed);
 
-  // Save todo - ensure DB ready and handle transaction errors
-  async function saveTodo(e) {
-    e.preventDefault();
-    const title = document.getElementById("todoInput").value.trim();
-    if (!title) return;
+    const pendingList = document.getElementById("pending-tasks-list");
+    const completedList = document.getElementById("completed-tasks-list");
+    pendingList.innerHTML = "";
+    completedList.innerHTML = "";
 
-    if (!db) {
-      alert("Database not ready yet. Please wait a moment and try again.");
-      return;
-    }
+    pending.forEach(t => pendingList.appendChild(createTaskElement(t)));
+    completed.forEach(t => completedList.appendChild(createTaskElement(t)));
 
-    const todo = { title, completed: false, timestamp: new Date().toISOString() };
+    document.getElementById("pending-count").textContent = pending.length;
+    document.getElementById("completed-count").textContent = completed.length;
+    document.getElementById("completed-tasks").style.display = completed.length ? "block" : "none";
+  };
+}
 
-    let tx;
-    try {
-      tx = db.transaction("todos", "readwrite");
-    } catch (err) {
-      console.error("Failed to create transaction, attempting upgrade:", err);
-      // try reopening/upgrading once
-      try {
-        db.close();
-        await new Promise((res, rej) => {
-          const r = indexedDB.open("ShareHiveDB", (db && db.version ? db.version + 1 : 23));
-          r.onupgradeneeded = ev => {
-            const d = ev.target.result;
-            STORES.forEach(name => {
-              if (!d.objectStoreNames.contains(name)) d.createObjectStore(name, { keyPath: "id", autoIncrement: true });
-            });
-            if (!d.objectStoreNames.contains("expense_categories")) d.createObjectStore("expense_categories", { keyPath: "name" });
-          };
-          r.onsuccess = ev => { db = ev.target.result; res(); };
-          r.onerror = ev => rej(ev.target.error);
-        });
-        tx = db.transaction("todos", "readwrite");
-      } catch (err2) {
-        console.error("Retry failed:", err2);
-        alert("Failed to create database transaction. See console.");
-        return;
-      }
-    }
+function createTaskElement(todo) {
+  const li = document.createElement("li");
+  li.className = "task" + (todo.completed ? " done" : "");
+  const checkboxId = `chk-${todo.id}`;
+  li.innerHTML = `
+    <label style="display:flex;align-items:center;gap:10px;width:100%;">
+      <input id="${checkboxId}" type="checkbox" ${todo.completed ? 'checked' : ''} style="display:none;">
+      <span class="custom-checkbox" data-id="${todo.id}"></span>
+      <div class="task-content">${escapeHTML(todo.title)}</div>
+      <div class="actions">
+        <button class="edit-btn" data-id="${todo.id}" title="Edit">✏️</button>
+        <button class="delete-btn" data-id="${todo.id}" title="Delete">🗑️</button>
+      </div>
+    </label>
+  `;
+  li.querySelector('.custom-checkbox').addEventListener('click', e => toggleTodo(Number(e.currentTarget.dataset.id)));
+  li.querySelector('.delete-btn').addEventListener('click', e => { e.stopPropagation(); deleteTodo(Number(e.currentTarget.dataset.id)); });
+  li.querySelector('.edit-btn').addEventListener('click', e => { e.stopPropagation(); editTodo(Number(e.currentTarget.dataset.id)); });
+  return li;
+}
 
-    const store = tx.objectStore("todos");
-    const addReq = store.add(todo);
+function toggleTodo(id) {
+  const tx = db.transaction("todos", "readwrite");
+  const store = tx.objectStore("todos");
+  const req = store.get(id);
+  req.onsuccess = e => {
+    const todo = e.target.result;
+    if (!todo) return;
+    todo.completed = !todo.completed;
+    todo.updatedAt = new Date().toISOString();
+    store.put(todo);
+  };
+  tx.oncomplete = () => displayTodos();
+}
 
-    addReq.onsuccess = () => {
-      document.getElementById("todoInput").value = "";
-    };
-    tx.oncomplete = () => displayTodos();
-    tx.onerror = (ev) => {
-      console.error("Transaction error saving todo:", ev.target.error);
-      alert("Failed to save todo. See console.");
-    };
-  }
+function deleteTodo(id) {
+  if (!confirm("Delete this task?")) return;
+  const tx = db.transaction("todos", "readwrite");
+  tx.objectStore("todos").delete(id);
+  tx.oncomplete = () => displayTodos();
+}
 
-  // Display todos (split pending/completed)
-  function displayTodos() {
-    if (!db) return;
-    const tx = db.transaction("todos", "readonly");
-    const store = tx.objectStore("todos");
-    const req = store.getAll();
+function editTodo(id) {
+  const tx = db.transaction("todos", "readonly");
+  const store = tx.objectStore("todos");
+  const req = store.get(id);
+  req.onsuccess = e => {
+    const todo = e.target.result;
+    if (!todo) return;
+    const newTitle = prompt("Edit task", todo.title);
+    if (!newTitle) return;
+    todo.title = newTitle.trim();
+    todo.updatedAt = new Date().toISOString();
+    const tx2 = db.transaction("todos", "readwrite");
+    tx2.objectStore("todos").put(todo);
+    tx2.oncomplete = () => displayTodos();
+  };
+}
 
-    req.onsuccess = (e) => {
-      const todos = e.target.result || [];
-      const pendingList = document.getElementById("pending-tasks-list");
-      const completedList = document.getElementById("completed-tasks-list");
-      pendingList.innerHTML = "";
-      completedList.innerHTML = "";
+function clearCompletedTasks() {
+  if (!confirm("Clear all completed tasks?")) return;
+  const tx = db.transaction("todos", "readwrite");
+  const store = tx.objectStore("todos");
+  store.openCursor().onsuccess = e => {
+    const cursor = e.target.result;
+    if (!cursor) return;
+    if (cursor.value.completed) cursor.delete();
+    cursor.continue();
+  };
+  tx.oncomplete = () => displayTodos();
+}
 
-      const pending = todos.filter(t => !t.completed);
-      const completed = todos.filter(t => t.completed);
+function escapeHTML(s = "") {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-      pending.forEach(t => pendingList.appendChild(createTaskElement(t)));
-      completed.forEach(t => completedList.appendChild(createTaskElement(t)));
-
-      document.getElementById("pending-count").textContent = pending.length;
-      document.getElementById("completed-count").textContent = completed.length;
-      document.getElementById("completed-tasks").style.display = completed.length ? "block" : "none";
-    };
-
-    req.onerror = (e) => console.error("Failed to read todos:", e.target.error);
-  }
-
-  function createTaskElement(todo) {
-    const li = document.createElement("li");
-    li.className = "task" + (todo.completed ? " done" : "");
-    // checkbox + custom-checkbox pattern
-    const checkboxId = `chk-${todo.id}`;
-    li.innerHTML = `
-      <label style="display:flex;align-items:center;gap:10px;width:100%;">
-        <input id="${checkboxId}" type="checkbox" ${todo.completed ? 'checked' : ''} style="display:none;">
-        <span class="custom-checkbox" data-id="${todo.id}"></span>
-        <div class="task-content">${escapeHTML(todo.title)}</div>
-        <div class="actions">
-          <button class="edit-btn" data-id="${todo.id}" title="Edit">✏️</button>
-          <button class="delete-btn" data-id="${todo.id}" title="Delete">🗑️</button>
-        </div>
-      </label>
-    `;
-    // events
-    li.querySelector('.custom-checkbox').addEventListener('click', (e) => {
-      const id = Number(e.currentTarget.dataset.id);
-      toggleTodo(id);
-    });
-    li.querySelector('.delete-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      deleteTodo(Number(e.currentTarget.dataset.id));
-    });
-    li.querySelector('.edit-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      startEditTask(Number(e.currentTarget.dataset.id));
-    });
-    return li;
-  }
-
-  // toggle complete
-  function toggleTodo(id) {
-    if (!db) return;
-    const tx = db.transaction("todos", "readwrite");
-    const store = tx.objectStore("todos");
-    const req = store.get(Number(id));
-    req.onsuccess = (e) => {
-      const rec = e.target.result;
-      if (!rec) return;
-      rec.completed = !rec.completed;
-      rec.updatedAt = new Date().toISOString();
-      store.put(rec);
-    };
-    tx.oncomplete = () => displayTodos();
-    tx.onerror = (e) => console.error("Toggle todo error:", e.target.error);
-  }
-
-  // delete
-  function deleteTodo(id) {
-    if (!db) return;
-    if (!confirm("Delete this task?")) return;
-    const tx = db.transaction("todos", "readwrite");
-    tx.objectStore("todos").delete(Number(id));
-    tx.oncomplete = () => displayTodos();
-    tx.onerror = (e) => console.error("Delete todo error:", e.target.error);
-  }
-
-  // edit flow (inline simple)
-  function startEditTask(id) {
-    if (!db) return;
-    const tx = db.transaction("todos", "readonly");
-    tx.objectStore("todos").get(Number(id)).onsuccess = (e) => {
-      const rec = e.target.result;
-      if (!rec) return;
-      const newTitle = prompt("Edit task", rec.title);
-      if (!newTitle) return;
-      rec.title = newTitle.trim();
-      rec.updatedAt = new Date().toISOString();
-      const tx2 = db.transaction("todos", "readwrite");
-      tx2.objectStore("todos").put(rec);
-      tx2.oncomplete = () => displayTodos();
-      tx2.onerror = (ev) => console.error("Update task error:", ev.target.error);
-    };
-  }
-
-  function clearCompletedTasks() {
-    if (!db) return;
-    if (!confirm("Clear all completed tasks?")) return;
-    const tx = db.transaction("todos", "readwrite");
-    const store = tx.objectStore("todos");
-    store.openCursor().onsuccess = (e) => {
-      const cursor = e.target.result;
-      if (!cursor) return;
-      const value = cursor.value;
-      if (value.completed) cursor.delete();
-      cursor.continue();
-    };
-    tx.oncomplete = () => displayTodos();
-  }
-
-  // escape helper
-  function escapeHTML(s = "") { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-  // Add event listener to the form
-  document.getElementById("todoForm").addEventListener("submit", saveTodo);
-
+document.getElementById("todoForm").addEventListener("submit", saveTodo);
 </script>
 </body>
 </html>
