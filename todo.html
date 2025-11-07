@@ -181,10 +181,10 @@
 
     <!-- Main -->
     <div class="main">
-      <div class="add-task-form">
-        <input type="text" id="taskInput" placeholder="e.g., Finish the project report">
-        <button id="addTaskBtn">Add Task</button>
-      </div>
+      <form id="todoForm" class="add-task-form">
+        <input type="text" id="todoInput" placeholder="e.g., Finish the project report">
+        <button type="submit" id="addTaskBtn">Add Task</button>
+      </form>
 
       <div id="pending-tasks">
         <div class="tasks-header">
@@ -220,185 +220,75 @@
         document.body.classList.add("dark");
         toggleBtn.textContent = '☀️';
     }
- // 📦 IndexedDB (v21 unified)
+
+    // IndexedDB initialization
     let db;
     const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
     const request = indexedDB.open("ShareHiveDB", 22);
 
     request.onupgradeneeded = e => {
       db = e.target.result;
+      // Create todos store if it doesn't exist
       if (!db.objectStoreNames.contains("todos")) {
-        // 'text' can be an index if we want to search, but not required for this app
         db.createObjectStore("todos", { keyPath: "id", autoIncrement: true });
       }
     };
-    request.onsuccess = e => { db = e.target.result; displayTasks(); };
+
+    request.onsuccess = e => { 
+      db = e.target.result;
+      displayTodos(); // Display existing todos when DB loads
+    };
+
     request.onerror = e => console.error("DB error:", e.target.error);
 
-    // --- DOM Elements ---
-    const taskInput = document.getElementById('taskInput');
-    const addTaskBtn = document.getElementById('addTaskBtn');
+    // Save todo function
+    function saveTodo(e) {
+      e.preventDefault();
+      const title = document.getElementById("todoInput").value.trim();
+      if (!title) return;
 
-    // --- Main Display Logic ---
-    async function displayTasks() {
+      const todo = {
+        title,
+        completed: false,
+        timestamp: new Date().toISOString()
+      };
+
+      const tx = db.transaction("todos", "readwrite");
+      const store = tx.objectStore("todos");
+      
+      store.add(todo);
+
+      tx.oncomplete = () => {
+        document.getElementById("todoInput").value = "";
+        displayTodos();
+      };
+    }
+
+    // Display todos function
+    function displayTodos() {
       const tx = db.transaction("todos", "readonly");
       const store = tx.objectStore("todos");
-      const allTasks = await new Promise((resolve, reject) => {
-        const req = store.getAll();
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
-
-      const pendingTasks = allTasks.filter(task => !task.done);
-      const completedTasks = allTasks.filter(task => task.done);
       
-      // Update counters
-      document.getElementById('pending-count').textContent = pendingTasks.length;
-      document.getElementById('completed-count').textContent = completedTasks.length;
-
-      // Render lists
-      renderTaskList('pending-tasks-list', pendingTasks);
-      renderTaskList('completed-tasks-list', completedTasks);
-      
-      // Show/hide completed section
-      const completedSection = document.getElementById('completed-tasks');
-      completedSection.style.display = completedTasks.length > 0 ? 'block' : 'none';
-    }
-    
-    function renderTaskList(containerId, tasks) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = ''; // Clear old tasks
-        tasks.forEach(task => {
-            const taskElement = createTaskElement(task);
-            container.appendChild(taskElement);
-        });
-    }
-
-    function createTaskElement(task) {
-        const li = document.createElement('li');
-        li.className = `task ${task.done ? 'done' : ''}`;
-        li.dataset.id = task.id; // Store ID for easier access
+      store.getAll().onsuccess = e => {
+        const todos = e.target.result;
+        const container = document.getElementById("todoList");
+        container.innerHTML = "";
         
-        li.innerHTML = `
-            <label>
-                <input type="checkbox" onchange="toggleComplete(${task.id})" ${task.done ? 'checked' : ''}>
-                <span class="custom-checkbox"></span>
-            </label>
-            <span class="task-content">${task.text}</span>
-            <div class="actions">
-                <button class="edit-btn" onclick="editTask(${task.id}, this)" title="Edit">✏️</button>
-                <button class="delete-btn" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
-            </div>
-        `;
-        return li;
-    }
-    
-    // --- CRUD and Actions ---
-    function addTask() {
-      const taskText = taskInput.value.trim();
-      if (!taskText) return;
-
-      const tx = db.transaction("todos", "readwrite");
-      tx.objectStore("todos").add({ text: taskText, done: false });
-      tx.oncomplete = () => {
-        taskInput.value = "";
-        displayTasks(); // Full refresh to get new item with its ID
+        todos.forEach(todo => {
+          const li = document.createElement("div");
+          li.className = "todo-item";
+          li.innerHTML = `
+            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})">
+            <span class="${todo.completed ? 'completed' : ''}">${todo.title}</span>
+            <button onclick="deleteTodo(${todo.id})">Delete</button>
+          `;
+          container.appendChild(li);
+        });
       };
     }
 
-    addTaskBtn.onclick = addTask;
-    taskInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            addTask();
-        }
-    });
-
-    function toggleComplete(id) {
-      const tx = db.transaction("todos", "readwrite");
-      const store = tx.objectStore("todos");
-      const req = store.get(id);
-      req.onsuccess = () => {
-        const task = req.result;
-        task.done = !task.done;
-        store.put(task);
-      };
-      tx.oncomplete = displayTasks;
-    }
-
-    function deleteTask(id) {
-        const taskElement = document.querySelector(`li[data-id="${id}"]`);
-        if (taskElement) {
-            taskElement.classList.add('deleting');
-            taskElement.addEventListener('animationend', () => {
-                const tx = db.transaction("todos", "readwrite");
-                tx.objectStore("todos").delete(id);
-                tx.oncomplete = displayTasks;
-            }, { once: true });
-        }
-    }
-
-    function editTask(id, btnElement) {
-        const taskElement = btnElement.closest('.task');
-        const contentSpan = taskElement.querySelector('.task-content');
-        const originalText = contentSpan.textContent;
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'edit-input';
-        input.value = originalText;
-
-        contentSpan.replaceWith(input);
-        input.focus();
-        input.select();
-
-        const saveChanges = () => {
-            const newText = input.value.trim();
-            if (newText && newText !== originalText) {
-                updateTaskText(id, newText);
-            } else {
-                // If text is empty or unchanged, revert
-                input.replaceWith(contentSpan);
-            }
-        };
-
-        input.addEventListener('blur', saveChanges);
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') input.blur();
-            if (e.key === 'Escape') {
-                input.replaceWith(contentSpan); // Cancel edit
-            }
-        });
-    }
-
-    function updateTaskText(id, newText) {
-        const tx = db.transaction("todos", "readwrite");
-        const store = tx.objectStore("todos");
-        const req = store.get(id);
-        req.onsuccess = () => {
-            const task = req.result;
-            task.text = newText;
-            store.put(task);
-        };
-        tx.oncomplete = displayTasks;
-    }
-
-    function clearCompletedTasks() {
-        if (!confirm("Are you sure you want to delete all completed tasks?")) return;
-        const tx = db.transaction("todos", "readwrite");
-        const store = tx.objectStore("todos");
-        const req = store.openCursor();
-        req.onsuccess = (e) => {
-            const cursor = e.target.result;
-            if (cursor) {
-                if (cursor.value.done) {
-                    cursor.delete();
-                }
-                cursor.continue();
-            }
-        };
-        tx.oncomplete = displayTasks;
-    }
+    // Add event listener to the form
+    document.getElementById("todoForm").addEventListener("submit", saveTodo);
   </script>
 </body>
 </html>
-```
