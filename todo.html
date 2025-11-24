@@ -198,8 +198,8 @@ request.onupgradeneeded = e => {
       d.createObjectStore(name, { keyPath: "id", autoIncrement: true });
     }
   });
-  if (!d.objectStoreNames.contains("expense_categories")) {
-    d.createObjectStore("expense_categories", { keyPath: "name" });
+  if (!d.objectStoreNames.contains("todo_categories")) {
+    d.createObjectStore("todo_categories", { keyPath: "name" });
   }
 };
 request.onsuccess = e => { db = e.target.result; displayTodos(); };
