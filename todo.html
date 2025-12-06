@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script src="./db.js"></script>
   <title>ShareHive - To-Do List</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -148,7 +149,7 @@
     <div class="main">
       <form id="todoForm" class="add-task-form">
         <input type="text" id="todoInput" placeholder="e.g., Finish the project report">
-        <button type="submit" id="addTaskBtn">Add Task</button>
+        <button type="submit" id="addTaskBtn" disabled>Add Task</button>
       </form>
 
       <div id="pending-tasks">
@@ -186,46 +187,85 @@ if (localStorage.getItem("theme") === "dark") {
   toggleBtn.textContent = '☀️';
 }
 
-/* 📦 IndexedDB v22 unified setup */
-let db;
-const stores = ["notes","bookmarks","videos","todos","expenses","planner","wiki","uploads","projects","watchlist","courses","profile","community"];
-const request = indexedDB.open("ShareHiveDB", 22);
+/* Use shared hiveDB from db.js to avoid version/schema conflicts */
+let db = null;
+function initDB() {
+  return new Promise(async (resolve) => {
+    console.log('todo: initDB start');
+    // If db.js already opened the unified DB, use it
+    if (window.hiveDB) {
+      db = window.hiveDB;
+      db.onversionchange = () => { try { db.close(); } catch (e) {} };
+      displayTodos();
+      console.log('todo: using window.hiveDB');
+      return resolve(db);
+    }
 
-request.onupgradeneeded = e => {
-  const d = e.target.result;
-  stores.forEach(name => {
-    if (!d.objectStoreNames.contains(name)) {
-      d.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+    // If dbHelpers is available, call its ensure method
+    if (window.dbHelpers && typeof window.dbHelpers.ensure === 'function') {
+      try {
+        await window.dbHelpers.ensure();
+        db = window.hiveDB || window.dbHelpers.db || null;
+        if (db) {
+          db.onversionchange = () => { try { db.close(); } catch (e) {} };
+          displayTodos();
+          console.log('todo: dbHelpers.ensure provided db');
+          return resolve(db);
+        }
+      } catch (err) {
+        console.warn('dbHelpers.ensure failed:', err);
+      }
+    }
+
+    // Use dbHelpers as the single source of truth; try to ensure DB is ready
+    try {
+      if (window.dbHelpers && typeof window.dbHelpers.ensure === 'function') {
+        await window.dbHelpers.ensure();
+        db = window.dbHelpers.db || window.hiveDB || null;
+      }
+      if (db) { displayTodos(); console.log('todo: fallback ensure success'); return resolve(db); }
+      console.warn('todo: DB not available after ensure');
+      return resolve(null);
+    } catch (err) {
+      console.error('Fallback ensure failed (todo):', err);
+      return resolve(null);
     }
   });
-  if (!d.objectStoreNames.contains("todo_categories")) {
-    d.createObjectStore("todo_categories", { keyPath: "name" });
+}
+
+// initialize and attach form when ready
+initDB().then((database) => {
+  if (database) {
+    db = database;
+    // enable form button
+    const addBtn = document.getElementById('addTaskBtn');
+    if (addBtn) addBtn.disabled = false;
+  } else {
+    console.warn('todo: DB not available after init');
   }
-};
-request.onsuccess = e => { db = e.target.result; displayTodos(); };
-request.onerror = e => console.error("DB error (todo):", e.target.error);
+});
 
 /* 📝 CRUD Functions */
-function saveTodo(e) {
+async function saveTodo(e) {
   e.preventDefault();
   const title = document.getElementById("todoInput").value.trim();
-  if (!title || !db) return;
+  if (!title) return;
 
   const todo = { title, completed: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-  const tx = db.transaction("todos", "readwrite");
-  tx.objectStore("todos").add(todo);
-  tx.oncomplete = () => {
-    document.getElementById("todoInput").value = "";
-    displayTodos();
-  };
+  if (!window.dbHelpers || typeof window.dbHelpers.addItem !== 'function') return alert('Database helper not available. Reload the page.');
+  try {
+    await window.dbHelpers.addItem('todos', todo);
+    document.getElementById('todoInput').value = '';
+    return displayTodos();
+  } catch (err) {
+    console.error('saveTodo error:', err);
+    return alert('Failed to save todo. See console for details.');
+  }
 }
 
 function displayTodos() {
-  if (!db) return;
-  const tx = db.transaction("todos", "readonly");
-  const req = tx.objectStore("todos").getAll();
-  req.onsuccess = e => {
-    const todos = e.target.result || [];
+  if (!window.dbHelpers || typeof window.dbHelpers.getAll !== 'function') return console.warn('dbHelpers.getAll not available');
+  window.dbHelpers.getAll('todos').then(todos => {
     const pending = todos.filter(t => !t.completed);
     const completed = todos.filter(t => t.completed);
 
@@ -240,7 +280,7 @@ function displayTodos() {
     document.getElementById("pending-count").textContent = pending.length;
     document.getElementById("completed-count").textContent = completed.length;
     document.getElementById("completed-tasks").style.display = completed.length ? "block" : "none";
-  };
+  }).catch(err => console.error('displayTodos error:', err));
 }
 
 function createTaskElement(todo) {
@@ -265,61 +305,78 @@ function createTaskElement(todo) {
 }
 
 function toggleTodo(id) {
-  const tx = db.transaction("todos", "readwrite");
-  const store = tx.objectStore("todos");
-  const req = store.get(id);
-  req.onsuccess = e => {
-    const todo = e.target.result;
+  if (!window.dbHelpers || typeof window.dbHelpers.getItem !== 'function') return console.error('dbHelpers not available');
+  window.dbHelpers.getItem('todos', id).then(todo => {
     if (!todo) return;
     todo.completed = !todo.completed;
     todo.updatedAt = new Date().toISOString();
-    store.put(todo);
-  };
-  tx.oncomplete = () => displayTodos();
+    return window.dbHelpers.updateItem('todos', todo);
+  }).then(() => displayTodos()).catch(err => console.error('toggleTodo error:', err));
 }
 
 function deleteTodo(id) {
   if (!confirm("Delete this task?")) return;
-  const tx = db.transaction("todos", "readwrite");
-  tx.objectStore("todos").delete(id);
-  tx.oncomplete = () => displayTodos();
+  if (!window.dbHelpers || typeof window.dbHelpers.deleteItem !== 'function') return console.error('dbHelpers.deleteItem not available');
+  window.dbHelpers.deleteItem('todos', id).then(() => displayTodos()).catch(err => console.error('deleteTodo error:', err));
 }
 
 function editTodo(id) {
-  const tx = db.transaction("todos", "readonly");
-  const store = tx.objectStore("todos");
-  const req = store.get(id);
-  req.onsuccess = e => {
-    const todo = e.target.result;
+  if (!window.dbHelpers || typeof window.dbHelpers.getItem !== 'function') return console.error('dbHelpers.getItem not available');
+  window.dbHelpers.getItem('todos', id).then(todo => {
     if (!todo) return;
-    const newTitle = prompt("Edit task", todo.title);
+    const newTitle = prompt('Edit task', todo.title);
     if (!newTitle) return;
     todo.title = newTitle.trim();
     todo.updatedAt = new Date().toISOString();
-    const tx2 = db.transaction("todos", "readwrite");
-    tx2.objectStore("todos").put(todo);
-    tx2.oncomplete = () => displayTodos();
-  };
+    return window.dbHelpers.updateItem('todos', todo);
+  }).then(() => displayTodos()).catch(err => console.error('editTodo error:', err));
 }
 
 function clearCompletedTasks() {
   if (!confirm("Clear all completed tasks?")) return;
-  const tx = db.transaction("todos", "readwrite");
-  const store = tx.objectStore("todos");
-  store.openCursor().onsuccess = e => {
-    const cursor = e.target.result;
-    if (!cursor) return;
-    if (cursor.value.completed) cursor.delete();
-    cursor.continue();
-  };
-  tx.oncomplete = () => displayTodos();
+  if (!window.dbHelpers || typeof window.dbHelpers.getAll !== 'function') return console.error('dbHelpers.getAll not available');
+  window.dbHelpers.getAll('todos').then(list => {
+    const deletes = list.filter(t => t.completed).map(t => window.dbHelpers.deleteItem('todos', t.id));
+    return Promise.allSettled(deletes);
+  }).then(() => displayTodos()).catch(err => console.error('clearCompletedTasks error:', err));
 }
 
 function escapeHTML(s = "") {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-document.getElementById("todoForm").addEventListener("submit", saveTodo);
+/* Test compatibility with dbHelpers */
+(async () => {
+  try {
+    const id = await window.dbHelpers.addItem('todo', { title: 'compat test', completed: false, createdAt: new Date().toISOString() });
+    console.log('added todo id:', id);
+    const all = await window.dbHelpers.getAll('todos');
+    console.log('todos now:', all.slice(-5));
+  } catch (err) {
+    console.error('dbHelpers test error:', err);
+  }
+})();
+
+// Attach submit handler after DOM and DB ready; keep a fallback in case init hasn't finished
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('todoForm');
+  const addBtn = document.getElementById('addTaskBtn');
+  // If DB already ready, ensure button enabled
+  if (window.hiveDB || (window.dbHelpers && window.dbHelpers.db)) {
+    if (addBtn) addBtn.disabled = false;
+  }
+  form.addEventListener('submit', async (e) => {
+    // ensure DB available before save
+    if (!db && window.dbHelpers && typeof window.dbHelpers.ensure === 'function') {
+      try { await window.dbHelpers.ensure(); db = window.hiveDB || window.dbHelpers.db || db; } catch (err) { console.warn('ensure before save failed', err); }
+    }
+    saveTodo(e);
+  });
+});
+
+console.log('hiveDB:', window.hiveDB);
+console.log('dbHelpers:', !!window.dbHelpers, Object.keys(window.dbHelpers || {}));
+console.log('stores:', window.hiveDB ? Array.from(window.hiveDB.objectStoreNames) : 'no hiveDB');
 </script>
 </body>
 </html>
